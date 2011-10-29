@@ -12,8 +12,8 @@ namespace Shipping {
 
 /************************** NETWORK **************************/
 
-  class Network : Fwk::NamedInterface {
-    
+  class Network : Fwk::NamedInterface
+	{
   public:
     typedef Fwk::Ptr<Network const> PtrConst;
     typedef Fwk::Ptr<Network> Ptr;
@@ -23,8 +23,8 @@ namespace Shipping {
     Entity::PtrConst entity(Fwk::String _name) const { return entity_[_name]; }
     Entity::Ptr entity(Fwk::String _name) { return entity_[_name]; }
     U32 entities() { return entity_.members(); }
-    Stats::Ptr stats() { return stats_ };
-    Fleet::Ptr fleet() { return fleet_ };
+		Stats::Ptr stats() { return stats_; };
+		Fleet::Ptr fleet() { return fleet_; };
   
     // Attribute Mutators
     Entity::Ptr entityDel(Fwk::String _name);
@@ -34,7 +34,7 @@ namespace Shipping {
       Ptr m = new Network();
       m->referencesDec(1);
       return m;   
-    }
+  	}
 
   protected:  
     EntityMap entity_;
@@ -42,6 +42,63 @@ namespace Shipping {
     Fleet::Ptr fleet_;
     Network( const Network& );
   };
+
+/************************** STATS **************************/
+
+	class Stats : Fwk::NamedInterface
+	{
+	public:
+		typedef Fwk::Ptr<Stats const> PtrConst;
+		typedef Fwk::Ptr<Stats> Ptr;
+	
+		U32 truckSegmentCount() { return truckSegmentCount_; }
+		U32 boatSegmentCount() { return boatSegmentCount_; }
+		U32 planeSegmentCount() { return planeSegmentCount_; }
+		U32 expeditePercentage() { return expeditePercentage_; }
+	
+	private:
+		U32 truckSegmentCount_;
+		U32 boatSegmentCount_;
+		U32 planeSegmentCount_;
+		float expeditePercentage_;
+	};
+
+/************************** FLEET **************************/
+
+	class Fleet : Fwk::NamedInterface
+	{
+	public:
+	  class Speed : public Ordinal<Speed, float> {
+	    Speed(float num) : Ordinal<Cost, float>(num) {
+	      value_ = num;
+	    }    
+	  };
+	  class Cost : public Ordinal<Cost, float> {
+	    Cost(float num) : Ordinal<Cost, float>(num) {
+	      value_ = num;
+	    }    
+	  };
+	  class Capacity : public Ordinal<Cost, int> {
+	    Capacity(int num) : Ordinal<Cost, float>(num) {
+	      value_ = num;
+	    }    
+	  };
+
+		Fleet::Speed truckSpeed() { return truckSpeed_; }
+		Fleet::Speed boatSpeed() { return boatSpeed; }
+		Fleet::Speed planeSpeed() { return planeSpeed; }
+		Fleet::Cost truckCost() { return truckCost_; }
+		Fleet::Cost boatCost() { return boatCost_; }
+		Fleet::Cost planeCost() { return planeCost_; }
+		Fleet::Capacity truckCapacity() { return truckCapacity_; }
+		Fleet::Capacity boatCapacity() { return boatCapacity_; }
+		Fleet::Capacity planeCapacity() { return planeCapacity_; }
+	
+	private:	
+		Speed truckSpeed_, boatSpeed, planeSpeed;
+		Cost truckCost, boatCost, planeCost;
+		Capacity truckCapacity, boatCapacity, planeCapcity;
+	};
 
 /************************** ENTITY **************************/
 
@@ -94,7 +151,7 @@ namespace Shipping {
       ~NotifieeConst();
     protected:
       Entity::PtrConst notifier_; 
-    }
+		};
     
     Entity::NotifieeConst::PtrConst notifiee() const { return notifiee_; }
   protected:
@@ -177,7 +234,7 @@ namespace Shipping {
       virtual void onExpedited() {}
     protected:
       NotifieeConst(Segment::Ptr p) : Entity::Notifee(p) {}
-    }
+	};
  
   protected:
     // Constructors
@@ -221,7 +278,7 @@ namespace Shipping {
       }
     protected:
       NotifieeConst(TruckSegment::Ptr p) : Segment::Notifee(p) {}
-    }
+		};
  
   protected:
     // Constructors
@@ -259,7 +316,7 @@ namespace Shipping {
       }
     protected:
       NotifieeConst(BoatSegment::Ptr p) : Segment::Notifee(p) {}
-    }
+		};
  
   protected:
     // Constructors
@@ -297,7 +354,7 @@ namespace Shipping {
       }
     protected:
       NotifieeConst(PlaneSegment::Ptr p) : Segment::Notifee(p) {}
-    }
+		};
  
   protected:
     // Constructors
@@ -341,7 +398,7 @@ namespace Shipping {
       virtual void onSegmentDel() {}
     protected:
       NotifieeConst(Location::Ptr p) : Entity::Notifee(p) {}
-    }
+		};
     
   protected:  
     SegmentMap segment_;
@@ -372,7 +429,7 @@ namespace Shipping {
 
     protected:
       NotifieeConst(CustomerLocation::Ptr p) : Location::Notifee(p) {}
-    }
+		};
     
     static CustomerLocation::Ptr CustomerLocationIs(Fwk::String _name, Entity::EntityType _type) {
        Ptr m = new CustomerLocation(_name, _type);
@@ -409,7 +466,7 @@ namespace Shipping {
 
     protected:
       NotifieeConst(PortLocation::Ptr p) : Location::Notifee(p) {}
-    }
+		};
     
     static PortLocation::Ptr PortLocationIs(Fwk::String _name, Entity::EntityType _type) {
        Ptr m = new PortLocation(_name, _type);
@@ -446,7 +503,7 @@ namespace Shipping {
 
     protected:
       NotifieeConst(TerminalLocation::Ptr p) : Location::Notifee(p) {}
-    }
+		};
   
   protected:
     TerminalLocation( const TerminalLocation& );
@@ -476,7 +533,7 @@ namespace Shipping {
 
     protected:
       NotifieeConst(TruckTerminal::Ptr p) : Terminal::Notifee(p) {}
-    }
+		};
     
     static TruckTerminal::Ptr TruckTerminalIs(Fwk::String _name, Entity::EntityType _type) {
        Ptr m = new TruckTerminal(_name, _type);
@@ -513,7 +570,7 @@ namespace Shipping {
 
     protected:
       NotifieeConst(BoatTerminal::Ptr p) : Terminal::Notifee(p) {}
-    }
+		};
     
     static BoatTerminal::Ptr BoatTerminalIs(Fwk::String _name, Entity::EntityType _type) {
        Ptr m = new BoatTerminal(_name, _type);
@@ -550,7 +607,7 @@ namespace Shipping {
 
     protected:
       NotifieeConst(PlaneTerminal::Ptr p) : Terminal::Notifee(p) {}
-    }
+		};
     
     static PlaneTerminal::Ptr PlaneTerminalIs(Fwk::String _name, Entity::EntityType _type) {
        Ptr m = new PlaneTerminal(_name, _type);
