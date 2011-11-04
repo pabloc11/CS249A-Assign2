@@ -7,8 +7,137 @@
 #include "PtrInterface.h"
 #include "Instance.h"
 #include "Nominal.h"
+#include "fwk/NamedInterface.h"
+#include "fwk/HashMap.h"
 
 namespace Shipping {
+
+/************************** ENTITY **************************/
+
+  class Entity : Fwk::NamedInterface
+  {
+  public:
+    typedef Fwk::Ptr<Entity const> PtrConst;
+    typedef Fwk::Ptr<Entity> Ptr;
+    
+    enum EntityType {
+       truckSegment_ = 0,
+       boatSegment_ = 1,
+       planeSegment_ = 2,
+       customerLocation_ = 3,
+       portLocation_ = 4,
+       truckTerminal_ = 5,
+       boatTerminal_ = 6,
+       planeTerminal_ = 7
+    };
+
+    EntityType entityType() const { return entityType_; }
+  
+    static inline EntityType truckSegment() { return truckSegment_; }
+    static inline EntityType boatSegment() { return boatSegment_; }
+    static inline EntityType planeSegment() { return planeSegment_; }
+    static inline EntityType customerLocation() { return customerLocation_; }
+    static inline EntityType portLocation() { return portLocation_; }
+    static inline EntityType truckTerminal() { return truckTerminal_; }
+    static inline EntityType boatTerminal() { return boatTerminal_; }
+    static inline EntityType planeTerminal() { return planeTerminal_; }
+    
+    static Entity::Ptr EntityNew(Fwk::String _name, EntityType _type) {
+      Ptr m = new Entity(_name, _type);
+      m->referencesDec(1);
+      return m;   
+    }
+    
+    class NotifieeConst : public virtual Fwk::NamedInterface::NotifieeConst
+    {
+    public:
+      typedef Fwk::Ptr<NotifieeConst const> PtrConst;
+      
+      Entity::PtrConst notifier() const { return notifier_; }
+      virtual void notifierIs(const Entity::PtrConst& _notifier);
+      static NotifieeConst::Ptr NotifieeConstIs() {
+        Ptr m = new NotifieeConst();
+        m->referencesDec(1);
+        // decr. refer count to compensate for initial val of 1
+        return m;
+      }
+      ~NotifieeConst();
+    protected:
+      Entity::PtrConst notifier_; 
+    };
+    
+    Entity::NotifieeConst::PtrConst notifiee() const { return notifiee_; }
+  protected:
+    EntityType entityType_;
+    Entity(Fwk::String, EntityType);
+  
+    void notifieeIs(Entity::NotifieeConst::PtrConst n) const 
+    {
+      Entity* me = const_cast<Entity*>(this);
+      me->notifiee_ = n;
+    }
+    Entity::NotifieeConst::PtrConst notifiee_;
+  };
+
+/************************** STATS **************************/
+
+  class Stats : Fwk::NamedInterface
+  {
+  public:
+    typedef Fwk::Ptr<Stats const> PtrConst;
+    typedef Fwk::Ptr<Stats> Ptr;
+  
+    U32 truckSegmentCount() { return truckSegmentCount_; }
+    U32 boatSegmentCount() { return boatSegmentCount_; }
+    U32 planeSegmentCount() { return planeSegmentCount_; }
+    float expeditePercentage() { return expeditePercentage_; }
+  
+  private:
+    U32 truckSegmentCount_;
+    U32 boatSegmentCount_;
+    U32 planeSegmentCount_;
+    float expeditePercentage_;
+  };
+
+/************************** FLEET **************************/
+
+  class Fleet : Fwk::NamedInterface
+  {
+  public:
+    typedef Fwk::Ptr<Fleet const> PtrConst;
+    typedef Fwk::Ptr<Fleet> Ptr;
+    
+    class Speed : public Ordinal<Speed, float> {
+      Speed(float num) : Ordinal<Speed, float>(num) {
+        value_ = num;
+      }    
+    };
+    class Cost : public Ordinal<Cost, float> {
+      Cost(float num) : Ordinal<Cost, float>(num) {
+        value_ = num;
+      }    
+    };
+    class Capacity : public Ordinal<Capacity, int> {
+      Capacity(int num) : Ordinal<Capacity, int>(num) {
+        value_ = num;
+      }    
+    };
+
+    Fleet::Speed truckSpeed() { return truckSpeed_; }
+    Fleet::Speed boatSpeed() { return boatSpeed_; }
+    Fleet::Speed planeSpeed() { return planeSpeed_; }
+    Fleet::Cost truckCost() { return truckCost_; }
+    Fleet::Cost boatCost() { return boatCost_; }
+    Fleet::Cost planeCost() { return planeCost_; }
+    Fleet::Capacity truckCapacity() { return truckCapacity_; }
+    Fleet::Capacity boatCapacity() { return boatCapacity_; }
+    Fleet::Capacity planeCapacity() { return planeCapacity_; }
+  
+  private:  
+    Speed truckSpeed_, boatSpeed_, planeSpeed_;
+    Cost truckCost_, boatCost_, planeCost_;
+    Capacity truckCapacity_, boatCapacity_, planeCapacity_;
+  };
 
 /************************** NETWORK **************************/
 
@@ -17,7 +146,7 @@ namespace Shipping {
   public:
     typedef Fwk::Ptr<Network const> PtrConst;
     typedef Fwk::Ptr<Network> Ptr;
-    typedef Fwk::HashMap< Entity, Fwk::String, Entity, Entity::PtrConst, Entity::Ptr > EntityMap; 
+    typedef Fwk::HashMap< Entity, Fwk::String, Entity, Entity::PtrConst, Entity::PtrConst > EntityMap; 
   
     // Attribute Accessors
     Entity::PtrConst entity(Fwk::String _name) const { return entity_[_name]; }
@@ -40,139 +169,19 @@ namespace Shipping {
     EntityMap entity_;
     Stats::Ptr stats_;
     Fleet::Ptr fleet_;
+    Network();
     Network( const Network& );
   };
 
-/************************** STATS **************************/
-
-	class Stats : Fwk::NamedInterface
-	{
-	public:
-		typedef Fwk::Ptr<Stats const> PtrConst;
-		typedef Fwk::Ptr<Stats> Ptr;
-	
-		U32 truckSegmentCount() { return truckSegmentCount_; }
-		U32 boatSegmentCount() { return boatSegmentCount_; }
-		U32 planeSegmentCount() { return planeSegmentCount_; }
-		U32 expeditePercentage() { return expeditePercentage_; }
-	
-	private:
-		U32 truckSegmentCount_;
-		U32 boatSegmentCount_;
-		U32 planeSegmentCount_;
-		float expeditePercentage_;
-	};
-
-/************************** FLEET **************************/
-
-	class Fleet : Fwk::NamedInterface
-	{
-	public:
-	  class Speed : public Ordinal<Speed, float> {
-	    Speed(float num) : Ordinal<Cost, float>(num) {
-	      value_ = num;
-	    }    
-	  };
-	  class Cost : public Ordinal<Cost, float> {
-	    Cost(float num) : Ordinal<Cost, float>(num) {
-	      value_ = num;
-	    }    
-	  };
-	  class Capacity : public Ordinal<Cost, int> {
-	    Capacity(int num) : Ordinal<Cost, float>(num) {
-	      value_ = num;
-	    }    
-	  };
-
-		Fleet::Speed truckSpeed() { return truckSpeed_; }
-		Fleet::Speed boatSpeed() { return boatSpeed; }
-		Fleet::Speed planeSpeed() { return planeSpeed; }
-		Fleet::Cost truckCost() { return truckCost_; }
-		Fleet::Cost boatCost() { return boatCost_; }
-		Fleet::Cost planeCost() { return planeCost_; }
-		Fleet::Capacity truckCapacity() { return truckCapacity_; }
-		Fleet::Capacity boatCapacity() { return boatCapacity_; }
-		Fleet::Capacity planeCapacity() { return planeCapacity_; }
-	
-	private:	
-		Speed truckSpeed_, boatSpeed, planeSpeed;
-		Cost truckCost, boatCost, planeCost;
-		Capacity truckCapacity, boatCapacity, planeCapcity;
-	};
-
-/************************** ENTITY **************************/
-
-  class Entity : Fwk::NamedInterface
-  {
-  public:
-    typedef Fwk::PtrInterface<Entity const> PtrConst;
-    typedef Fwk::PtrInterface<Entity> Ptr;
-    
-    enum EntityType {
-       truckSegment_ = 0,
-       boatSegment_ = 1,
-       planeSegment_ = 2,
-       customerLocation_ = 3,
-       portLocation_ = 4,
-       truckTerminal_ = 5,
-       boatTerminal_ = 6,
-       planeTerminal_ = 7
-    };
-
-    EntityType entityType() const { return entityType_; }
-  
-    static inline EntityType truckSegment_() { return truckSegment_; }
-    static inline EntityType boatSegment_() { return boatSegment_; }
-    static inline EntityType planeSegment_() { return planeSegment_; }
-    static inline EntityType customerLocation_() { return customerLocation_; }
-    static inline EntityType portLocation_() { return portLocation_; }
-    static inline EntityType truckTerminal_() { return truckTerminal_; }
-    static inline EntityType boatTerminal_() { return boatTerminal_; }
-    static inline EntityType planeTerminal_() { return planeTerminal_; }
-    
-    static Entity::Ptr EntityNew(Fwk::String _name, EntityType _type) {
-      Ptr m = new Entity(_name, _type);
-      m->referencesDec(1);
-      return m;   
-    }
-    class NotifieeConst : public virtual Fwk::NamedInterface::NotifieeConst
-    {
-    public:
-      typedef Fwk::PtrInterface<NotifeeConst const> PtrConst;
-      
-      Entity::PtrConst notifier() const { return notifier_; }
-      virtual void notifierIs(const Entity::PtrConst& _notifier);
-      static NotifieeConst::Ptr NotifieeConstIs() {
-        Ptr m = new NotifieeConst();
-        m->referencesDec(1);
-        // decr. refer count to compensate for initial val of 1
-        return m;
-      }
-      ~NotifieeConst();
-    protected:
-      Entity::PtrConst notifier_; 
-		};
-    
-    Entity::NotifieeConst::PtrConst notifiee() const { return notifiee_; }
-  protected:
-    EntityType entityType_;
-    Entity(Fwk::String, EntityType);
-  
-    void notifieeIs(Entity::NotifieeConst::PtrConst n) const 
-    {
-      Entity* me = const_cast<Entity*>(this);
-      me->notifiee_ = n;
-    }
-    Entity::NotifieeConst::PtrConst notifiee_;
-  };
+  class Location;
 
 /************************** SEGMENT **************************/
 
   class Segment : Entity 
   {
   public:
-    typedef Fwk::PtrInterface<Segment const> PtrConst;
-    typedef Fwk::PtrInterface<Segment> Ptr;
+    typedef Fwk::Ptr<Segment const> PtrConst;
+    typedef Fwk::Ptr<Segment> Ptr;
 
     class Difficulty : public Ordinal<Difficulty, float> 
     {
@@ -196,16 +205,16 @@ namespace Shipping {
     static inline Expedited notExpedited() { return notExpedited_; }
 
     // Attribute Accessors
-    Location::PtrConst source() const { return source_; }
+    Fwk::Ptr<Location const> source() const { return source_; }
     Segment::PtrConst returnSegment() const { return returnSegment_; }
     Difficulty difficulty() const { return difficulty_; }
     Expedited expeditedState() const { return expeditedState_; }
     
     // Attribute Mutators
-    void sourceIs()(Location::PtrConst _source);
-    void returnSegmentIs() (Segment::PtrConst _returnSegment);
-    void difficultyIs() (Difficulty _difficulty);
-    void expeditedIs() (Expedited _expedited);
+    void sourceIs(Fwk::Ptr<Location const> _source);
+    void returnSegmentIs(Segment::PtrConst _returnSegment);
+    void difficultyIs(Difficulty _difficulty);
+    void expeditedIs(Expedited _expedited);
  
     // public constructor
     static Segment::Ptr SegmentIs(Fwk::String _name) {
@@ -218,7 +227,7 @@ namespace Shipping {
     class NotifieeConst : public virtual Entity::NotifieeConst
     {
     public:
-      typedef Fwk::PtrInterface<NotifeeConst const> PtrConst;
+      typedef Fwk::Ptr<NotifieeConst const> PtrConst;
       
       Segment::PtrConst notifier() const { return dynamic_cast<Segment const *>(Entity::NotifieeConst::notifier().ptr()); }
       static NotifieeConst::Ptr NotifieeConstIs(Segment::Ptr p) 
@@ -242,7 +251,7 @@ namespace Shipping {
     Segment(Fwk::String _name);
 
     // Attributes
-    Location::PtrConst source_;
+    Fwk::Ptr<Location const> source_;
     Segment::PtrConst returnSegment_;
     Difficulty difficulty_;
     Expedited expeditedState_;
@@ -253,8 +262,8 @@ namespace Shipping {
   class TruckSegment : Segment
   {
   public:
-    typedef Fwk::PtrInterface<Segment const> PtrConst;
-    typedef Fwk::PtrInterface<Segment> Ptr;
+    typedef Fwk::Ptr<Segment const> PtrConst;
+    typedef Fwk::Ptr<Segment> Ptr;
 
     // public constructor
     static TruckSegment::Ptr TruckSegmentIs(Fwk::String _name) {
@@ -267,7 +276,7 @@ namespace Shipping {
     class NotifieeConst : public virtual Segment::NotifieeConst
     {
     public:
-      typedef Fwk::PtrInterface<NotifeeConst const> PtrConst;
+      typedef Fwk::Ptr<NotifieeConst const> PtrConst;
       
       Segment::PtrConst notifier() const { return dynamic_cast<TruckSegment const *>(Segment::NotifieeConst::notifier().ptr()); }
       static NotifieeConst::Ptr NotifieeConstIs(TruckSegment::Ptr p) 
@@ -291,8 +300,8 @@ namespace Shipping {
   class BoatSegment : Segment
   {
   public:
-    typedef Fwk::PtrInterface<Segment const> PtrConst;
-    typedef Fwk::PtrInterface<Segment> Ptr;
+    typedef Fwk::Ptr<Segment const> PtrConst;
+    typedef Fwk::Ptr<Segment> Ptr;
 
     // public constructor
     static BoatSegment::Ptr BoatSegmentIs(Fwk::String _name) {
@@ -305,7 +314,7 @@ namespace Shipping {
     class NotifieeConst : public virtual Segment::NotifieeConst
     {
     public:
-      typedef Fwk::PtrInterface<NotifeeConst const> PtrConst;
+      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
       
       Segment::PtrConst notifier() const { return dynamic_cast<BoatSegment const *>(Segment::NotifieeConst::notifier().ptr()); }
       static NotifieeConst::Ptr NotifieeConstIs(BoatSegment::Ptr p) 
@@ -329,8 +338,8 @@ namespace Shipping {
   class PlaneSegment : Segment
   {
   public:
-    typedef Fwk::PtrInterface<Segment const> PtrConst;
-    typedef Fwk::PtrInterface<Segment> Ptr;
+    typedef Fwk::Ptr<Segment const> PtrConst;
+    typedef Fwk::Ptr<Segment> Ptr;
 
     // public constructor
     static PlaneSegment::Ptr PlaneSegmentIs(Fwk::String _name) {
@@ -343,7 +352,7 @@ namespace Shipping {
     class NotifieeConst : public virtual Segment::NotifieeConst
     {
     public:
-      typedef Fwk::PtrInterface<NotifeeConst const> PtrConst;
+      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
       
       Segment::PtrConst notifier() const { return dynamic_cast<PlaneSegment const *>(Segment::NotifieeConst::notifier().ptr()); }
       static NotifieeConst::Ptr NotifieeConstIs(PlaneSegment::Ptr p) 
@@ -384,7 +393,7 @@ namespace Shipping {
     class NotifieeConst : public virtual Entity::NotifieeConst
     {
     public:
-      typedef Fwk::PtrInterface<NotifeeConst const> PtrConst;
+      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
       
       Location::PtrConst notifier() const { return dynamic_cast<Location const *>(Entity::NotifieeConst::notifier().ptr()); }
       static NotifieeConst::Ptr NotifieeConstIs(Location::Ptr p) 
@@ -417,7 +426,7 @@ namespace Shipping {
     class NotifieeConst : public virtual Location::NotifieeConst
     {
     public:
-      typedef Fwk::PtrInterface<NotifeeConst const> PtrConst;
+      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
       
       CustomerLocation::PtrConst notifier() const { return dynamic_cast<CustomerLocation const *>(Location::NotifieeConst::notifier().ptr()); }
       static NotifieeConst::Ptr NotifieeConstIs(CustomerLocation::Ptr p) 
@@ -454,7 +463,7 @@ namespace Shipping {
     class NotifieeConst : public virtual Location::NotifieeConst
     {
     public:
-      typedef Fwk::PtrInterface<NotifeeConst const> PtrConst;
+      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
       
       PortLocation::PtrConst notifier() const { return dynamic_cast<PortLocation const *>(Location::NotifieeConst::notifier().ptr()); }
       static NotifieeConst::Ptr NotifieeConstIs(PortLocation::Ptr p) 
@@ -491,7 +500,7 @@ namespace Shipping {
     class NotifieeConst : public virtual Location::NotifieeConst
     {
     public:
-      typedef Fwk::PtrInterface<NotifeeConst const> PtrConst;
+      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
       
       TerminalLocation::PtrConst notifier() const { return dynamic_cast<TerminalLocation const *>(Location::NotifieeConst::notifier().ptr()); }
       static NotifieeConst::Ptr NotifieeConstIs(TerminalLocation::Ptr p) 
