@@ -86,17 +86,37 @@ namespace Shipping {
   public:
     typedef Fwk::Ptr<Stats const> PtrConst;
     typedef Fwk::Ptr<Stats> Ptr;
+
+		class Percent : public Ordinal<Percent, float>
+		{
+	  	Percent(float num) : Ordinal<Percent, float>(num) {
+				if (num < 0.0f) value_ = 0.0;
+				else if (num > 1.0f) value_ = 1.0;
+				else value_ = num;
+		  } 
+		};
   
-    U32 truckSegmentCount() { return truckSegmentCount_; }
-    U32 boatSegmentCount() { return boatSegmentCount_; }
-    U32 planeSegmentCount() { return planeSegmentCount_; }
-    float expeditePercentage() { return expeditePercentage_; }
+		inline U32 truckSegmentCount() const { return truckSegmentCount_; }
+		inline U32 boatSegmentCount() const { return boatSegmentCount_; }
+		inline U32 planeSegmentCount() const { return planeSegmentCount_; }
+		inline U32 customerLocationCount() const { return customerLocationCount_; }
+		inline U32 portLocationCount() const { return portLocationCount_; }
+		inline U32 truckTerminalCount() const { return truckTerminalCount_; }
+		inline U32 boatTerminalCount() const { return boatTerminalCount_; }
+		inline U32 planeTerminalCount() const { return planeTerminalCount_; }
+		inline Percent expeditePercentage();
   
   private:
-    U32 truckSegmentCount_;
-    U32 boatSegmentCount_;
-    U32 planeSegmentCount_;
-    float expeditePercentage_;
+		U32 expeditedCount_;
+
+		U32 truckSegmentCount_;
+		U32 boatSegmentCount_;
+		U32 planeSegmentCount_;
+		U32 customerLocationCount_;
+		U32 portLocationCount_;
+		U32 truckTerminalCount_;
+		U32 boatTerminalCount_;
+		U32 planeTerminalCount_;
   };
 
 /************************** FLEET **************************/
@@ -123,15 +143,15 @@ namespace Shipping {
       }    
     };
 
-    Fleet::Speed truckSpeed() { return truckSpeed_; }
-    Fleet::Speed boatSpeed() { return boatSpeed_; }
-    Fleet::Speed planeSpeed() { return planeSpeed_; }
-    Fleet::Cost truckCost() { return truckCost_; }
-    Fleet::Cost boatCost() { return boatCost_; }
-    Fleet::Cost planeCost() { return planeCost_; }
-    Fleet::Capacity truckCapacity() { return truckCapacity_; }
-    Fleet::Capacity boatCapacity() { return boatCapacity_; }
-    Fleet::Capacity planeCapacity() { return planeCapacity_; }
+    inline Fleet::Speed truckSpeed() const { return truckSpeed_; }
+    inline Fleet::Speed boatSpeed() const { return boatSpeed_; }
+    inline Fleet::Speed planeSpeed() const { return planeSpeed_; }
+    inline Fleet::Cost truckCost() const { return truckCost_; }
+    inline Fleet::Cost boatCost() const { return boatCost_; }
+    inline Fleet::Cost planeCost() const { return planeCost_; }
+    inline Fleet::Capacity truckCapacity() const { return truckCapacity_; }
+    inline Fleet::Capacity boatCapacity() const { return boatCapacity_; }
+    inline Fleet::Capacity planeCapacity() const { return planeCapacity_; }
   
   private:  
     Speed truckSpeed_, boatSpeed_, planeSpeed_;
@@ -149,11 +169,11 @@ namespace Shipping {
     typedef Fwk::HashMap< Entity, Fwk::String, Entity, Entity::PtrConst, Entity::PtrConst > EntityMap; 
   
     // Attribute Accessors
-    Entity::PtrConst entity(Fwk::String _name) const { return entity_[_name]; }
-    Entity::Ptr entity(Fwk::String _name) { return entity_[_name]; }
-    U32 entities() { return entity_.members(); }
-		Stats::Ptr stats() { return stats_; };
-		Fleet::Ptr fleet() { return fleet_; };
+	  inline Entity::PtrConst entity(Fwk::String _name) const { return entity_[_name]; }
+	  inline Entity::Ptr entity(Fwk::String _name) const { return entity_[_name]; }
+	  inline U32 entities() const { return entity_.members(); }
+		inline Stats::Ptr stats() const { return stats_; };
+		inline Fleet::Ptr fleet() const { return fleet_; };
   
     // Attribute Mutators
     Entity::Ptr entityDel(Fwk::String _name);
@@ -201,8 +221,8 @@ namespace Shipping {
       expedited_ = 1,
       notExpedited_ = 0
     };
-    static inline Expedited expedited() { return expedited_; }
-    static inline Expedited notExpedited() { return notExpedited_; }
+    static inline Expedited expedited() const { return expedited_; }
+    static inline Expedited notExpedited() const { return notExpedited_; }
 
     // Attribute Accessors
     Fwk::Ptr<Location const> source() const { return source_; }
@@ -239,8 +259,8 @@ namespace Shipping {
       
       virtual void onSource() {}
       virtual void onReturnSegment() {}
-      virtual void onDifficulty() {}
-      virtual void onExpedited() {}
+      virtual void onExpeditedNew() {}
+			virtual void onExpeditedNew() {}
     protected:
       NotifieeConst(Segment::Ptr p) : Entity::Notifee(p) {}
 	};
@@ -285,6 +305,8 @@ namespace Shipping {
          m->referencesDec(1);
          return m;
       }
+      virtual void onTruckSegmentNew() {}
+			virtual void onTruckSegmentDel() {}
     protected:
       NotifieeConst(TruckSegment::Ptr p) : Segment::Notifee(p) {}
 		};
@@ -323,6 +345,8 @@ namespace Shipping {
          m->referencesDec(1);
          return m;
       }
+      virtual void onBoatSegmentNew() {}
+			virtual void onBoatSegmentDel() {}
     protected:
       NotifieeConst(BoatSegment::Ptr p) : Segment::Notifee(p) {}
 		};
@@ -361,6 +385,8 @@ namespace Shipping {
          m->referencesDec(1);
          return m;
       }
+      virtual void onPlaneSegmentNew() {}
+			virtual void onPlaneSegmentDel() {}
     protected:
       NotifieeConst(PlaneSegment::Ptr p) : Segment::Notifee(p) {}
 		};
@@ -381,9 +407,9 @@ namespace Shipping {
     typedef Fwk::HashMap< Segment, Fwk::String, Segment, Segment::PtrConst, Segment::Ptr > SegmentMap;
     
     // Attribute Accessors
-    Segment::PtrConst segment(Fwk::String _str) const { return segment_[_str]; }
-    Segment::Ptr segment(Fwk::String _str) { return segment_[_str]; }
-    U32 segments() { return segment_.members(); }
+    inline Segment::PtrConst segment(Fwk::String _str) const { return segment_[_str]; }
+    inline Segment::Ptr segment(Fwk::String _str) { return segment_[_str]; }
+    inline U32 segments() { return segment_.members(); }
     
     // Attribute Mutators
     Segment::Ptr segmentDel(Fwk::String _str);
@@ -435,6 +461,8 @@ namespace Shipping {
          m->referencesDec(1);
          return m;
       }
+      virtual void onCustomerLocationNew() {}
+			virtual void onCustomerLocationDel() {}
 
     protected:
       NotifieeConst(CustomerLocation::Ptr p) : Location::Notifee(p) {}
@@ -472,6 +500,8 @@ namespace Shipping {
          m->referencesDec(1);
          return m;
       }
+      virtual void onPortLocationNew() {}
+			virtual void onPortLocationDel() {}
 
     protected:
       NotifieeConst(PortLocation::Ptr p) : Location::Notifee(p) {}
@@ -539,6 +569,8 @@ namespace Shipping {
          m->referencesDec(1);
          return m;
       }
+      virtual void onTruckTerminalNew() {}
+			virtual void onTruckTerminalDel() {}
 
     protected:
       NotifieeConst(TruckTerminal::Ptr p) : Terminal::Notifee(p) {}
@@ -576,6 +608,8 @@ namespace Shipping {
          m->referencesDec(1);
          return m;
       }
+      virtual void onBoatTerminalNew() {}
+			virtual void onBoatTerminalDel() {}
 
     protected:
       NotifieeConst(BoatTerminal::Ptr p) : Terminal::Notifee(p) {}
@@ -613,6 +647,8 @@ namespace Shipping {
          m->referencesDec(1);
          return m;
       }
+      virtual void onPlaneTerminalNew() {}
+			virtual void onPlaneTerminalDel() {}
 
     protected:
       NotifieeConst(PlaneTerminal::Ptr p) : Terminal::Notifee(p) {}
