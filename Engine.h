@@ -14,7 +14,7 @@ namespace Shipping {
 
 /************************** ENTITY **************************/
 
-  class Entity : Fwk::NamedInterface
+  class Entity : public Fwk::NamedInterface
   {
   public:
     typedef Fwk::Ptr<Entity const> PtrConst;
@@ -60,9 +60,19 @@ namespace Shipping {
       NotifieeConst() : Fwk::NamedInterface::NotifieeConst() {}
       Entity::PtrConst notifier_; 
     };
+
     Entity::NotifieeConst::PtrConst notifiee() const { return notifiee_; }
+
+    Entity const * fwkHmNext() const { return fwkHmNext_.ptr(); }
+    Entity * fwkHmNext() { return fwkHmNext_.ptr(); }
+    void fwkHmNextIs(Entity * _fwkHmNext) const {
+      fwkHmNext_ = _fwkHmNext;
+    }
+    Fwk::String fwkKey() const { return name(); }
+
   protected:
     EntityType entityType_;
+    mutable Entity::Ptr fwkHmNext_;
     Entity(Fwk::String, EntityType);
   
     void notifieeIs(Entity::NotifieeConst::PtrConst n) const 
@@ -75,7 +85,7 @@ namespace Shipping {
 
 /************************** STATS **************************/
 
-  class Stats : Fwk::NamedInterface
+  class Stats : public Fwk::NamedInterface
   {
   public:
     typedef Fwk::Ptr<Stats const> PtrConst;
@@ -115,7 +125,7 @@ namespace Shipping {
 
 /************************** FLEET **************************/
 
-  class Fleet : Fwk::NamedInterface
+  class Fleet : public Fwk::NamedInterface
   {
   public:
     typedef Fwk::Ptr<Fleet const> PtrConst;
@@ -155,7 +165,7 @@ namespace Shipping {
 
 /************************** NETWORK **************************/
 
-  class Network : Fwk::NamedInterface
+  class Network : public Fwk::NamedInterface
 	{
   public:
     typedef Fwk::Ptr<Network const> PtrConst;
@@ -189,7 +199,7 @@ namespace Shipping {
 
 /************************** SEGMENT **************************/
 
-  class Segment : Entity 
+  class Segment : public Entity 
   {
   public:
     typedef Fwk::Ptr<Segment const> PtrConst;
@@ -250,6 +260,12 @@ namespace Shipping {
       NotifieeConst() : Entity::NotifieeConst() {}
 	  };
  
+    Segment const * fwkHmNext() const { return dynamic_cast<Segment const *>(fwkHmNext_.ptr()); }
+    Segment * fwkHmNext() { return dynamic_cast<Segment *>(fwkHmNext_.ptr()); }
+    void fwkHmNextIs(Segment * _fwkHmNext) const {
+      fwkHmNext_ = _fwkHmNext;
+    }
+ 
   protected:
     // Constructors
     Segment( const Segment& );
@@ -264,7 +280,7 @@ namespace Shipping {
 
 /************************** TRUCK SEGMENT **************************/
 
-  class TruckSegment : Segment
+  class TruckSegment : public Segment
   {
   public:
     typedef Fwk::Ptr<Segment const> PtrConst;
@@ -298,7 +314,7 @@ namespace Shipping {
 
 /************************** BOAT SEGMENT **************************/
 
-  class BoatSegment : Segment
+  class BoatSegment : public Segment
   {
   public:
     typedef Fwk::Ptr<Segment const> PtrConst;
@@ -333,7 +349,7 @@ namespace Shipping {
 
 /************************** PLANE SEGMENT **************************/
 
-  class PlaneSegment : Segment
+  class PlaneSegment : public Segment
   {
   public:
     typedef Fwk::Ptr<Segment const> PtrConst;
@@ -495,7 +511,7 @@ namespace Shipping {
   
   /************************** TRUCK TERMINAL **************************/
   
-  class TruckTerminal : TerminalLocation {
+  class TruckTerminal : public TerminalLocation {
     
   public:
     typedef Fwk::Ptr<TruckTerminal const> PtrConst;
@@ -528,7 +544,7 @@ namespace Shipping {
   
   /************************** BOAT TERMINAL **************************/
   
-  class BoatTerminal : TerminalLocation {
+  class BoatTerminal : public TerminalLocation {
     
   public:
     typedef Fwk::Ptr<BoatTerminal const> PtrConst;
@@ -561,7 +577,7 @@ namespace Shipping {
   
   /************************** PLANE TERMINAL **************************/
   
-  class PlaneTerminal : TerminalLocation {
+  class PlaneTerminal : public TerminalLocation {
     
   public:
     typedef Fwk::Ptr<PlaneTerminal const> PtrConst;
