@@ -73,7 +73,9 @@ namespace Shipping {
   protected:
     EntityType entityType_;
     mutable Entity::Ptr fwkHmNext_;
-    Entity(Fwk::String, EntityType);
+
+    Entity(Fwk::String _name, EntityType _entityType);
+    Entity(const Entity&);
   
     void notifieeIs(Entity::NotifieeConst::PtrConst n) const 
     {
@@ -83,9 +85,65 @@ namespace Shipping {
     Entity::NotifieeConst::PtrConst notifiee_;
   };
 
+/************************** NETWORK **************************/
+
+  class Stats;
+  class Fleet;
+
+  class Network : public Fwk::NamedInterface
+  {
+  public:
+    typedef Fwk::Ptr<Network const> PtrConst;
+    typedef Fwk::Ptr<Network> Ptr;
+    typedef Fwk::HashMap< Entity, Fwk::String, Entity, Entity::PtrConst, Entity::Ptr> EntityMap; 
+  
+    // Attribute Accessors
+    inline Entity::PtrConst entity(Fwk::String _name) const { return entity_[_name]; }
+    inline U32 entities() const { return entity_.members(); }
+    inline Fwk::Ptr<Stats> stats() const { return stats_; };
+    inline Fwk::Ptr<Fleet> fleet() const { return fleet_; };
+  
+    // Attribute Mutators
+    Entity::Ptr entityDel(Fwk::String _name);
+    Entity::Ptr entityIs(Entity::Ptr _ptr);
+  
+    static Network::Ptr NetworkNew(Fwk::String _name) {
+      Ptr m = new Network(_name);
+      return m;   
+    }
+
+    class NotifieeConst : public virtual Fwk::NamedInterface::NotifieeConst
+    {
+    public:
+      typedef Fwk::Ptr<NotifieeConst const> PtrConst;
+      
+      Network::PtrConst notifier() const { return notifier_; }
+      virtual void notifierIs(const Network::PtrConst& _notifier);
+      
+      virtual void onEntityNew(Entity::Ptr _ptr) const {}
+      virtual void onEntityDel(Entity::Ptr _ptr) const {}
+      
+      ~NotifieeConst();
+    protected:
+      NotifieeConst() : Fwk::NamedInterface::NotifieeConst() {}
+      Network::PtrConst notifier_; 
+    };
+
+    Network::NotifieeConst::PtrConst notifiee() const { return notifiee_; }
+
+  protected:  
+    EntityMap entity_;
+    Fwk::Ptr<Stats> stats_;
+    Fwk::Ptr<Fleet> fleet_;
+    Network(Fwk::String _name);
+    Network( const Network& );
+    
+    Network::NotifieeConst::PtrConst notifiee_;
+  };
+
 /************************** STATS **************************/
 
-  class Stats : public Fwk::NamedInterface
+  class Stats : public Fwk::PtrInterface<Stats>
   {
   public:
     typedef Fwk::Ptr<Stats const> PtrConst;
@@ -93,10 +151,11 @@ namespace Shipping {
 
 		class Percent : public Ordinal<Percent, float>
 		{
+    public:
 	  	Percent(float num) : Ordinal<Percent, float>(num) {
-				if (num < 0.0f) value_ = 0.0;
-				else if (num > 1.0f) value_ = 1.0;
-				else value_ = num;
+				if (num < 0.0f || num > 1.0f)
+          throw Fwk::RangeException("Invalid range passed to Percent constructor\n");
+				value_ = num;
 		  } 
 		};
   
@@ -108,10 +167,15 @@ namespace Shipping {
 		inline U32 truckTerminalCount() const { return truckTerminalCount_; }
 		inline U32 boatTerminalCount() const { return boatTerminalCount_; }
 		inline U32 planeTerminalCount() const { return planeTerminalCount_; }
-		inline Percent expeditePercentage();
+		inline Percent expeditePercentage() const { return Percent(expeditedCount_/(float)totalCount_); }
+  
+    Stats(Network*);
   
   private:
+    Stats(const Stats&);
+   
 		U32 expeditedCount_;
+    U32 totalCount_;
 
 		U32 truckSegmentCount_;
 		U32 boatSegmentCount_;
@@ -121,27 +185,32 @@ namespace Shipping {
 		U32 truckTerminalCount_;
 		U32 boatTerminalCount_;
 		U32 planeTerminalCount_;
+    
+    Fwk::Ptr<Network::NotifieeConst> reactor_;
   };
 
 /************************** FLEET **************************/
 
-  class Fleet : public Fwk::NamedInterface
+  class Fleet : public Fwk::PtrInterface<Fleet>
   {
   public:
     typedef Fwk::Ptr<Fleet const> PtrConst;
     typedef Fwk::Ptr<Fleet> Ptr;
     
     class Speed : public Ordinal<Speed, float> {
+    public:
       Speed(float num) : Ordinal<Speed, float>(num) {
         value_ = num;
       }    
     };
     class Cost : public Ordinal<Cost, float> {
+    public:
       Cost(float num) : Ordinal<Cost, float>(num) {
         value_ = num;
       }    
     };
     class Capacity : public Ordinal<Capacity, int> {
+    public:
       Capacity(int num) : Ordinal<Capacity, int>(num) {
         value_ = num;
       }    
@@ -156,43 +225,24 @@ namespace Shipping {
     inline Fleet::Capacity truckCapacity() const { return truckCapacity_; }
     inline Fleet::Capacity boatCapacity() const { return boatCapacity_; }
     inline Fleet::Capacity planeCapacity() const { return planeCapacity_; }
+
+    void truckSpeedIs(Fleet::Speed _truckSpeed);
+    void boatSpeedIs(Fleet::Speed _boatSpeed);
+    void planeSpeedIs(Fleet::Speed _planeSpeed);
+    void truckCostIs(Fleet::Cost _truckCost);
+    void boatCostIs(Fleet::Cost _boatCost);
+    void planeCostIs(Fleet::Cost _planeCost);
+    void truckCapacityIs(Fleet::Capacity _truckCapacity);
+    void boatCapacityIs(Fleet::Capacity _boatCapacity);
+    void planeCapacityIs(Fleet::Capacity _fleetCapacity);
+    
+    Fleet();
   
-  private:  
+  private:
+    Fleet(const Fleet&);
     Speed truckSpeed_, boatSpeed_, planeSpeed_;
     Cost truckCost_, boatCost_, planeCost_;
     Capacity truckCapacity_, boatCapacity_, planeCapacity_;
-  };
-
-/************************** NETWORK **************************/
-
-  class Network : public Fwk::NamedInterface
-	{
-  public:
-    typedef Fwk::Ptr<Network const> PtrConst;
-    typedef Fwk::Ptr<Network> Ptr;
-    typedef Fwk::HashMap< Entity, Fwk::String, Entity, Entity::PtrConst, Entity::PtrConst > EntityMap; 
-  
-    // Attribute Accessors
-	  inline Entity::PtrConst entity(Fwk::String _name) const { return entity_[_name]; }
-	  inline U32 entities() const { return entity_.members(); }
-		inline Stats::Ptr stats() const { return stats_; };
-		inline Fleet::Ptr fleet() const { return fleet_; };
-  
-    // Attribute Mutators
-    Entity::Ptr entityDel(Fwk::String _name);
-    Entity::Ptr entityIs(Fwk::String _name);
-  
-    static Network::Ptr NetworkNew() {
-      Ptr m = new Network();
-      return m;   
-  	}
-
-  protected:  
-    EntityMap entity_;
-    Stats::Ptr stats_;
-    Fleet::Ptr fleet_;
-    Network();
-    Network( const Network& );
   };
 
   class Location;
@@ -211,9 +261,7 @@ namespace Shipping {
       Difficulty(float num) : Ordinal<Difficulty, float>(num)
       {
         if(num < 1.0f || num > 5.0f)
-        {
-          //TODO: throw an exception
-        }
+          throw Fwk::RangeException("Invalid range passed to Difficulty constructor\n");
         value_ = num;
       }    
     };
