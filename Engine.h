@@ -9,6 +9,7 @@
 #include "Nominal.h"
 #include "fwk/NamedInterface.h"
 #include "fwk/HashMap.h"
+#include "fwk/ListRaw.h"
 
 namespace Shipping {
 
@@ -41,7 +42,7 @@ namespace Shipping {
     static inline EntityType truckTerminal() { return truckTerminal_; }
     static inline EntityType boatTerminal() { return boatTerminal_; }
     static inline EntityType planeTerminal() { return planeTerminal_; }
-  
+    
     /*
      * TODO: this shouldn't be needed, but comment it back in and let me know if it is
     static Entity::Ptr EntityNew(Fwk::String _name, EntityType _type) {
@@ -339,6 +340,11 @@ namespace Shipping {
       fwkHmNext_ = _fwkHmNext;
     }
  
+    Segment * lrNext() const { return lrNext_; }
+    void lrNextIs(Segment * _lrNext) {
+         lrNext_ = _lrNext;
+    }
+ 
   protected:
     // Constructors
     Segment( const Segment& );
@@ -351,6 +357,7 @@ namespace Shipping {
     Expedited expeditedState_;
     
     Segment::NotifieeConst::PtrConst notifiee_;
+    Segment *lrNext_;
   };
 
 /************************** TRUCK SEGMENT **************************/
@@ -465,15 +472,15 @@ namespace Shipping {
   public:
     typedef Fwk::Ptr<Location const> PtrConst;
     typedef Fwk::Ptr<Location> Ptr;
-    typedef Fwk::HashMap< Segment, Fwk::String, Segment, Segment::PtrConst, Segment::Ptr > SegmentMap;
+    typedef Fwk::ListRaw<Segment> SegmentList;
+    typedef SegmentList::IteratorConst SegmentListIteratorConst;
     
     // Attribute Accessors
-// The segments here will be replaced with an array that has an iterator
-    //inline Segment::PtrConst segment(unsigned _index) const { return segment_[_index]; }
-    //inline Segment::Ptr segment(unsigned _index) { return segment_[_index]; }
-    //inline Segment::PtrConst segment(Fwk::String _str) const { return segment_[_str]; }
-    //inline Segment::Ptr segment(Fwk::String _str) { return segment_[_str]; }
+    //TODO: implement these accessors
+    Segment::PtrConst segment(unsigned _index) const;
+    Segment::Ptr segment(unsigned _index);
     inline U32 segments() { return segment_.members(); }
+    inline SegmentListIteratorConst segmentIterConst() const { return segment_.iterator(); }
     
     // Attribute Mutators 
     // NOTE: array is read-only use "source" attribute of Segment to set instead
@@ -495,8 +502,7 @@ namespace Shipping {
 		};
     */
   protected:
-    //TODO: make this an array
-    SegmentMap segment_;
+    SegmentList segment_;
     Location(Fwk::String _name, Entity::EntityType _type);
     Location( const Location& );
   };
