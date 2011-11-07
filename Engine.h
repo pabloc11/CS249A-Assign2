@@ -468,8 +468,11 @@ namespace Shipping {
     typedef Fwk::HashMap< Segment, Fwk::String, Segment, Segment::PtrConst, Segment::Ptr > SegmentMap;
     
     // Attribute Accessors
-    inline Segment::PtrConst segment(Fwk::String _str) const { return segment_[_str]; }
-    inline Segment::Ptr segment(Fwk::String _str) { return segment_[_str]; }
+// The segments here will be replaced with an array that has an iterator
+    //inline Segment::PtrConst segment(unsigned _index) const { return segment_[_index]; }
+    //inline Segment::Ptr segment(unsigned _index) { return segment_[_index]; }
+    //inline Segment::PtrConst segment(Fwk::String _str) const { return segment_[_str]; }
+    //inline Segment::Ptr segment(Fwk::String _str) { return segment_[_str]; }
     inline U32 segments() { return segment_.members(); }
     
     // Attribute Mutators 
