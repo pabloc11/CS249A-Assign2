@@ -42,10 +42,13 @@ namespace Shipping {
     static inline EntityType boatTerminal() { return boatTerminal_; }
     static inline EntityType planeTerminal() { return planeTerminal_; }
     
+    /*
+     * TODO: this shouldn't be needed, but comment it back in and let me know if it is
     static Entity::Ptr EntityNew(Fwk::String _name, EntityType _type) {
       Ptr m = new Entity(_name, _type);
       return m;   
     }
+    */
     
     class NotifieeConst : public virtual Fwk::NamedInterface::NotifieeConst
     {
@@ -167,15 +170,34 @@ namespace Shipping {
 		inline U32 truckTerminalCount() const { return truckTerminalCount_; }
 		inline U32 boatTerminalCount() const { return boatTerminalCount_; }
 		inline U32 planeTerminalCount() const { return planeTerminalCount_; }
-		inline Percent expeditePercentage() const { return Percent(expeditedCount_/(float)totalCount_); }
+		inline Percent expeditePercentage() const { return Percent(expeditedSegmentCount_/(float)(truckSegmentCount_ + boatSegmentCount_ + planeSegmentCount_)); }
   
     Stats(Network*);
   
-  private:
+    void truckSegmentCountInc();
+    void boatSegmentCountInc();
+    void planeSegmentCountInc();
+    void customerLocationCountInc();
+    void portLocationCountInc();
+    void truckTerminalCountInc();
+    void boatTerminalCountInc();
+    void planeTerminalCountInc();
+    void expeditedSegmentCountInc();
+  
+    void truckSegmentCountDec();
+    void boatSegmentCountDec();
+    void planeSegmentCountDec();
+    void customerLocationCountDec();
+    void portLocationCountDec();
+    void truckTerminalCountDec();
+    void boatTerminalCountDec();
+    void planeTerminalCountDec();
+    void expeditedSegmentCountDec();
+  
+  protected:
     Stats(const Stats&);
    
-		U32 expeditedCount_;
-    U32 totalCount_;
+		U32 expeditedSegmentCount_;
 
 		U32 truckSegmentCount_;
 		U32 boatSegmentCount_;
@@ -234,7 +256,7 @@ namespace Shipping {
     void planeCostIs(Fleet::Cost _planeCost);
     void truckCapacityIs(Fleet::Capacity _truckCapacity);
     void boatCapacityIs(Fleet::Capacity _boatCapacity);
-    void planeCapacityIs(Fleet::Capacity _fleetCapacity);
+    void planeCapacityIs(Fleet::Capacity _planeCapacity);
     
     Fleet();
   
