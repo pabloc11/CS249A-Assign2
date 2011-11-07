@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <iostream>
+#include <sstream>
 #include <map>
 #include <vector>
 #include "Instance.h"
@@ -35,6 +36,8 @@ public:
 
     LocationRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
 
+	Location::Ptr location() { return location_; }
+
     // Instance method
     string attribute(const string& name);
 
@@ -51,6 +54,8 @@ class SegmentRep : public Instance {
 public:
 
     SegmentRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
+
+	Segment::Ptr segment() { return segment_; }
 
     // Instance method
     string attribute(const string& name);
@@ -179,7 +184,7 @@ void ManagerImpl::instanceDel(const string& name) {
 string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
     if (i != 0) {
-        cout << "Tried to read interface " << i;
+		//return location_->segment(i)->name();
     }
     return "";
 }
@@ -190,11 +195,27 @@ void LocationRep::attributeIs(const string& name, const string& v) {
 }
 
 string SegmentRep::attribute(const string& name) {
+    if (name == "source") {
+		return segment_->source()->name();
+    }
+	else if (name == "length") {
+		std::stringstream out;
+		out << segment_->length().value();
+		return out.str();
+	}
 	return "";
 }
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
-	
+    if (name == "source") {
+		Ptr<LocationRep> ptr = dynamic_cast<LocationRep *>(manager_->instance(v).ptr());
+		if (ptr) {
+			segment_->sourceIs(ptr->location());
+		}
+    }
+	if (name == "length") {
+		segment_->lengthIs(Segment::Length(atof(v.c_str())));
+	}
 }
 
 static const string segmentStr = "segment";

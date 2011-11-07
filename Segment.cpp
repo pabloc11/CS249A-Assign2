@@ -6,6 +6,7 @@ namespace Shipping {
     Entity(_name, _type),
     source_(NULL),
     returnSegment_(NULL),
+		length_(0.0f),
     difficulty_(1.0f),
     expeditedState_(Segment::notExpedited())
   {}
@@ -23,6 +24,10 @@ namespace Shipping {
     returnSegment_ = _returnSegment;
     _returnSegment->returnSegment_ = this;
   }
+
+	void Segment::lengthIs(Length _length) {
+		length_ = _length;
+	}
   
   void Segment::difficultyIs(Difficulty _difficulty) {
     difficulty_ = _difficulty;

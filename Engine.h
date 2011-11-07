@@ -278,6 +278,17 @@ namespace Shipping {
     typedef Fwk::Ptr<Segment const> PtrConst;
     typedef Fwk::Ptr<Segment> Ptr;
 
+		class Length : public Nominal<Length, float>
+		{
+		public:
+			Length(float num) : Nominal<Length, float>(num)
+			{
+				if(num < 0.0f)
+					throw Fwk::RangeException("Invalid range passed to Length constructor\n");
+				value_ = num;
+			}
+		};
+
     class Difficulty : public Ordinal<Difficulty, float> 
     {
     public:
@@ -300,12 +311,14 @@ namespace Shipping {
     // Attribute Accessors
     Fwk::Ptr<Location const> source() const { return source_; }
     Segment::PtrConst returnSegment() const { return returnSegment_; }
+		Length length() const { return length_; }
     Difficulty difficulty() const { return difficulty_; }
     Expedited expeditedState() const { return expeditedState_; }
     
     // Attribute Mutators
     void sourceIs(Fwk::Ptr<Location const> _source);
     void returnSegmentIs(Segment::Ptr _returnSegment);
+		void lengthIs(Length _length);
     void difficultyIs(Difficulty _difficulty);
     void expeditedIs(Expedited _expedited);
  
@@ -353,6 +366,7 @@ namespace Shipping {
     // Attributes
     Fwk::Ptr<Location const> source_;
     Segment::Ptr returnSegment_;
+		Length length_;
     Difficulty difficulty_;
     Expedited expeditedState_;
     
