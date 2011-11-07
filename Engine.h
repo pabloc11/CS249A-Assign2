@@ -42,11 +42,6 @@ namespace Shipping {
     static inline EntityType boatTerminal() { return boatTerminal_; }
     static inline EntityType planeTerminal() { return planeTerminal_; }
     
-    static Entity::Ptr EntityNew(Fwk::String _name, EntityType _type) {
-      Ptr m = new Entity(_name, _type);
-      return m;   
-    }
-    
     class NotifieeConst : public virtual Fwk::NamedInterface::NotifieeConst
     {
     public:
@@ -490,14 +485,14 @@ namespace Shipping {
       NotifieeConst() : Location::NotifieeConst() {}
 		};
     
-    static CustomerLocation::Ptr CustomerLocationIs(Fwk::String _name, Entity::EntityType _type) {
-       Ptr m = new CustomerLocation(_name, _type);
+    static CustomerLocation::Ptr CustomerLocationIs(Fwk::String _name) {
+       Ptr m = new CustomerLocation(_name);
        return m;
     }
     
   protected:
     CustomerLocation( const CustomerLocation& );
-    CustomerLocation(Fwk::String _name, Entity::EntityType _type);
+    CustomerLocation(Fwk::String _name);
   };
   
   /************************** PORT LOCATION **************************/
@@ -523,14 +518,14 @@ namespace Shipping {
       NotifieeConst() : Location::NotifieeConst() {}
 		};
     
-    static PortLocation::Ptr PortLocationIs(Fwk::String _name, Entity::EntityType _type) {
-       Ptr m = new PortLocation(_name, _type);
+    static PortLocation::Ptr PortLocationIs(Fwk::String _name) {
+       Ptr m = new PortLocation(_name);
        return m;
     }
   
   protected:
     PortLocation( const PortLocation& );
-    PortLocation(Fwk::String _name, Entity::EntityType _type);
+    PortLocation(Fwk::String _name);
   };
   
   /************************** TERMINAL LOCATION **************************/
@@ -580,14 +575,14 @@ namespace Shipping {
       NotifieeConst() : TerminalLocation::NotifieeConst() {}
 		};
     
-    static TruckTerminal::Ptr TruckTerminalIs(Fwk::String _name, Entity::EntityType _type) {
-       Ptr m = new TruckTerminal(_name, _type);
+    static TruckTerminal::Ptr TruckTerminalIs(Fwk::String _name) {
+       Ptr m = new TruckTerminal(_name);
        return m;
     }
   
   protected:
     TruckTerminal( const TruckTerminal& );
-    TruckTerminal(Fwk::String _name, Entity::EntityType _type);
+    TruckTerminal(Fwk::String _name);
   };
   
   /************************** BOAT TERMINAL **************************/
@@ -613,14 +608,14 @@ namespace Shipping {
       NotifieeConst() : TerminalLocation::NotifieeConst() {}
 		};
     
-    static BoatTerminal::Ptr BoatTerminalIs(Fwk::String _name, Entity::EntityType _type) {
-       Ptr m = new BoatTerminal(_name, _type);
+    static BoatTerminal::Ptr BoatTerminalIs(Fwk::String _name) {
+       Ptr m = new BoatTerminal(_name);
        return m;
     }
   
   protected:
     BoatTerminal( const BoatTerminal& );
-    BoatTerminal(Fwk::String _name, Entity::EntityType _type);  
+    BoatTerminal(Fwk::String _name);  
   };
   
   /************************** PLANE TERMINAL **************************/
@@ -646,14 +641,14 @@ namespace Shipping {
       NotifieeConst() : TerminalLocation::NotifieeConst() {}
 		};
     
-    static PlaneTerminal::Ptr PlaneTerminalIs(Fwk::String _name, Entity::EntityType _type) {
-       Ptr m = new PlaneTerminal(_name, _type);
+    static PlaneTerminal::Ptr PlaneTerminalIs(Fwk::String _name) {
+       Ptr m = new PlaneTerminal(_name);
        return m;
     }
   
   protected:
     PlaneTerminal( const PlaneTerminal& );
-    PlaneTerminal(Fwk::String _name, Entity::EntityType _type);
+    PlaneTerminal(Fwk::String _name);
   };
 
 } /* end namespace */
