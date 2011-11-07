@@ -66,56 +66,56 @@ protected:
 class CustomerLocationRep : public LocationRep {
 public:
     CustomerLocationRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		//location_ = CustomerLocation::CustomerLocationIs(name);
+		location_ = CustomerLocation::CustomerLocationIs(name);
 	}
 };
 
 class PortLocationRep : public LocationRep {
 public:
     PortLocationRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		// location_ = PortLocation::PortLocationIs(name);
+		location_ = PortLocation::PortLocationIs(name);
 	}
 };
 
 class TruckTerminalRep : public LocationRep {
 public:
     TruckTerminalRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		// location_ = TruckTerminal::TruckTerminalIs(name);
+		location_ = TruckTerminal::TruckTerminalIs(name);
 	}
 };
 
 class BoatTerminalRep : public LocationRep {
 public:
     BoatTerminalRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		// location_ = BoatTerminal::BoatTerminalIs(name);
+		location_ = BoatTerminal::BoatTerminalIs(name);
 	}
 };
 
 class PlaneTerminalRep : public LocationRep {
 public:
     PlaneTerminalRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		// location_ = PlaneTerminal::PlaneTerminalIs(name);
+		location_ = PlaneTerminal::PlaneTerminalIs(name);
 	}
 };
 
 class TruckSegmentRep : public SegmentRep {
 public:
     TruckSegmentRep(const string& name, ManagerImpl *manager) : SegmentRep(name, manager) {
- 		// segment_ = TruckSegment::TruckSegmentIs(name);
+ 		segment_ = TruckSegment::TruckSegmentIs(name);
 	}
 };
 
 class BoatSegmentRep : public SegmentRep {
 public:
     BoatSegmentRep(const string& name, ManagerImpl *manager) : SegmentRep(name, manager) {
-		// segment_ = BoatSegment::BoatSegmentIs(name);
+		segment_ = BoatSegment::BoatSegmentIs(name);
 	}
 };
 
 class PlaneSegmentRep : public SegmentRep {
 public:
     PlaneSegmentRep(const string& name, ManagerImpl *manager) : SegmentRep(name, manager) {
-		// segment_ = PlaneSegment::PlaneSegmentIs(name);
+		segment_ = PlaneSegment::PlaneSegmentIs(name);
 	}
 };
 
