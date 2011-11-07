@@ -2,15 +2,31 @@
 
 namespace Shipping {
   
+  class SegmentReactor : public Segment::NotifieeConst {
+  public:
+    void onExpedited(Segment::Expedited _expedited) {
+      if(_expedited == Segment::expedited())
+        stats_->expeditedSegmentCountInc();
+      else if(_expedited == Segment::notExpedited())
+        stats_->expeditedSegmentCountDec();
+    }
+    
+    SegmentReactor(Segment * _s, Stats* _stats) : Segment::NotifieeConst(), stats_(_stats) {
+      notifierIs(_s);
+    }
+  private:
+    Fwk::Ptr<Stats> stats_;
+  };
+  
   class NetworkReactor : public Network::NotifieeConst {
   public:
-      void onEntityNew(Entity::Ptr _ptr) {
-        //TODO: register for notifications of changes to expedited attribute        
+      void onEntityNew(Entity::Ptr _ptr) {        
         if(_ptr->entityType() == Entity::truckSegment()) {
           stats_->truckSegmentCountInc();
           if(((TruckSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
             stats_->expeditedSegmentCountInc();
           }
+          new SegmentReactor((Segment*)_ptr.ptr(), stats_.ptr());
         }
        
         if(_ptr->entityType() == Entity::boatSegment()) {
@@ -18,6 +34,7 @@ namespace Shipping {
           if(((BoatSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
             stats_->expeditedSegmentCountInc();
           }
+          new SegmentReactor((Segment*)_ptr.ptr(), stats_.ptr());
         }
         
         if(_ptr->entityType() == Entity::planeSegment()) {
@@ -25,6 +42,7 @@ namespace Shipping {
           if(((PlaneSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
             stats_->expeditedSegmentCountInc();
           }
+          new SegmentReactor((Segment*)_ptr.ptr(), stats_.ptr());
         }
         
         if(_ptr->entityType() == Entity::customerLocation()) {
@@ -105,9 +123,11 @@ namespace Shipping {
     portLocationCount_(0),
     truckTerminalCount_(0),
     boatTerminalCount_(0),
-    planeTerminalCount_(0),
-    reactor_(new NetworkReactor(_n, this))
-  {}
+    planeTerminalCount_(0)
+    //reactor_(new NetworkReactor(_n, this))
+  {
+    new NetworkReactor(_n, this);
+  }
   
   void Stats::truckSegmentCountInc() {
     truckSegmentCount_++;
