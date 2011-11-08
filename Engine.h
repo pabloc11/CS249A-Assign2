@@ -124,16 +124,14 @@ namespace Shipping {
       Network::PtrConst notifier() const { return notifier_; }
       virtual void notifierIs(const Network::PtrConst& _notifier);
       
-      virtual void onEntityNew(Entity::Ptr _ptr) const {}
-      virtual void onEntityDel(Entity::Ptr _ptr) const {}
+      virtual void onEntityNew(Entity::Ptr _ptr) {};
+      virtual void onEntityDel(Entity::Ptr _ptr) {};
       
       ~NotifieeConst();
     protected:
       NotifieeConst() : Fwk::NamedInterface::NotifieeConst() {}
       Network::PtrConst notifier_; 
     };
-
-    //Network::NotifieeConst::PtrConst notifiee() const { return notifiee_; }
 
   protected:  
     EntityMap entity_;
@@ -339,11 +337,12 @@ namespace Shipping {
     {
     public:
       typedef Fwk::Ptr<NotifieeConst const> PtrConst;
+      typedef Fwk::Ptr<NotifieeConst> Ptr;
       
       Segment::PtrConst notifier() const { return notifier_; }
       virtual void notifierIs(const Segment::PtrConst& _notifier);
       
-      virtual void onExpedited(Segment::Expedited _expedited) const {}
+      virtual void onExpedited(Segment::Expedited _expedited) {}
       
       ~NotifieeConst();
     protected:
@@ -374,7 +373,7 @@ namespace Shipping {
     Difficulty difficulty_;
     Expedited expeditedState_;
     
-    Segment::NotifieeConst::PtrConst notifiee_;
+    Segment::NotifieeConst::Ptr notifiee_;
     Segment *lrNext_;
   };
 

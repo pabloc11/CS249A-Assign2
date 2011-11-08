@@ -59,7 +59,7 @@ namespace Shipping {
     expeditedState_ = _expedited;
     if(notifiee_) {
       try {
-        notifiee_->onExpedited(_expedited);
+        const_cast<Segment::NotifieeConst *>(notifiee_.ptr())->onExpedited(_expedited);
       } catch(...) {}
     }
   }

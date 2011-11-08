@@ -12,7 +12,7 @@ namespace Shipping {
     if(!m) return NULL;
     if(notifiee_) { 
       try {
-        notifiee_->onEntityDel(m);
+        const_cast<Network::NotifieeConst *>(notifiee_.ptr())->onEntityDel(m);
       } catch(...) {}
     }
     return m; 
@@ -29,7 +29,7 @@ namespace Shipping {
     }
     if(notifiee_) {   
       try {
-        notifiee_->onEntityNew(m);
+        const_cast<Network::NotifieeConst *>(notifiee_.ptr())->onEntityNew(m);
       } catch(...) {}
     }
     return _ptr;
