@@ -58,7 +58,7 @@ private:
 class StatsRep : public Instance {
 public:	
 	StatsRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
-		//stats_ = Stats(manager->network().ptr());
+		stats_ = Stats::StatsNew(manager->network());
 	}
 	Stats::Ptr stats() { return stats_; }
 	string attribute(const string& name);
@@ -72,7 +72,7 @@ private:
 class FleetRep : public Instance {
 public:	
 	FleetRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
-		fleet_ = new Fleet();
+		fleet_ = Fleet::FleetNew();
 	}
 	Fleet::Ptr fleet() { return fleet_; }
 	string attribute(const string& name);
@@ -189,7 +189,7 @@ ManagerImpl::ManagerImpl() {
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
-	
+
 	if (instance(name)) {
 		fprintf(stderr, "An instance already exists with the specified name.\n");
 		return NULL;
