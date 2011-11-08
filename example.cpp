@@ -100,17 +100,26 @@ int main(int argc, char *argv[]) {
 
     // -- Segment difficulties
     boatSeg1->attributeIs("difficulty", "1");
+    assert(boatSeg1->attribute("difficulty") == "1.00");
     boatSeg2->attributeIs("difficulty", "1");
+    assert(boatSeg2->attribute("difficulty") == "1.00");
     truckSeg1->attributeIs("difficulty", "1");
+    assert(truckSeg1->attribute("difficulty") == "1.00");
     truckSeg2->attributeIs("difficulty", "1");
+    assert(truckSeg2->attribute("difficulty") == "1.00");
     
     // -- Segment expedite support
     boatSeg1->attributeIs("expedite support", "yes");
+    assert(boatSeg1->attribute("expedite support") == "yes");
     boatSeg2->attributeIs("expedite support", "yes");
+    assert(boatSeg2->attribute("expedite support") == "yes");
     truckSeg1->attributeIs("expedite support", "yes");
+    assert(truckSeg1->attribute("expedite support") == "yes");
     truckSeg2->attributeIs("expedite support", "yes");
+    assert(truckSeg2->attribute("expedite support") == "yes");
 
     // -- Connectivity queries
+/*
     Ptr<Instance> conn = manager->instanceNew("myConn", "Conn");
 
     if (conn == NULL) {
@@ -125,6 +134,7 @@ int main(int argc, char *argv[]) {
     cout << "*** connect customer2 : customer1 ****" << endl;
     cout << conn->attribute("connect customer2 : customer1") << endl;
     cout << endl;
+*/
 
     // -- Statistics queries
     cout << "===== Stats attributes =====" << endl;

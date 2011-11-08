@@ -299,7 +299,7 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
     if (i != 0) {
-		if (!location_->segment(i))
+		if (location_->segment(i))
 			return location_->segment(i)->name();
 		else
 			fprintf(stderr, "Segment not found with given index.\n");
