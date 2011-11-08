@@ -11,11 +11,21 @@ namespace Shipping {
     expeditedState_(Segment::notExpedited())
   {}
     
-  void Segment::sourceIs(Fwk::Ptr<Location const> _source) {
+  void Segment::sourceIs(Fwk::Ptr<Location> _source) {
     if(source_ == _source)
       return;
+    
+    if(source_) {
+      //remove from Location array
+      source_->segment_.deleteMember(this);
+    }
+     
+    if(_source) {
+      // add to end of Location array
+      _source->segment_.newMember(this);
+    }
+    
     source_ = _source;
-    //TODO: add to Location array
   }
   
   void Segment::returnSegmentIs(Segment::Ptr _returnSegment) {

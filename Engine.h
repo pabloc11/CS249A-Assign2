@@ -316,7 +316,7 @@ namespace Shipping {
     Expedited expeditedState() const { return expeditedState_; }
     
     // Attribute Mutators
-    void sourceIs(Fwk::Ptr<Location const> _source);
+    void sourceIs(Fwk::Ptr<Location> _source);
     void returnSegmentIs(Segment::Ptr _returnSegment);
 		void lengthIs(Length _length);
     void difficultyIs(Difficulty _difficulty);
@@ -364,7 +364,7 @@ namespace Shipping {
     Segment(Fwk::String _name, Entity::EntityType _type);
 
     // Attributes
-    Fwk::Ptr<Location const> source_;
+    Fwk::Ptr<Location> source_;
     Segment::Ptr returnSegment_;
 		Length length_;
     Difficulty difficulty_;
@@ -490,7 +490,6 @@ namespace Shipping {
     typedef SegmentList::IteratorConst SegmentListIteratorConst;
     
     // Attribute Accessors
-    //TODO: implement these accessors
     Segment::PtrConst segment(unsigned _index) const;
     Segment::Ptr segment(unsigned _index);
     inline U32 segments() { return segment_.members(); }
@@ -516,6 +515,7 @@ namespace Shipping {
 		};
     */
   protected:
+    friend class Segment;
     SegmentList segment_;
     Location(Fwk::String _name, Entity::EntityType _type);
     Location( const Location& );
