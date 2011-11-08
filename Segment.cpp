@@ -66,16 +66,18 @@ namespace Shipping {
   
   void Segment::NotifieeConst::notifierIs(const Segment::PtrConst& _notifier) {
     Segment::Ptr notifierSave(const_cast<Segment *>(notifier_.ptr()));
-    if(_notifier==notifier_)
+    if(notifier_==_notifier)
       return;
     notifier_ = _notifier;
-    notifierSave->notifiee_ = this;
+    if(notifierSave)
+      notifierSave->notifiee_ == NULL;
+    if(_notifier)
+      (const_cast<Segment*>(_notifier.ptr()))->notifiee_ = this;
   }
   
   Segment::NotifieeConst::~NotifieeConst() {
     if(notifier_) {
-      Segment::Ptr notifierSave(const_cast<Segment *>(notifier_.ptr()));
-      notifierSave->notifiee_ = NULL;
+      (const_cast<Segment*>(notifier_.ptr()))->notifiee_ = NULL;
     }
   }
 }

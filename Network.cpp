@@ -27,7 +27,7 @@ namespace Shipping {
       m = _ptr;
       entity_.newMember(m);
     }
-    if(notifiee_) { 
+    if(notifiee_) {   
       try {
         notifiee_->onEntityNew(m);
       } catch(...) {}
@@ -37,16 +37,18 @@ namespace Shipping {
   
   void Network::NotifieeConst::notifierIs(const Network::PtrConst& _notifier) {
     Network::Ptr notifierSave(const_cast<Network *>(notifier_.ptr()));
-    if(_notifier==notifier_)
+    if(notifier_==_notifier)
       return;
     notifier_ = _notifier;
-    notifierSave->notifiee_ = this;
+    if(notifierSave)
+      notifierSave->notifiee_ == NULL;
+    if(_notifier)
+      (const_cast<Network*>(_notifier.ptr()))->notifiee_ = this;
   }
   
   Network::NotifieeConst::~NotifieeConst() {
     if(notifier_) {
-      Network::Ptr notifierSave(const_cast<Network *>(notifier_.ptr()));
-      notifierSave->notifiee_ = NULL;
+      (const_cast<Network*>(notifier_.ptr()))->notifiee_ = NULL;
     }
   }
 }
