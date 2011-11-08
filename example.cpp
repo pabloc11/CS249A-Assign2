@@ -79,15 +79,24 @@ int main(int argc, char *argv[]) {
     
     // customer2 <---> port1
     boatSeg1->attributeIs("source", "customer2");
+    assert(boatSeg1->attribute("source") == "customer2");
+    assert(customer2->attribute("segment1") == "boatSeg1");
     boatSeg2->attributeIs("source", "port1");
+    assert(boatSeg2->attribute("source") == "port1");
+    assert(port1->attribute("segment2") == "boatSeg2");
     boatSeg1->attributeIs("return segment", "boatSeg2");
-    cout << "boatSeg1->attribute('return segment'): " << boatSeg1->attribute("return segment") << endl;
+    assert(boatSeg1->attribute("return segment") == "boatSeg2");
+    assert(boatSeg2->attribute("return segment") == "boatSeg1");
 
     // -- Segment lengths
     boatSeg1->attributeIs("length", "400");
+    assert(boatSeg1->attribute("length") == "400.00");
     boatSeg2->attributeIs("length", "400");
+    assert(boatSeg2->attribute("length") == "400.00");
     truckSeg1->attributeIs("length", "900");
+    assert(truckSeg1->attribute("length") == "900.00");
     truckSeg2->attributeIs("length", "900");
+    assert(truckSeg2->attribute("length") == "900.00");
 
     // -- Segment difficulties
     boatSeg1->attributeIs("difficulty", "1");
