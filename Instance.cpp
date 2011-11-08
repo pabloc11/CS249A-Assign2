@@ -10,13 +10,28 @@ namespace Shipping {
 
 using namespace std;
 
+string IntToString(int v) {
+	std::stringstream out;
+	out << v;
+	return out.str();	
+}
+
+string FloatToString(float v) {
+ 	char buffer [100];
+	sprintf (buffer, "%.2f", v);
+	return buffer;
+}
+
 //
 // Rep layer classes
 //
 
+class StatsRep;
+class FleetRep;
+
 class ManagerImpl : public Instance::Manager {
 public:
-    ManagerImpl();
+	ManagerImpl();
 
     // Manager method
     Ptr<Instance> instanceNew(const string& name, const string& type);
@@ -29,19 +44,43 @@ public:
 
 private:
     map<string,Ptr<Instance> > instance_;
+	Ptr<StatsRep> statsRep_;
+	Ptr<FleetRep> fleetRep_;
+};
+
+/*********************** REPRESENTATION CLASSES ***********************/
+
+class StatsRep : public Instance {
+public:	
+	StatsRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
+	Stats::Ptr stats() { return stats_; }
+	string attribute(const string& name);
+    void attributeIs(const string& name, const string& v);
+
+private:
+    Ptr<ManagerImpl> manager_;
+	Stats::Ptr stats_;
+};
+
+class FleetRep : public Instance {
+public:	
+	FleetRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
+		fleet_ = new Fleet();
+	}
+	Fleet::Ptr fleet() { return fleet_; }
+	string attribute(const string& name);
+	void attributeIs(const string& name, const string& v);
+
+private:
+    Ptr<ManagerImpl> manager_;
+	Fleet::Ptr fleet_;
 };
 
 class LocationRep : public Instance {
 public:
-
     LocationRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
-
 	Location::Ptr location() { return location_; }
-
-    // Instance method
     string attribute(const string& name);
-
-    // Instance method
     void attributeIs(const string& name, const string& v);
 
 protected:
@@ -52,15 +91,9 @@ protected:
 
 class SegmentRep : public Instance {
 public:
-
     SegmentRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
-
 	Segment::Ptr segment() { return segment_; }
-
-    // Instance method
     string attribute(const string& name);
-
-    // Instance method
     void attributeIs(const string& name, const string& v);
 
 protected:
@@ -124,10 +157,38 @@ public:
 	}
 };
 
-ManagerImpl::ManagerImpl() {}
+/************************** IMPLEMENTATIONS **************************/
+
+ManagerImpl::ManagerImpl() {
+	statsRep_ = NULL;
+	fleetRep_ = NULL;
+}
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
-    if (type == "Customer") {
+
+	if (type == "Stats" ) {
+		if (!statsRep_) {
+       	 	Ptr<StatsRep> t = new StatsRep(name, this);
+	        instance_[name] = t;
+			statsRep_ = t;
+	        return t;
+		}
+		else {
+			return statsRep_;
+		}
+	}
+	else if (type == "Fleet" ) {
+		if (!fleetRep_) {
+       	 	Ptr<FleetRep> t = new FleetRep(name, this);
+	        instance_[name] = t;
+			fleetRep_ = t;
+	        return t;
+		}
+		else {
+			return fleetRep_;
+		}
+	}
+    else if (type == "Customer") {
         Ptr<CustomerLocationRep> t = new CustomerLocationRep(name, this);
         instance_[name] = t;
         return t;
@@ -180,6 +241,60 @@ Ptr<Instance> ManagerImpl::instance(const string& name) {
 void ManagerImpl::instanceDel(const string& name) {
 }
 
+/***************** REPRESENTATION CLASS IMPLEMENTATIONS *****************/
+
+string StatsRep::attribute(const string& name) {
+	return "";
+}
+
+void StatsRep::attributeIs(const string& name, const string& v) {
+	
+}
+
+string FleetRep::attribute(const string& name) {
+	if (name == "Truck, speed")
+		return FloatToString(fleet_->truckSpeed().value());
+	else if (name == "Boat, speed")
+		return FloatToString(fleet_->boatSpeed().value());
+	else if (name == "Plane, speed")
+		return FloatToString(fleet_->planeSpeed().value());
+	else if (name == "Truck, cost")
+		return FloatToString(fleet_->truckCost().value());
+	else if (name == "Boat, cost")
+		return FloatToString(fleet_->boatCost().value());
+	else if (name == "Plane, cost")
+		return FloatToString(fleet_->planeCost().value());
+	else if (name == "Truck, capacity")
+		return IntToString(fleet_->truckCapacity().value());
+	else if (name == "Boat, capacity")
+		return IntToString(fleet_->boatCapacity().value());
+	else if (name == "Plane, capacity")
+		return IntToString(fleet_->planeCapacity().value());	
+
+	return "";
+}
+
+void FleetRep::attributeIs(const string& name, const string& v) {
+
+	if (name == "Truck, speed")
+		fleet_->truckSpeedIs(Fleet::Speed(atof(v.c_str())));
+	else if (name == "Boat, speed")
+		fleet_->boatSpeedIs(Fleet::Speed(atof(v.c_str())));
+	else if (name == "Plane, speed")
+		fleet_->planeSpeedIs(Fleet::Speed(atof(v.c_str())));
+	else if (name == "Truck, cost")
+		fleet_->truckCostIs(Fleet::Cost(atof(v.c_str())));
+	else if (name == "Boat, cost")
+		fleet_->boatCostIs(Fleet::Cost(atof(v.c_str())));
+	else if (name == "Plane, cost")
+		fleet_->planeCostIs(Fleet::Cost(atof(v.c_str())));
+	else if (name == "Truck, capacity")
+		fleet_->truckCapacityIs(Fleet::Capacity(atoi(v.c_str())));
+	else if (name == "Boat, capacity")
+		fleet_->boatCapacityIs(Fleet::Capacity(atoi(v.c_str())));
+	else if (name == "Plane, capacity")
+		fleet_->planeCapacityIs(Fleet::Capacity(atoi(v.c_str())));
+}
 
 string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
@@ -195,14 +310,12 @@ void LocationRep::attributeIs(const string& name, const string& v) {
 }
 
 string SegmentRep::attribute(const string& name) {
-    if (name == "source") {
+	
+    if (name == "source")
 		return segment_->source()->name();
-    }
-	else if (name == "length") {
-		std::stringstream out;
-		out << segment_->length().value();
-		return out.str();
-	}
+	else if (name == "length")
+		return FloatToString(segment_->length().value());
+		
 	return "";
 }
 
