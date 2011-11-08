@@ -4,8 +4,6 @@
 namespace Shipping {
   Network::Network(Fwk::String _name) : 
     Fwk::NamedInterface(_name),
-    stats_(new Stats(this)),
-    fleet_(new Fleet()),
     notifiee_(NULL) 
     {}
   

@@ -140,11 +140,21 @@ int main(int argc, char *argv[]) {
     cout << "===== Stats attributes =====" << endl;
     cout << " --- Segments --- " << endl;
     cout << "# Truck segments : " << stats->attribute("Truck segment") << endl;
+    assert(stats->attribute("Truck segment") == "2");
+    cout << "# Boat segments  : " << stats->attribute("Boat segment") << endl;
+    assert(stats->attribute("Boat segment") == "2");
+    cout << "# Plane segments : " << stats->attribute("Plane segment") << endl;
+    assert(stats->attribute("Plane segment") == "0");
     cout << "Expediting %     : " << stats->attribute("expedite percentage") << endl;
+    assert(stats->attribute("expedite percentage") == "100.00");
     cout << " --- Terminals --- " << endl;
+    cout << "# Truck terminals: " << stats->attribute("Truck terminal") << endl;
+    assert(stats->attribute("Truck terminal") == "0");
+    cout << "# Boat terminals : " << stats->attribute("Boat terminal") << endl;
     cout << "# Plane terminals: " << stats->attribute("Plane terminal") << endl;
     cout << " --- Ports and customers --- " << endl;
     cout << "# Ports          : " << stats->attribute("Port") << endl;
+    cout << "# Customers      : " << stats->attribute("Customer") << endl;
 
     cerr << "Done!" << endl;
 

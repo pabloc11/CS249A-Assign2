@@ -106,8 +106,6 @@ namespace Shipping {
     // Attribute Accessors
     inline Entity::PtrConst entity(Fwk::String _name) const { return entity_[_name]; }
     inline U32 entities() const { return entity_.members(); }
-    inline Fwk::Ptr<Stats> stats() const { return stats_; };
-    inline Fwk::Ptr<Fleet> fleet() const { return fleet_; };
   
     // Attribute Mutators
     Entity::Ptr entityDel(Fwk::String _name);
@@ -139,8 +137,6 @@ namespace Shipping {
 
   protected:  
     EntityMap entity_;
-    Fwk::Ptr<Stats> stats_;
-    Fwk::Ptr<Fleet> fleet_;
     Network(Fwk::String _name);
     Network( const Network& );
     
@@ -175,8 +171,6 @@ namespace Shipping {
 		inline U32 planeTerminalCount() const { return planeTerminalCount_; }
 		inline Percent expeditePercentage() const { return Percent(expeditedSegmentCount_/(float)(truckSegmentCount_ + boatSegmentCount_ + planeSegmentCount_)); }
   
-    Stats(Network*);
-  
     void truckSegmentCountInc();
     void boatSegmentCountInc();
     void planeSegmentCountInc();
@@ -196,9 +190,15 @@ namespace Shipping {
     void boatTerminalCountDec();
     void planeTerminalCountDec();
     void expeditedSegmentCountDec();
+    
+    static Stats::Ptr StatsNew(Network * _n) {
+      Ptr m = new Stats(_n);
+      return m;   
+    }
   
   protected:
     Stats(const Stats&);
+    Stats(Network*);
    
 		U32 expeditedSegmentCount_;
 
@@ -258,10 +258,14 @@ namespace Shipping {
     void truckCapacityIs(Fleet::Capacity _truckCapacity);
     void boatCapacityIs(Fleet::Capacity _boatCapacity);
     void planeCapacityIs(Fleet::Capacity _planeCapacity);
-    
-    Fleet();
   
-  private:
+    static Fleet::Ptr FleetNew() {
+      Ptr m = new Fleet();
+      return m;   
+    }
+  
+  protected:
+    Fleet();
     Fleet(const Fleet&);
     Speed truckSpeed_, boatSpeed_, planeSpeed_;
     Cost truckCost_, boatCost_, planeCost_;

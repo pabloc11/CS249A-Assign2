@@ -124,7 +124,6 @@ namespace Shipping {
     truckTerminalCount_(0),
     boatTerminalCount_(0),
     planeTerminalCount_(0)
-    //reactor_(new NetworkReactor(_n, this))
   {
     new NetworkReactor(_n, this);
   }
