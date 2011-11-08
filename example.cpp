@@ -151,10 +151,14 @@ int main(int argc, char *argv[]) {
     cout << "# Truck terminals: " << stats->attribute("Truck terminal") << endl;
     assert(stats->attribute("Truck terminal") == "0");
     cout << "# Boat terminals : " << stats->attribute("Boat terminal") << endl;
+    assert(stats->attribute("Boat terminal") == "0");
     cout << "# Plane terminals: " << stats->attribute("Plane terminal") << endl;
+    assert(stats->attribute("Plane terminal") == "0");
     cout << " --- Ports and customers --- " << endl;
     cout << "# Ports          : " << stats->attribute("Port") << endl;
+    assert(stats->attribute("Port") == "1");
     cout << "# Customers      : " << stats->attribute("Customer") << endl;
+    assert(stats->attribute("Customer") == "2");
 
     cerr << "Done!" << endl;
 

@@ -107,14 +107,14 @@ namespace Shipping {
           stats_->planeTerminalCountDec();
         }
       }
-      NetworkReactor(Network * _n, Stats* _stats) : Network::NotifieeConst(), stats_(_stats) {
+      NetworkReactor(Network::Ptr _n, Stats* _stats) : Network::NotifieeConst(), stats_(_stats) {
         notifierIs(_n);
       }
   private:
     Fwk::Ptr<Stats> stats_;
   };
   
-  Stats::Stats(Network* _n) :
+  Stats::Stats(Network::Ptr _n) :
     expeditedSegmentCount_(0),
     truckSegmentCount_(0),
     boatSegmentCount_(0),

@@ -191,14 +191,14 @@ namespace Shipping {
     void planeTerminalCountDec();
     void expeditedSegmentCountDec();
     
-    static Stats::Ptr StatsNew(Network * _n) {
+    static Stats::Ptr StatsNew(Network::Ptr _n) {
       Ptr m = new Stats(_n);
       return m;   
     }
   
   protected:
     Stats(const Stats&);
-    Stats(Network*);
+    Stats(Network::Ptr);
    
 		U32 expeditedSegmentCount_;
 
