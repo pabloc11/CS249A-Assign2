@@ -83,6 +83,16 @@ private:
 	Fleet::Ptr fleet_;
 };
 
+class ConnectivityRep : public Instance {
+public:
+	ConnectivityRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}	
+	string attribute(const string& name);
+	void attributeIs(const string& name, const string& v);
+
+private:
+    Ptr<ManagerImpl> manager_;
+};
+
 class LocationRep : public Instance {
 public:
     LocationRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
@@ -191,7 +201,7 @@ ManagerImpl::ManagerImpl() {
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 
 	if (instance(name)) {
-		fprintf(stderr, "An instance already exists with the specified name.\n");
+		cerr << "An instance already exists with the name: " << name << endl;
 		return NULL;
 	}
 
@@ -210,6 +220,11 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 			fleetRep_ = t;
 	        return t;
 		}
+	}
+	else if (type == "Conn") {
+		Ptr<ConnectivityRep> t = new ConnectivityRep(name, this);
+		instance_[name] = t;
+		return t;
 	}
     else if (type == "Customer") {
         Ptr<CustomerLocationRep> t = new CustomerLocationRep(name, this);
@@ -252,7 +267,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		return t;
 	}
 	else 
-		fprintf(stderr, "Incompatible type-attribute pair.\n");
+		cerr << "Invalid type: " << type << endl;
 
     return NULL;
 }
@@ -263,6 +278,8 @@ Ptr<Instance> ManagerImpl::instance(const string& name) {
 }
 
 void ManagerImpl::instanceDel(const string& name) {
+	network_->entityDel(name);
+	instance_.erase(name);
 }
 
 /***************** REPRESENTATION CLASS IMPLEMENTATIONS *****************/
@@ -288,7 +305,7 @@ string StatsRep::attribute(const string& name) {
 	else if (name == "expedite percentage")
 		return FloatToString(stats_->expeditePercentage().value()*100);
 	else
-		fprintf(stderr, "Incompatible type-attribute pair.\n");
+		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 		
 	return "";
 }
@@ -317,30 +334,61 @@ string FleetRep::attribute(const string& name) {
 		return IntToString(fleet_->boatCapacity().value());
 	else if (name == "Plane, capacity")
 		return IntToString(fleet_->planeCapacity().value());	
+	else
+		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 
 	return "";
 }
 
 void FleetRep::attributeIs(const string& name, const string& v) {
 
-	if (name == "Truck, speed")
-		fleet_->truckSpeedIs(Fleet::Speed(atof(v.c_str())));
-	else if (name == "Boat, speed")
-		fleet_->boatSpeedIs(Fleet::Speed(atof(v.c_str())));
-	else if (name == "Plane, speed")
-		fleet_->planeSpeedIs(Fleet::Speed(atof(v.c_str())));
-	else if (name == "Truck, cost")
-		fleet_->truckCostIs(Fleet::Cost(atof(v.c_str())));
-	else if (name == "Boat, cost")
-		fleet_->boatCostIs(Fleet::Cost(atof(v.c_str())));
-	else if (name == "Plane, cost")
-		fleet_->planeCostIs(Fleet::Cost(atof(v.c_str())));
-	else if (name == "Truck, capacity")
-		fleet_->truckCapacityIs(Fleet::Capacity(atoi(v.c_str())));
-	else if (name == "Boat, capacity")
-		fleet_->boatCapacityIs(Fleet::Capacity(atoi(v.c_str())));
-	else if (name == "Plane, capacity")
-		fleet_->planeCapacityIs(Fleet::Capacity(atoi(v.c_str())));
+	if (name == "Truck, speed") {
+		try { fleet_->truckSpeedIs(Fleet::Speed(atof(v.c_str()))); }
+		catch (Fwk::Exception e) { cerr << "Invalid speed: " << v << endl; }
+	}
+	else if (name == "Boat, speed") {
+		try { fleet_->boatSpeedIs(Fleet::Speed(atof(v.c_str()))); }
+		catch (Fwk::Exception e) { cerr << "Invalid speed: " << v << endl; }
+	}
+	else if (name == "Plane, speed") {
+		try { fleet_->planeSpeedIs(Fleet::Speed(atof(v.c_str()))); }
+		catch (Fwk::Exception e) { cerr << "Invalid speed: " << v << endl; }
+	}
+	else if (name == "Truck, cost") {
+		try { fleet_->truckCostIs(Fleet::Cost(atof(v.c_str()))); }
+		catch (Fwk::Exception e) { cerr << "Invalid cost: " << v << endl; }
+	}
+	else if (name == "Boat, cost") {
+		try { fleet_->boatCostIs(Fleet::Cost(atof(v.c_str()))); }
+		catch (Fwk::Exception e) { cerr << "Invalid cost: " << v << endl; }
+	}
+	else if (name == "Plane, cost") {
+		try { fleet_->planeCostIs(Fleet::Cost(atof(v.c_str()))); }
+		catch (Fwk::Exception e) { cerr << "Invalid cost: " << v << endl; }
+	}
+	else if (name == "Truck, capacity") {
+		try { fleet_->truckCapacityIs(Fleet::Capacity(atoi(v.c_str()))); }
+		catch (Fwk::Exception e) { cerr << "Invalid capacity: " << v << endl; }
+	}
+	else if (name == "Boat, capacity") {
+		try { fleet_->boatCapacityIs(Fleet::Capacity(atoi(v.c_str()))); }
+		catch (Fwk::Exception e) { cerr << "Invalid capacity: " << v << endl; }
+	}
+	else if (name == "Plane, capacity") {
+		try { fleet_->planeCapacityIs(Fleet::Capacity(atoi(v.c_str()))); }
+		catch (Fwk::Exception e) { cerr << "Invalid capacity: " << v << endl; }
+	}
+	else
+		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+}
+
+string ConnectivityRep::attribute(const string& name) {
+	return "";
+}
+
+
+void ConnectivityRep::attributeIs(const string& name, const string& v) {
+    //nothing to do
 }
 
 string LocationRep::attribute(const string& name) {
@@ -349,10 +397,11 @@ string LocationRep::attribute(const string& name) {
 		if (location_->segment(i))
 			return location_->segment(i)->name();
 		else
-			fprintf(stderr, "Segment not found with given index.\n");
+			cerr << "Segment not found with index: " << i << endl;
     }
 	else
-		fprintf(stderr, "Incompatible type-attribute pair.\n");
+		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+		
     return "";
 }
 
@@ -378,7 +427,8 @@ string SegmentRep::attribute(const string& name) {
 			return "no";
 	}
 	else
-		fprintf(stderr, "Incompatible type-attribute pair.\n");
+		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+		
 	return "";
 }
 
@@ -389,22 +439,22 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 		if (ptr)
 			segment_->sourceIs(ptr->location());
 		else
-			fprintf(stderr, "Instance given to 'source' is not a location.\n");
+			cerr << "Instance given to 'source' is not a location: " << v << endl;
     }
 	else if (name == "length") {
 		try	{ segment_->lengthIs(Segment::Length(atof(v.c_str()))); }
-		catch (Fwk::Exception e) { fprintf(stderr, "Invalid length given.\n"); }			
+		catch (Fwk::Exception e) { cerr << "Invalid length: " << v << endl; }			
 	}
 	else if (name == "return segment") {
 		Ptr<SegmentRep> ptr = dynamic_cast<SegmentRep *>(manager_->instance(v).ptr());
 		if (ptr)
 			segment_->returnSegmentIs(ptr->segment());
 		else
-			fprintf(stderr, "Instance given to 'return segment' is not a segment.\n");
+			cerr << "Instance given to 'return segment' is not a segment: " << v << endl;
 	}
 	else if (name == "difficulty") {
 		try { segment_->difficultyIs(Segment::Difficulty(atof(v.c_str()))); }
-		catch (Fwk::Exception e) { fprintf(stderr, "Invalid difficulty given.\n"); }
+		catch (Fwk::Exception e) { cerr << "Invalid difficulty: " << v << endl; }
 	}
 	else if (name == "expedite support") {
 		if (v == "yes")
@@ -412,10 +462,10 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 		else if (v == "no")
 			segment_->expeditedIs(Segment::notExpedited());
 		else
-			fprintf(stderr, "Invalid expedite support given.\n");
+			cerr << "Invalid expedite support: " << v << endl;
 	}
 	else {
-		fprintf(stderr, "Incompatible type-attribute pair.\n");
+		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 	}
 }
 

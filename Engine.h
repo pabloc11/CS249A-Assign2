@@ -167,7 +167,13 @@ namespace Shipping {
 		inline U32 truckTerminalCount() const { return truckTerminalCount_; }
 		inline U32 boatTerminalCount() const { return boatTerminalCount_; }
 		inline U32 planeTerminalCount() const { return planeTerminalCount_; }
-		inline Percent expeditePercentage() const { return Percent(expeditedSegmentCount_/(float)(truckSegmentCount_ + boatSegmentCount_ + planeSegmentCount_)); }
+		inline Percent expeditePercentage() const { 
+			int total = truckSegmentCount_ + boatSegmentCount_ + planeSegmentCount_;
+			if (total > 0)
+				return Percent(expeditedSegmentCount_/(float)(total));
+			else
+				return Percent(0.0f);
+		}
   
     void truckSegmentCountInc();
     void boatSegmentCountInc();
@@ -221,18 +227,24 @@ namespace Shipping {
     class Speed : public Ordinal<Speed, float> {
     public:
       Speed(float num) : Ordinal<Speed, float>(num) {
+				if(num < 0.0f)
+					throw Fwk::RangeException("Invalid range passed to Speed constructor\n");
         value_ = num;
       }    
     };
     class Cost : public Ordinal<Cost, float> {
     public:
       Cost(float num) : Ordinal<Cost, float>(num) {
+				if(num < 0.0f)
+					throw Fwk::RangeException("Invalid range passed to Cost constructor\n");
         value_ = num;
       }    
     };
     class Capacity : public Ordinal<Capacity, int> {
     public:
       Capacity(int num) : Ordinal<Capacity, int>(num) {
+				if(num < 0)
+					throw Fwk::RangeException("Invalid range passed to Capacity constructor\n");
         value_ = num;
       }    
     };
