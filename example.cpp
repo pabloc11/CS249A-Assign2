@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include "Instance.h"
+#include <assert.h>
 
 using std::cout;
 using std::cerr;
@@ -32,9 +33,11 @@ int main(int argc, char *argv[]) {
     }
 
     fleet->attributeIs("Boat, speed", "60");
+    assert(fleet->attribute("Boat, speed") == "60.00");
     fleet->attributeIs("Truck, capacity", "50");
+    assert(fleet->attribute("Truck, capacity") == "50");
     fleet->attributeIs("Plane, cost", "20");
-    cout << "fleet->attribute('Boat, speed'): " << fleet->attribute("Boat, speed") << endl;
+    assert(fleet->attribute("Plane, cost") == "20.00");
 
     // --- Create instances
     // -- Locations
@@ -46,7 +49,7 @@ int main(int argc, char *argv[]) {
 
     if (customer1 == NULL || customer2 == NULL || port1 == NULL) {
         cerr << "Unexpected NULL customer or port." << endl;
-	return 1;
+  return 1;
     }
 
     // -- Segments
@@ -65,35 +68,58 @@ int main(int argc, char *argv[]) {
     // connections
     // customer1 <---> port1
     truckSeg1->attributeIs("source", "customer1");
+    assert(truckSeg1->attribute("source") == "customer1");
+    assert(customer1->attribute("segment1") == "truckSeg1");
     truckSeg2->attributeIs("source", "port1");
+    assert(truckSeg2->attribute("source") == "port1");
+    assert(port1->attribute("segment1") == "truckSeg2");
     truckSeg1->attributeIs("return segment", "truckSeg2");
-    cout << "truckSeg1->attribute('source'): " << truckSeg1->attribute("source") << endl;
+    assert(truckSeg1->attribute("return segment") == "truckSeg2");
+    assert(truckSeg2->attribute("return segment") == "truckSeg1");
     
     // customer2 <---> port1
     boatSeg1->attributeIs("source", "customer2");
+    assert(boatSeg1->attribute("source") == "customer2");
+    assert(customer2->attribute("segment1") == "boatSeg1");
     boatSeg2->attributeIs("source", "port1");
+    assert(boatSeg2->attribute("source") == "port1");
+    assert(port1->attribute("segment2") == "boatSeg2");
     boatSeg1->attributeIs("return segment", "boatSeg2");
-    cout << "boatSeg1->attribute('return segment'): " << boatSeg1->attribute("return segment") << endl;
+    assert(boatSeg1->attribute("return segment") == "boatSeg2");
+    assert(boatSeg2->attribute("return segment") == "boatSeg1");
 
     // -- Segment lengths
     boatSeg1->attributeIs("length", "400");
+    assert(boatSeg1->attribute("length") == "400.00");
     boatSeg2->attributeIs("length", "400");
+    assert(boatSeg2->attribute("length") == "400.00");
     truckSeg1->attributeIs("length", "900");
+    assert(truckSeg1->attribute("length") == "900.00");
     truckSeg2->attributeIs("length", "900");
+    assert(truckSeg2->attribute("length") == "900.00");
 
     // -- Segment difficulties
     boatSeg1->attributeIs("difficulty", "1");
+    assert(boatSeg1->attribute("difficulty") == "1.00");
     boatSeg2->attributeIs("difficulty", "1");
+    assert(boatSeg2->attribute("difficulty") == "1.00");
     truckSeg1->attributeIs("difficulty", "1");
+    assert(truckSeg1->attribute("difficulty") == "1.00");
     truckSeg2->attributeIs("difficulty", "1");
+    assert(truckSeg2->attribute("difficulty") == "1.00");
     
     // -- Segment expedite support
     boatSeg1->attributeIs("expedite support", "yes");
+    assert(boatSeg1->attribute("expedite support") == "yes");
     boatSeg2->attributeIs("expedite support", "yes");
+    assert(boatSeg2->attribute("expedite support") == "yes");
     truckSeg1->attributeIs("expedite support", "yes");
+    assert(truckSeg1->attribute("expedite support") == "yes");
     truckSeg2->attributeIs("expedite support", "yes");
+    assert(truckSeg2->attribute("expedite support") == "yes");
 
     // -- Connectivity queries
+/*
     Ptr<Instance> conn = manager->instanceNew("myConn", "Conn");
 
     if (conn == NULL) {
@@ -108,16 +134,31 @@ int main(int argc, char *argv[]) {
     cout << "*** connect customer2 : customer1 ****" << endl;
     cout << conn->attribute("connect customer2 : customer1") << endl;
     cout << endl;
+*/
 
     // -- Statistics queries
     cout << "===== Stats attributes =====" << endl;
     cout << " --- Segments --- " << endl;
     cout << "# Truck segments : " << stats->attribute("Truck segment") << endl;
+    assert(stats->attribute("Truck segment") == "2");
+    cout << "# Boat segments  : " << stats->attribute("Boat segment") << endl;
+    assert(stats->attribute("Boat segment") == "2");
+    cout << "# Plane segments : " << stats->attribute("Plane segment") << endl;
+    assert(stats->attribute("Plane segment") == "0");
     cout << "Expediting %     : " << stats->attribute("expedite percentage") << endl;
+    assert(stats->attribute("expedite percentage") == "100.00");
     cout << " --- Terminals --- " << endl;
+    cout << "# Truck terminals: " << stats->attribute("Truck terminal") << endl;
+    assert(stats->attribute("Truck terminal") == "0");
+    cout << "# Boat terminals : " << stats->attribute("Boat terminal") << endl;
+    assert(stats->attribute("Boat terminal") == "0");
     cout << "# Plane terminals: " << stats->attribute("Plane terminal") << endl;
+    assert(stats->attribute("Plane terminal") == "0");
     cout << " --- Ports and customers --- " << endl;
     cout << "# Ports          : " << stats->attribute("Port") << endl;
+    assert(stats->attribute("Port") == "1");
+    cout << "# Customers      : " << stats->attribute("Customer") << endl;
+    assert(stats->attribute("Customer") == "2");
 
     cerr << "Done!" << endl;
 
