@@ -7,7 +7,7 @@ namespace Shipping {
   {}
   
   Segment::PtrConst Location::segment(unsigned _index) const {
-    unsigned i = 0;
+    unsigned i = 1;
     for( SegmentList::IteratorConst iter = segment_.iterator(); iter.ptr() && i <= _index; ++iter, i++) {
       if(i == _index)
         return iter.ptr();
@@ -15,7 +15,7 @@ namespace Shipping {
     return NULL;
   }
   Segment::Ptr Location::segment(unsigned _index) {
-    unsigned i = 0;
+    unsigned i = 1;
     for( SegmentList::Iterator iter = segment_.iterator(); iter.ptr() && i <= _index; ++iter, i++) {
       if(i == _index)
         return iter.ptr();
