@@ -18,7 +18,9 @@ string IntToString(int v) {
 
 string FloatToString(float v) {
  	char buffer [100];
-	sprintf (buffer, "%.2f", v);
+	int n = sprintf(buffer, "%.2f", v);
+	if (n >= 100)
+		throw Fwk::RangeException("Floating point number too large to display\n");
 	return buffer;
 }
 
@@ -165,6 +167,11 @@ ManagerImpl::ManagerImpl() {
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
+	
+	if (instance(name)) {
+		fprintf(stderr, "An instance already exists with the specified name.\n");
+		return NULL;
+	}
 
 	if (type == "Stats" ) {
 		if (!statsRep_) {
@@ -173,9 +180,6 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 			statsRep_ = t;
 	        return t;
 		}
-		else {
-			return statsRep_;
-		}
 	}
 	else if (type == "Fleet" ) {
 		if (!fleetRep_) {
@@ -183,9 +187,6 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 	        instance_[name] = t;
 			fleetRep_ = t;
 	        return t;
-		}
-		else {
-			return fleetRep_;
 		}
 	}
     else if (type == "Customer") {
@@ -234,7 +235,6 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 
 Ptr<Instance> ManagerImpl::instance(const string& name) {
     map<string,Ptr<Instance> >::const_iterator t = instance_.find(name);
-
     return t == instance_.end() ? NULL : (*t).second;
 }
 
@@ -299,8 +299,13 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
     if (i != 0) {
-		//return location_->segment(i)->name();
+		if (!location_->segment(i))
+			return location_->segment(i)->name();
+		else
+			fprintf(stderr, "Segment not found with given index.\n");
     }
+	else
+		fprintf(stderr, "Incompatible type-attribute pair.\n");
     return "";
 }
 
@@ -315,19 +320,54 @@ string SegmentRep::attribute(const string& name) {
 		return segment_->source()->name();
 	else if (name == "length")
 		return FloatToString(segment_->length().value());
-		
+	else if (name == "return segment")
+		return segment_->returnSegment()->name();
+	else if (name == "difficulty")
+		return FloatToString(segment_->difficulty().value());
+	else if (name == "expedite support") {
+		if (segment_->expeditedState() == Segment::expedited())
+			return "yes";
+		else if (segment_->expeditedState() == Segment::notExpedited())
+			return "no";
+	}
+	else
+		fprintf(stderr, "Incompatible type-attribute pair.\n");
 	return "";
 }
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
     if (name == "source") {
 		Ptr<LocationRep> ptr = dynamic_cast<LocationRep *>(manager_->instance(v).ptr());
-		if (ptr) {
+		if (ptr)
 			segment_->sourceIs(ptr->location());
-		}
+		else
+			fprintf(stderr, "Instance given to 'source' is not a location.\n");
     }
-	if (name == "length") {
-		segment_->lengthIs(Segment::Length(atof(v.c_str())));
+	else if (name == "length") {
+		try	{ segment_->lengthIs(Segment::Length(atof(v.c_str()))); }
+		catch (Fwk::Exception e) { fprintf(stderr, "Invalid length given.\n"); }			
+	}
+	else if (name == "return segment") {
+		Ptr<SegmentRep> ptr = dynamic_cast<SegmentRep *>(manager_->instance(v).ptr());
+		if (ptr)
+			segment_->returnSegmentIs(ptr->segment());
+		else
+			fprintf(stderr, "Instance given to 'return segment' is not a segment.\n");
+	}
+	else if (name == "difficulty") {
+		try { segment_->difficultyIs(Segment::Difficulty(atof(v.c_str()))); }
+		catch (Fwk::Exception e) { fprintf(stderr, "Invalid difficulty given.\n"); }
+	}
+	else if (name == "expedite support") {
+		if (v == "yes")
+			segment_->expeditedIs(Segment::expedited());
+		else if (v == "no")
+			segment_->expeditedIs(Segment::notExpedited());
+		else
+			fprintf(stderr, "Invalid expedite support given.\n");
+	}
+	else {
+		fprintf(stderr, "Incompatible type-attribute pair.\n");
 	}
 }
 
