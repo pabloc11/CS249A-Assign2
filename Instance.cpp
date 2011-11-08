@@ -244,14 +244,35 @@ void ManagerImpl::instanceDel(const string& name) {
 /***************** REPRESENTATION CLASS IMPLEMENTATIONS *****************/
 
 string StatsRep::attribute(const string& name) {
+	
+	if (name == "Customer")
+		return IntToString(stats_->customerLocationCount());
+	else if (name == "Port")
+		return IntToString(stats_->portLocationCount());
+	else if (name == "Truck terminal")
+		return IntToString(stats_->truckTerminalCount());
+	else if (name == "Boat terminal")
+		return IntToString(stats_->boatTerminalCount());
+	else if (name == "Plane terminal")
+		return IntToString(stats_->planeTerminalCount());
+	else if (name == "Truck segment")
+		return IntToString(stats_->truckSegmentCount());
+	else if (name == "Boat segment")
+		return IntToString(stats_->boatSegmentCount());
+	else if (name == "Plane segment")
+		return IntToString(stats_->planeSegmentCount());
+	else
+		fprintf(stderr, "Incompatible type-attribute pair.\n");
+		
 	return "";
 }
 
 void StatsRep::attributeIs(const string& name, const string& v) {
-	
+	// nothing to do
 }
 
 string FleetRep::attribute(const string& name) {
+	
 	if (name == "Truck, speed")
 		return FloatToString(fleet_->truckSpeed().value());
 	else if (name == "Boat, speed")
@@ -336,6 +357,7 @@ string SegmentRep::attribute(const string& name) {
 }
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
+	
     if (name == "source") {
 		Ptr<LocationRep> ptr = dynamic_cast<LocationRep *>(manager_->instance(v).ptr());
 		if (ptr)
