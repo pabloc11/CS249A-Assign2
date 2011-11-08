@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
     assert(truckSeg2->attribute("expedite support") == "yes");
 
     // -- Connectivity queries
-/*
+
     Ptr<Instance> conn = manager->instanceNew("myConn", "Conn");
 
     if (conn == NULL) {
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     cout << "*** connect customer2 : customer1 ****" << endl;
     cout << conn->attribute("connect customer2 : customer1") << endl;
     cout << endl;
-*/
+
 
     // -- Statistics queries
     cout << "===== Stats attributes =====" << endl;
