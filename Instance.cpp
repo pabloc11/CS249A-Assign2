@@ -44,8 +44,11 @@ public:
     // Manager method
     void instanceDel(const string& name);
 
+	Network::Ptr network() { return network_; }
+
 private:
     map<string,Ptr<Instance> > instance_;
+	Network::Ptr network_;
 	Ptr<StatsRep> statsRep_;
 	Ptr<FleetRep> fleetRep_;
 };
@@ -54,7 +57,9 @@ private:
 
 class StatsRep : public Instance {
 public:	
-	StatsRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
+	StatsRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
+		//stats_ = Stats(manager->network().ptr());
+	}
 	Stats::Ptr stats() { return stats_; }
 	string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
@@ -106,62 +111,79 @@ protected:
 class CustomerLocationRep : public LocationRep {
 public:
     CustomerLocationRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		location_ = CustomerLocation::CustomerLocationIs(name);
+		CustomerLocation::Ptr ptr = CustomerLocation::CustomerLocationIs(name);
+		manager->network()->entityIs(ptr);
+		location_ = ptr;
 	}
 };
 
 class PortLocationRep : public LocationRep {
 public:
     PortLocationRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		location_ = PortLocation::PortLocationIs(name);
+		PortLocation::Ptr ptr = PortLocation::PortLocationIs(name);
+		manager->network()->entityIs(ptr);
+		location_ = ptr;
 	}
 };
 
 class TruckTerminalRep : public LocationRep {
 public:
     TruckTerminalRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		location_ = TruckTerminal::TruckTerminalIs(name);
+		TruckTerminal::Ptr ptr = TruckTerminal::TruckTerminalIs(name);
+		manager->network()->entityIs(ptr);
+		location_ = ptr;
 	}
 };
 
 class BoatTerminalRep : public LocationRep {
 public:
     BoatTerminalRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		location_ = BoatTerminal::BoatTerminalIs(name);
+		BoatTerminal::Ptr ptr = BoatTerminal::BoatTerminalIs(name);
+		manager->network()->entityIs(ptr);
+		location_ = ptr;
 	}
 };
 
 class PlaneTerminalRep : public LocationRep {
 public:
     PlaneTerminalRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		location_ = PlaneTerminal::PlaneTerminalIs(name);
+		PlaneTerminal::Ptr ptr = PlaneTerminal::PlaneTerminalIs(name);
+		manager->network()->entityIs(ptr);
+		location_ = ptr;
 	}
 };
 
 class TruckSegmentRep : public SegmentRep {
 public:
     TruckSegmentRep(const string& name, ManagerImpl *manager) : SegmentRep(name, manager) {
- 		segment_ = TruckSegment::TruckSegmentIs(name);
+ 		TruckSegment::Ptr ptr = TruckSegment::TruckSegmentIs(name);
+		manager->network()->entityIs(ptr);
+		segment_ = ptr;
 	}
 };
 
 class BoatSegmentRep : public SegmentRep {
 public:
     BoatSegmentRep(const string& name, ManagerImpl *manager) : SegmentRep(name, manager) {
-		segment_ = BoatSegment::BoatSegmentIs(name);
+		BoatSegment::Ptr ptr = BoatSegment::BoatSegmentIs(name);
+		manager->network()->entityIs(ptr);
+		segment_ = ptr;
 	}
 };
 
 class PlaneSegmentRep : public SegmentRep {
 public:
     PlaneSegmentRep(const string& name, ManagerImpl *manager) : SegmentRep(name, manager) {
-		segment_ = PlaneSegment::PlaneSegmentIs(name);
+		PlaneSegment::Ptr ptr = PlaneSegment::PlaneSegmentIs(name);
+		manager->network()->entityIs(ptr);
+		segment_ = ptr;
 	}
 };
 
 /************************** IMPLEMENTATIONS **************************/
 
 ManagerImpl::ManagerImpl() {
+	network_ = Network::NetworkNew("network");
 	statsRep_ = NULL;
 	fleetRep_ = NULL;
 }
@@ -229,6 +251,8 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		instance_[name] = t;
 		return t;
 	}
+	else 
+		fprintf(stderr, "Incompatible type-attribute pair.\n");
 
     return NULL;
 }
@@ -261,6 +285,8 @@ string StatsRep::attribute(const string& name) {
 		return IntToString(stats_->boatSegmentCount());
 	else if (name == "Plane segment")
 		return IntToString(stats_->planeSegmentCount());
+	else if (name == "expedite percentage")
+		return FloatToString(stats_->expeditePercentage().value()*100);
 	else
 		fprintf(stderr, "Incompatible type-attribute pair.\n");
 		
