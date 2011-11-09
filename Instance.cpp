@@ -3,6 +3,7 @@
 #include <sstream>
 #include <map>
 #include <vector>
+#include <iterator>
 #include "Instance.h"
 #include "Engine.h"
 
@@ -30,6 +31,7 @@ string FloatToString(float v) {
 
 class StatsRep;
 class FleetRep;
+class ConnRep;
 
 class ManagerImpl : public Instance::Manager {
 public:
@@ -51,6 +53,7 @@ private:
 	Network::Ptr network_;
 	Ptr<StatsRep> statsRep_;
 	Ptr<FleetRep> fleetRep_;
+	Ptr<ConnRep> connRep_;
 };
 
 /*********************** REPRESENTATION CLASSES ***********************/
@@ -83,9 +86,9 @@ private:
 	Fleet::Ptr fleet_;
 };
 
-class ConnectivityRep : public Instance {
+class ConnRep : public Instance {
 public:
-	ConnectivityRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}	
+	ConnRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}	
 	string attribute(const string& name);
 	void attributeIs(const string& name, const string& v);
 
@@ -193,38 +196,35 @@ public:
 /************************** IMPLEMENTATIONS **************************/
 
 ManagerImpl::ManagerImpl() {
-	network_ = Network::NetworkNew("network");
+	network_ = NULL;
 	statsRep_ = NULL;
 	fleetRep_ = NULL;
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
-
+	
+	// First call to instanceNew
+	if (!network_) {
+		network_ = Network::NetworkNew("network");
+		statsRep_ = new StatsRep("statsRep", this);
+		fleetRep_ = new FleetRep("fleetRep", this);
+		connRep_ = new ConnRep("connRep", this);
+	}
+	
+	// Instance name already exists
 	if (instance(name)) {
 		cerr << "An instance already exists with the name: " << name << endl;
 		return NULL;
 	}
 
 	if (type == "Stats" ) {
-		if (!statsRep_) {
-       	 	Ptr<StatsRep> t = new StatsRep(name, this);
-	        instance_[name] = t;
-			statsRep_ = t;
-	        return t;
-		}
+		return statsRep_;
 	}
 	else if (type == "Fleet" ) {
-		if (!fleetRep_) {
-       	 	Ptr<FleetRep> t = new FleetRep(name, this);
-	        instance_[name] = t;
-			fleetRep_ = t;
-	        return t;
-		}
+		return fleetRep_;
 	}
 	else if (type == "Conn") {
-		Ptr<ConnectivityRep> t = new ConnectivityRep(name, this);
-		instance_[name] = t;
-		return t;
+		return connRep_;
 	}
     else if (type == "Customer") {
         Ptr<CustomerLocationRep> t = new CustomerLocationRep(name, this);
@@ -280,6 +280,22 @@ Ptr<Instance> ManagerImpl::instance(const string& name) {
 void ManagerImpl::instanceDel(const string& name) {
 	network_->entityDel(name);
 	instance_.erase(name);
+}
+
+/******************** CONNECTIVITY ALGORITHMS ********************/
+
+string explore(Ptr<LocationRep> loc, float dist, float cost, float time, bool expedited) {
+		
+	for (Location::SegmentListIteratorConst iter = loc->location()->segmentIterConst(); iter.ptr(); ++iter) {
+		Segment::PtrConst segment = iter.ptr();
+		
+    }
+	
+	return "";
+}
+
+string connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1) {
+	return "";
 }
 
 /***************** REPRESENTATION CLASS IMPLEMENTATIONS *****************/
@@ -382,16 +398,70 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 }
 
-string ConnectivityRep::attribute(const string& name) {
+string ConnRep::attribute(const string& name) {
+	
+	// Tokenize string
+	istringstream iss(name);
+	vector<string> tokens;
+	copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter<vector<string> >(tokens));
+	vector<string>::iterator token;
+	token = tokens.begin();
+	if (token == tokens.end()) return "";
+	
+	if (*token == "explore") {
+		advance(token, 1);
+		if (token == tokens.end()) return "";
+		Ptr<LocationRep> loc = dynamic_cast<LocationRep *>(manager_->instance(*token).ptr());
+		if (!loc) return "";
+		advance(token, 1);
+		if (token == tokens.end() || *token != ":") return "";
+		advance(token, 1);
+		
+		float distance, cost, time;
+		bool expedited = false;
+
+		while (token != tokens.end()) {
+			string attr = *token;
+			advance(token, 1);
+			if (attr == "expedited") {
+				expedited = true;
+				continue;
+			}
+			if (token == tokens.end()) return "";
+			string val = *token;
+			advance(token, 1);
+			if (attr == "distance") distance = atof(val.c_str());
+			else if (attr == "cost") cost = atof(val.c_str());
+			else if (attr == "time") time = atof(val.c_str());
+		}
+		return explore(loc, distance, cost, time, expedited);
+	}
+	else if (*token == "connect") {
+		advance(token, 1);
+		if (token == tokens.end()) return "";
+		Ptr<LocationRep> loc0 = dynamic_cast<LocationRep *>(manager_->instance(*token).ptr());
+		if (!loc0) return "";
+		advance(token, 1);
+		if (token == tokens.end() || *token != ":") return "";
+		advance(token, 1);
+		if (token == tokens.end()) return "";
+		Ptr<LocationRep> loc1 = dynamic_cast<LocationRep *>(manager_->instance(*token).ptr());
+		if (!loc1) return "";
+		return connect(loc0, loc1);
+	}
+	else
+		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+	
 	return "";
 }
 
 
-void ConnectivityRep::attributeIs(const string& name, const string& v) {
+void ConnRep::attributeIs(const string& name, const string& v) {
     //nothing to do
 }
 
 string LocationRep::attribute(const string& name) {
+	
     int i = segmentNumber(name);
     if (i != 0) {
 		if (location_->segment(i))
@@ -446,9 +516,12 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 		catch (Fwk::Exception e) { cerr << "Invalid length: " << v << endl; }			
 	}
 	else if (name == "return segment") {
+		if (v == "") segment_->returnSegmentIs(NULL);
 		Ptr<SegmentRep> ptr = dynamic_cast<SegmentRep *>(manager_->instance(v).ptr());
-		if (ptr)
-			segment_->returnSegmentIs(ptr->segment());
+		if (ptr) {
+			try { segment_->returnSegmentIs(ptr->segment()); }
+			catch (Fwk::Exception e) { cerr << "Return segment given to " << this->name() << " must have the same entity type."; }
+		}
 		else
 			cerr << "Instance given to 'return segment' is not a segment: " << v << endl;
 	}
