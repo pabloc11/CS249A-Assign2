@@ -5,12 +5,12 @@ namespace Shipping {
     truckSpeed_(1),
     boatSpeed_(1),
     planeSpeed_(1),
-    truckCost_(0),
-    boatCost_(0),
-    planeCost_(0),
-    truckCapacity_(0),
-    boatCapacity_(0),
-    planeCapacity_(0) 
+    truckCost_(1),
+    boatCost_(1),
+    planeCost_(1),
+    truckCapacity_(1),
+    boatCapacity_(1),
+    planeCapacity_(1) 
   {}
   
   void Fleet::truckSpeedIs(Fleet::Speed _truckSpeed) {

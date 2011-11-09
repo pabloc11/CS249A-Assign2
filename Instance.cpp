@@ -92,10 +92,13 @@ private:
 class ConnRep : public Instance {
 public:	
 	struct SearchParams {
+		// Explore params
 		float dist;
 		float cost;
 		float time;
 		bool expedited;
+		// Connect params
+		string destination;
 	};
 	struct SearchProgress {
 		float dist;
@@ -106,14 +109,17 @@ public:
 	ConnRep(const string& name, ManagerImpl* manager);
 	string attribute(const string& name);
 	void attributeIs(const string& name, const string& v);
-	
- 	string explore(Ptr<LocationRep> loc);
-	string connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1);
 
 private:
 	bool paramsExceeded(SearchProgress& progress);
-	void DFS(Segment::PtrConst seg, Location::PtrConst loc, set<string>& visited,
-			 SearchProgress progress, string& output, string path);
+	void appendToPath(Segment::PtrConst seg, Location::PtrConst loc, string& path);
+	SearchProgress updateProgress(Segment::PtrConst seg, SearchProgress& progress, bool expedited);
+	void exploreDFS(Segment::PtrConst seg, Location::PtrConst loc, set<string> visited,
+			 		SearchProgress progress, string& output, string path);
+	void connectDFS(Segment::PtrConst seg, Location::PtrConst loc, set<string> visited,
+					SearchProgress progress, bool expedited, string& output, string path);
+ 	string explore(Ptr<LocationRep> loc);
+	string connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1);
 	
     Ptr<ManagerImpl> manager_;
 	SearchParams params_;	
@@ -406,6 +412,7 @@ ConnRep::ConnRep(const string& name, ManagerImpl* manager) : Instance(name), man
 	params_.cost = 0;
 	params_.time = 0;
 	params_.expedited = false;
+	params_.destination = "";
 }
 
 bool ConnRep::paramsExceeded(SearchProgress& progress) {
@@ -417,65 +424,104 @@ bool ConnRep::paramsExceeded(SearchProgress& progress) {
 	return false;
 }
 
-void ConnRep::DFS(Segment::PtrConst seg, Location::PtrConst loc, set<string>& visited,
-				  SearchProgress progress, string& output, string path) {
+void ConnRep::appendToPath(Segment::PtrConst seg, Location::PtrConst loc, string& path) {
+	
+	if (path == "") path += seg->source()->name();
+	path += "(" + seg->name() + ":" + FloatToString(seg->length().value()) + ":" +
+		seg->returnSegment()->name() + ") " + loc->name();
+}
+
+ConnRep::SearchProgress ConnRep::updateProgress(Segment::PtrConst seg, SearchProgress& progress, bool expedited) {
+	
+	float distance = seg->length().value();
+	float difficulty = seg->difficulty().value();
+	
+	float cost, speed;
+	if (seg->entityType() == Entity::truckSegment()) {
+		cost = distance * difficulty * manager_->fleetRep()->fleet()->truckCost().value();
+		speed = manager_->fleetRep()->fleet()->truckSpeed().value();
+	}
+	else if (seg->entityType() == Entity::boatSegment()) {
+		cost = distance * difficulty * manager_->fleetRep()->fleet()->boatCost().value();
+		speed = manager_->fleetRep()->fleet()->boatSpeed().value();
+	}
+	else if (seg->entityType() == Entity::planeSegment()) {
+		cost = distance * difficulty * manager_->fleetRep()->fleet()->planeCost().value();
+		speed = manager_->fleetRep()->fleet()->planeSpeed().value();
+	}
+	
+	// Update for expedited shipping
+	if (expedited) {
+		cost *= 1.5;
+		speed *= 1.3;
+	}
+	
+	float time = distance / speed;
+	
+	// Update progress
+	SearchProgress newProgress = { progress.dist + distance, progress.cost + cost, progress.time + time };
+	return newProgress;
+}
+
+void ConnRep::exploreDFS(Segment::PtrConst seg, Location::PtrConst loc, set<string> visited,
+				  		 SearchProgress progress, string& output, string path) {
 
 	// Base case - location has already been visited or search parameters are exceeded
-	if (visited.count(loc->name()) || paramsExceeded(progress)) {
-		visited.erase(loc->name());
+	if (visited.count(loc->name()) || paramsExceeded(progress))
 		return;
-	}
-
-	visited.insert(loc->name());
 	
 	// Add path to output string
 	if (seg) {
-		if (output == "") path += seg->source()->name();
-		path += "(" + seg->name() + ":" + FloatToString(seg->length().value()) + ":" +
-			seg->returnSegment()->name() + ") " + loc->name();
+		appendToPath(seg, loc, path);
 		output += path + "\n";
 	}
 	
+	visited.insert(loc->name());
+	
+	// Search all outbound segments from current location
 	for (Location::SegmentListIteratorConst iter = loc->segmentIterConst(); iter.ptr(); ++iter) {
 		Segment::PtrConst segment = iter.ptr();
 		
 		// Skip segment if expedited shipping is specified but segment doesn't offer it
 		if (params_.expedited && segment->expeditedState() != Segment::expedited())
 			continue;
-		
-		if (segment->returnSegment()) {
-			
-			float distance = segment->length().value();
-			float difficulty = segment->difficulty().value();
-			
-			float cost, speed;
-			if (segment->entityType() == Entity::truckSegment()) {
-				cost = distance * difficulty * manager_->fleetRep()->fleet()->truckCost().value();
-				speed = manager_->fleetRep()->fleet()->truckSpeed().value();
-			}
-			else if (segment->entityType() == Entity::boatSegment()) {
-				cost = distance * difficulty * manager_->fleetRep()->fleet()->boatCost().value();
-				speed = manager_->fleetRep()->fleet()->boatSpeed().value();
-			}
-			else if (segment->entityType() == Entity::planeSegment()) {
-				cost = distance * difficulty * manager_->fleetRep()->fleet()->planeCost().value();
-				speed = manager_->fleetRep()->fleet()->planeSpeed().value();
-			}
-			
-			// Update for expedited shipping
-			if (params_.expedited) {
-				cost *= 1.5;
-				speed *= 1.3;
-			}
-			
-			float time = distance / speed;
-			
-			// Update progress and continue search at next location
-			SearchProgress newProgress = { progress.dist + distance, progress.cost + cost, progress.time + time };
-			DFS(segment, segment->returnSegment()->source(), visited, newProgress, output, path);
+					
+		if (segment->returnSegment()) {			
+			SearchProgress newProgress = updateProgress(segment, progress, params_.expedited);
+			exploreDFS(segment, segment->returnSegment()->source(), visited, newProgress, output, path);
 		}
-    }	
+    }		
+}
+
+void ConnRep::connectDFS(Segment::PtrConst seg, Location::PtrConst loc, set<string> visited,
+				  		 SearchProgress progress, bool expedited, string& output, string path) {
+
+	// Base case - location has already been visited
+	if (visited.count(loc->name()))
+		return;
 	
+	if (seg) appendToPath(seg, loc, path);
+	
+	// Add path to output string if destination reached
+	if (loc->name() == params_.destination) {
+		string isExpedited;
+		if (expedited) isExpedited = "yes";
+		else isExpedited = "no";
+		output += FloatToString(progress.cost) + " " + FloatToString(progress.time) + " " + isExpedited + "; " + path + "\n";
+		return;
+	}
+	
+	visited.insert(loc->name());
+	
+	// Search all outbound segments from current location
+	for (Location::SegmentListIteratorConst iter = loc->segmentIterConst(); iter.ptr(); ++iter) {
+		Segment::PtrConst segment = iter.ptr();	
+			
+		if (segment->returnSegment()) {			
+			SearchProgress newProgress = updateProgress(segment, progress, expedited);
+			connectDFS(segment, segment->returnSegment()->source(), visited, newProgress, expedited, output, path);
+		}
+    }		
 }
 
 string ConnRep::explore(Ptr<LocationRep> loc) {
@@ -484,13 +530,28 @@ string ConnRep::explore(Ptr<LocationRep> loc) {
 	set<string> visited;
 	string output = "";
 
-	DFS(NULL, loc->location(), visited, progress, output, "");
+	exploreDFS(NULL, loc->location(), visited, progress, output, "");
 	
+	size_t end = output.find_last_of("\n");
+	if (end != string::npos) output = output.substr(0, end);
 	return output;
 }
 
 string ConnRep::connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1) {
-	return "";
+	
+	params_.destination = loc1->name();
+	SearchProgress progress = {0, 0, 0};
+	set<string> visited;
+	string output = "";	
+	connectDFS(NULL, loc0->location(), visited, progress, false, output, "");
+	
+	SearchProgress expeditedProgress = {0, 0, 0};
+	set<string> expeditedVisited;
+	connectDFS(NULL, loc0->location(), expeditedVisited, expeditedProgress, true, output, "");
+	
+	size_t end = output.find_last_of("\n");
+	if (end != string::npos) output = output.substr(0, end);
+	return output;
 }
 
 string ConnRep::attribute(const string& name) {
@@ -591,10 +652,8 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 	
     if (name == "source") {
 		Ptr<LocationRep> ptr = dynamic_cast<LocationRep *>(manager_->instance(v).ptr());
-		if (ptr)
-			segment_->sourceIs(ptr->location());
-		else
-			cerr << "Instance given to 'source' is not a location: " << v << endl;
+		if (ptr) segment_->sourceIs(ptr->location());
+		else cerr << "Instance given to 'source' is not a location: " << v << endl;
     }
 	else if (name == "length") {
 		try	{ segment_->lengthIs(Segment::Length(atof(v.c_str()))); }
@@ -618,8 +677,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 			segment_->expeditedIs(Segment::expedited());
 		else if (v == "no")
 			segment_->expeditedIs(Segment::notExpedited());
-		else
-			cerr << "Invalid expedite support: " << v << endl;
+		else cerr << "Invalid expedite support: " << v << endl;
 	}
 	else cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 }
