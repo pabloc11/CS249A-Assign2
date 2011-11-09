@@ -1,0 +1,73 @@
+fleet->attribute('Boat, speed'): 60.00
+fleet->attribute('Truck, speed'): 70.00
+fleet->attribute('Boat, cost'): 30.00
+fleet->attribute('Truck, cost'): 50.00
+truckSeg1->attribute('source'): customer1
+truckSeg2->attribute('source'): port1
+truckSeg1->attribute('return segment'): truckSeg2
+truckSeg2->attribute('return segment'): truckSeg1
+truckSeg3->attribute('source'): port1
+truckSeg4->attribute('source'): truckterminal1
+truckSeg3->attribute('return segment'): truckSeg4
+truckSeg4->attribute('return segment'): truckSeg3
+truckSeg5->attribute('source'): truckterminal1
+truckSeg6->attribute('source'): port2
+truckSeg5->attribute('return segment'): truckSeg6
+truckSeg6->attribute('return segment'): truckSeg5
+truckSeg7->attribute('source'): truckterminal1
+truckSeg8->attribute('source'): port3
+truckSeg7->attribute('return segment'): truckSeg8
+truckSeg8->attribute('return segment'): truckSeg7
+boatseg1->attribute('source'): port2
+boatseg2->attribute('source'): boatterminal1
+boatseg1->attribute('return segment'): boatSeg2
+boatseg2->attribute('return segment'): boatSeg1
+boatseg3->attribute('source'): boatterminal1
+boatseg4->attribute('source'): port3
+boatseg3->attribute('return segment'): boatSeg4
+boatseg4->attribute('return segment'): boatSeg3
+boatseg5->attribute('source'): boatterminal1
+boatseg6->attribute('source'): customer1
+boatseg5->attribute('return segment'): boatSeg6
+boatseg6->attribute('return segment'): boatSeg5
+**** explore customer1 : expedited****
+customer1(truckSeg1:800.00:truckSeg2) port1
+customer1(truckSeg1:800.00:truckSeg2) port1(truckSeg3:200.00:truckSeg4) truckterminal1
+customer1(truckSeg1:800.00:truckSeg2) port1(truckSeg3:200.00:truckSeg4) truckterminal1(truckSeg5:500.00:truckSeg6) port2
+customer1(truckSeg1:800.00:truckSeg2) port1(truckSeg3:200.00:truckSeg4) truckterminal1(truckSeg5:500.00:truckSeg6) port2(boatSeg1:400.00:boatSeg2) boatterminal1
+customer1(truckSeg1:800.00:truckSeg2) port1(truckSeg3:200.00:truckSeg4) truckterminal1(truckSeg5:500.00:truckSeg6) port2(boatSeg1:400.00:boatSeg2) boatterminal1(boatSeg3:200.00:boatSeg4) port3
+customer1(truckSeg1:800.00:truckSeg2) port1(truckSeg3:200.00:truckSeg4) truckterminal1(truckSeg7:800.00:truckSeg8) port3
+customer1(truckSeg1:800.00:truckSeg2) port1(truckSeg3:200.00:truckSeg4) truckterminal1(truckSeg7:800.00:truckSeg8) port3(boatSeg4:500.00:boatSeg3) boatterminal1
+customer1(truckSeg1:800.00:truckSeg2) port1(truckSeg3:200.00:truckSeg4) truckterminal1(truckSeg7:800.00:truckSeg8) port3(boatSeg4:500.00:boatSeg3) boatterminal1(boatSeg2:300.00:boatSeg1) port2
+customer1(boatSeg6:700.00:boatSeg5) boatterminal1
+customer1(boatSeg6:700.00:boatSeg5) boatterminal1(boatSeg2:300.00:boatSeg1) port2
+customer1(boatSeg6:700.00:boatSeg5) boatterminal1(boatSeg2:300.00:boatSeg1) port2(truckSeg6:600.00:truckSeg5) truckterminal1
+customer1(boatSeg6:700.00:boatSeg5) boatterminal1(boatSeg2:300.00:boatSeg1) port2(truckSeg6:600.00:truckSeg5) truckterminal1(truckSeg4:400.00:truckSeg3) port1
+customer1(boatSeg6:700.00:boatSeg5) boatterminal1(boatSeg2:300.00:boatSeg1) port2(truckSeg6:600.00:truckSeg5) truckterminal1(truckSeg7:800.00:truckSeg8) port3
+customer1(boatSeg6:700.00:boatSeg5) boatterminal1(boatSeg3:200.00:boatSeg4) port3
+customer1(boatSeg6:700.00:boatSeg5) boatterminal1(boatSeg3:200.00:boatSeg4) port3(truckSeg8:1000.00:truckSeg7) truckterminal1
+customer1(boatSeg6:700.00:boatSeg5) boatterminal1(boatSeg3:200.00:boatSeg4) port3(truckSeg8:1000.00:truckSeg7) truckterminal1(truckSeg4:400.00:truckSeg3) port1
+customer1(boatSeg6:700.00:boatSeg5) boatterminal1(boatSeg3:200.00:boatSeg4) port3(truckSeg8:1000.00:truckSeg7) truckterminal1(truckSeg5:500.00:truckSeg6) port2
+
+
+*** connect port3 : truckterminal1 ****
+85000.00 14.29 no; port3(truckSeg8:1000.00:truckSeg7) truckterminal1
+87600.00 21.90 no; port3(boatSeg4:500.00:boatSeg3) boatterminal1(boatSeg2:300.00:boatSeg1) port2(truckSeg6:600.00:truckSeg5) truckterminal1
+227000.00 32.62 no; port3(boatSeg4:500.00:boatSeg3) boatterminal1(boatSeg5:600.00:boatSeg6) customer1(truckSeg1:800.00:truckSeg2) port1(truckSeg3:200.00:truckSeg4) truckterminal1
+127500.00 10.99 yes; port3(truckSeg8:1000.00:truckSeg7) truckterminal1
+131400.00 16.85 yes; port3(boatSeg4:500.00:boatSeg3) boatterminal1(boatSeg2:300.00:boatSeg1) port2(truckSeg6:600.00:truckSeg5) truckterminal1
+340500.00 25.09 yes; port3(boatSeg4:500.00:boatSeg3) boatterminal1(boatSeg5:600.00:boatSeg6) customer1(truckSeg1:800.00:truckSeg2) port1(truckSeg3:200.00:truckSeg4) truckterminal1
+
+
+===== Stats attributes =====
+ --- Segments --- 
+# Truck segments : 8
+# Boat segments : 6
+Expediting %     : 100.00
+ --- Terminals --- 
+# Plane terminals: 0
+# Truck terminals: 1
+# Boat terminals: 1
+ --- Ports and customers --- 
+# Ports          : 3
+# Customer          : 1

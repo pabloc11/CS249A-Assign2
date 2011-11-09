@@ -5,7 +5,6 @@
 
 #include "Ptr.h"
 #include "PtrInterface.h"
-#include "Instance.h"
 #include "Nominal.h"
 #include "fwk/NamedInterface.h"
 #include "fwk/HashMap.h"

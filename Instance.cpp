@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <map>
+#include <set>
 #include <vector>
 #include <iterator>
 #include "Instance.h"
@@ -32,6 +33,7 @@ string FloatToString(float v) {
 class StatsRep;
 class FleetRep;
 class ConnRep;
+class LocationRep;
 
 class ManagerImpl : public Instance::Manager {
 public:
@@ -47,6 +49,7 @@ public:
     void instanceDel(const string& name);
 
 	Network::Ptr network() { return network_; }
+	Ptr<FleetRep> fleetRep() { return fleetRep_; }
 
 private:
     map<string,Ptr<Instance> > instance_;
@@ -56,7 +59,7 @@ private:
 	Ptr<ConnRep> connRep_;
 };
 
-/*********************** REPRESENTATION CLASSES ***********************/
+/************************** REPRESENTATION CLASSES **************************/
 
 class StatsRep : public Instance {
 public:	
@@ -87,13 +90,32 @@ private:
 };
 
 class ConnRep : public Instance {
-public:
-	ConnRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}	
+public:	
+	struct SearchParams {
+		float dist;
+		float cost;
+		float time;
+		bool expedited;
+	};
+	struct SearchProgress {
+		float dist;
+		float cost;
+		float time;
+	};
+	
+	ConnRep(const string& name, ManagerImpl* manager);
 	string attribute(const string& name);
 	void attributeIs(const string& name, const string& v);
+	
+ 	string explore(Ptr<LocationRep> loc);
+	string connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1);
 
 private:
+	bool paramsExceeded(SearchProgress& progress);
+	void DFS(Location::PtrConst loc, set<string>& visited, SearchProgress& progress, string& output);
+	
     Ptr<ManagerImpl> manager_;
+	SearchParams params_;	
 };
 
 class LocationRep : public Instance {
@@ -193,7 +215,7 @@ public:
 	}
 };
 
-/************************** IMPLEMENTATIONS **************************/
+/************************ INSTANCE MANAGER IMPLEMENTATION ************************/
 
 ManagerImpl::ManagerImpl() {
 	network_ = NULL;
@@ -280,22 +302,6 @@ Ptr<Instance> ManagerImpl::instance(const string& name) {
 void ManagerImpl::instanceDel(const string& name) {
 	network_->entityDel(name);
 	instance_.erase(name);
-}
-
-/******************** CONNECTIVITY ALGORITHMS ********************/
-
-string explore(Ptr<LocationRep> loc, float dist, float cost, float time, bool expedited) {
-		
-	for (Location::SegmentListIteratorConst iter = loc->location()->segmentIterConst(); iter.ptr(); ++iter) {
-		Segment::PtrConst segment = iter.ptr();
-		
-    }
-	
-	return "";
-}
-
-string connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1) {
-	return "";
 }
 
 /***************** REPRESENTATION CLASS IMPLEMENTATIONS *****************/
@@ -398,6 +404,75 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 }
 
+ConnRep::ConnRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
+	params_.dist = 0;
+	params_.cost = 0;
+	params_.time = 0;
+	params_.expedited = false;
+}
+
+bool ConnRep::paramsExceeded(SearchProgress& progress) {
+	
+	if ((params_.dist != 0 && progress.dist > params_.dist) || (params_.cost != 0 && progress.cost > params_.cost) ||
+	  	(params_.time != 0 && progress.time > params_.time))
+		return true;
+	
+	return false;
+}
+
+void ConnRep::DFS(Location::PtrConst loc, set<string>& visited, SearchProgress& progress, string& output) {
+
+	if (visited.count(loc->name()) || !paramsExceeded(progress))
+		return;
+	cout << "Visiting: " << loc->name() << endl;
+	visited.insert(loc->name());
+	
+	for (Location::SegmentListIteratorConst iter = loc->segmentIterConst(); iter.ptr(); ++iter) {
+		Segment::PtrConst segment = iter.ptr();
+		if (segment->returnSegment()) {
+			
+			float dist = segment->length().value();
+			
+			float cost, speed;
+			if (segment->entityType() == Entity::truckSegment()) {
+				cost = manager_->fleetRep()->fleet()->truckCost().value();
+				speed = manager_->fleetRep()->fleet()->truckSpeed().value();
+			}
+			else if (segment->entityType() == Entity::boatSegment()) {
+				cost = manager_->fleetRep()->fleet()->boatCost().value();
+				speed = manager_->fleetRep()->fleet()->boatSpeed().value();
+			}
+			else if (segment->entityType() == Entity::planeSegment()) {
+				cost = manager_->fleetRep()->fleet()->planeCost().value();
+				speed = manager_->fleetRep()->fleet()->planeSpeed().value();
+			}
+			
+			float time = dist / speed;
+			
+			progress.dist += dist;
+			progress.cost += cost;
+			progress.time += time;
+			DFS(segment->returnSegment()->source(), visited, progress, output);
+		}
+    }	
+	
+}
+
+string ConnRep::explore(Ptr<LocationRep> loc) {
+	
+	SearchProgress progress = {0, 0, 0};
+	set<string> visited;
+	string output = "";
+
+	DFS(loc->location(), visited, progress, output);
+	
+	return output;
+}
+
+string ConnRep::connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1) {
+	return "";
+}
+
 string ConnRep::attribute(const string& name) {
 	
 	// Tokenize string
@@ -416,25 +491,22 @@ string ConnRep::attribute(const string& name) {
 		advance(token, 1);
 		if (token == tokens.end() || *token != ":") return "";
 		advance(token, 1);
-		
-		float distance, cost, time;
-		bool expedited = false;
 
 		while (token != tokens.end()) {
 			string attr = *token;
 			advance(token, 1);
 			if (attr == "expedited") {
-				expedited = true;
+				params_.expedited = true;
 				continue;
 			}
 			if (token == tokens.end()) return "";
 			string val = *token;
 			advance(token, 1);
-			if (attr == "distance") distance = atof(val.c_str());
-			else if (attr == "cost") cost = atof(val.c_str());
-			else if (attr == "time") time = atof(val.c_str());
+			if (attr == "distance") params_.dist = atof(val.c_str());
+			else if (attr == "cost") params_.cost = atof(val.c_str());
+			else if (attr == "time") params_.time = atof(val.c_str());
 		}
-		return explore(loc, distance, cost, time, expedited);
+		return explore(loc);
 	}
 	else if (*token == "connect") {
 		advance(token, 1);
@@ -454,7 +526,6 @@ string ConnRep::attribute(const string& name) {
 	
 	return "";
 }
-
 
 void ConnRep::attributeIs(const string& name, const string& v) {
     //nothing to do
