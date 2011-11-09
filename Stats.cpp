@@ -29,7 +29,7 @@ namespace Shipping {
           new SegmentReactor((Segment*)_ptr.ptr(), stats_.ptr());
         }
        
-        if(_ptr->entityType() == Entity::boatSegment()) {
+        else if(_ptr->entityType() == Entity::boatSegment()) {
           stats_->boatSegmentCountInc();
           if(((BoatSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
             stats_->expeditedSegmentCountInc();
@@ -37,7 +37,7 @@ namespace Shipping {
           new SegmentReactor((Segment*)_ptr.ptr(), stats_.ptr());
         }
         
-        if(_ptr->entityType() == Entity::planeSegment()) {
+        else if(_ptr->entityType() == Entity::planeSegment()) {
           stats_->planeSegmentCountInc();
           if(((PlaneSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
             stats_->expeditedSegmentCountInc();
@@ -45,23 +45,23 @@ namespace Shipping {
           new SegmentReactor((Segment*)_ptr.ptr(), stats_.ptr());
         }
         
-        if(_ptr->entityType() == Entity::customerLocation()) {
+        else if(_ptr->entityType() == Entity::customerLocation()) {
           stats_->customerLocationCountInc();
         }
         
-        if(_ptr->entityType() == Entity::portLocation()) {
+        else if(_ptr->entityType() == Entity::portLocation()) {
           stats_->portLocationCountInc();
         }
         
-        if(_ptr->entityType() == Entity::truckTerminal()) {
+        else if(_ptr->entityType() == Entity::truckTerminal()) {
           stats_->truckTerminalCountInc();
         }
         
-        if(_ptr->entityType() == Entity::boatTerminal()) {
+        else if(_ptr->entityType() == Entity::boatTerminal()) {
           stats_->boatTerminalCountInc();
         }
         
-        if(_ptr->entityType() == Entity::planeTerminal()) {
+        else if(_ptr->entityType() == Entity::planeTerminal()) {
           stats_->planeTerminalCountInc();
         }
       }
