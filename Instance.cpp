@@ -112,7 +112,8 @@ public:
 
 private:
 	bool paramsExceeded(SearchProgress& progress);
-	void DFS(Location::PtrConst loc, set<string>& visited, SearchProgress& progress, string& output);
+	void DFS(Segment::PtrConst seg, Location::PtrConst loc, set<string>& visited,
+			 SearchProgress progress, string& output, string path);
 	
     Ptr<ManagerImpl> manager_;
 	SearchParams params_;	
@@ -288,8 +289,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		instance_[name] = t;
 		return t;
 	}
-	else 
-		cerr << "Invalid type: " << type << endl;
+	else cerr << "Invalid type: " << type << endl;
 
     return NULL;
 }
@@ -326,8 +326,7 @@ string StatsRep::attribute(const string& name) {
 		return IntToString(stats_->planeSegmentCount());
 	else if (name == "expedite percentage")
 		return FloatToString(stats_->expeditePercentage().value()*100);
-	else
-		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+	else cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 		
 	return "";
 }
@@ -356,8 +355,7 @@ string FleetRep::attribute(const string& name) {
 		return IntToString(fleet_->boatCapacity().value());
 	else if (name == "Plane, capacity")
 		return IntToString(fleet_->planeCapacity().value());	
-	else
-		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+	else cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 
 	return "";
 }
@@ -400,11 +398,10 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 		try { fleet_->planeCapacityIs(Fleet::Capacity(atoi(v.c_str()))); }
 		catch (Fwk::Exception e) { cerr << "Invalid capacity: " << v << endl; }
 	}
-	else
-		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+	else cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 }
 
-ConnRep::ConnRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
+ConnRep::ConnRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {	
 	params_.dist = 0;
 	params_.cost = 0;
 	params_.time = 0;
@@ -420,39 +417,62 @@ bool ConnRep::paramsExceeded(SearchProgress& progress) {
 	return false;
 }
 
-void ConnRep::DFS(Location::PtrConst loc, set<string>& visited, SearchProgress& progress, string& output) {
+void ConnRep::DFS(Segment::PtrConst seg, Location::PtrConst loc, set<string>& visited,
+				  SearchProgress progress, string& output, string path) {
 
-	if (visited.count(loc->name()) || !paramsExceeded(progress))
+	// Base case - location has already been visited or search parameters are exceeded
+	if (visited.count(loc->name()) || paramsExceeded(progress)) {
+		visited.erase(loc->name());
 		return;
-	cout << "Visiting: " << loc->name() << endl;
+	}
+
 	visited.insert(loc->name());
+	
+	// Add path to output string
+	if (seg) {
+		if (output == "") path += seg->source()->name();
+		path += "(" + seg->name() + ":" + FloatToString(seg->length().value()) + ":" +
+			seg->returnSegment()->name() + ") " + loc->name();
+		output += path + "\n";
+	}
 	
 	for (Location::SegmentListIteratorConst iter = loc->segmentIterConst(); iter.ptr(); ++iter) {
 		Segment::PtrConst segment = iter.ptr();
+		
+		// Skip segment if expedited shipping is specified but segment doesn't offer it
+		if (params_.expedited && segment->expeditedState() != Segment::expedited())
+			continue;
+		
 		if (segment->returnSegment()) {
 			
-			float dist = segment->length().value();
+			float distance = segment->length().value();
+			float difficulty = segment->difficulty().value();
 			
 			float cost, speed;
 			if (segment->entityType() == Entity::truckSegment()) {
-				cost = manager_->fleetRep()->fleet()->truckCost().value();
+				cost = distance * difficulty * manager_->fleetRep()->fleet()->truckCost().value();
 				speed = manager_->fleetRep()->fleet()->truckSpeed().value();
 			}
 			else if (segment->entityType() == Entity::boatSegment()) {
-				cost = manager_->fleetRep()->fleet()->boatCost().value();
+				cost = distance * difficulty * manager_->fleetRep()->fleet()->boatCost().value();
 				speed = manager_->fleetRep()->fleet()->boatSpeed().value();
 			}
 			else if (segment->entityType() == Entity::planeSegment()) {
-				cost = manager_->fleetRep()->fleet()->planeCost().value();
+				cost = distance * difficulty * manager_->fleetRep()->fleet()->planeCost().value();
 				speed = manager_->fleetRep()->fleet()->planeSpeed().value();
 			}
 			
-			float time = dist / speed;
+			// Update for expedited shipping
+			if (params_.expedited) {
+				cost *= 1.5;
+				speed *= 1.3;
+			}
 			
-			progress.dist += dist;
-			progress.cost += cost;
-			progress.time += time;
-			DFS(segment->returnSegment()->source(), visited, progress, output);
+			float time = distance / speed;
+			
+			// Update progress and continue search at next location
+			SearchProgress newProgress = { progress.dist + distance, progress.cost + cost, progress.time + time };
+			DFS(segment, segment->returnSegment()->source(), visited, newProgress, output, path);
 		}
     }	
 	
@@ -464,7 +484,7 @@ string ConnRep::explore(Ptr<LocationRep> loc) {
 	set<string> visited;
 	string output = "";
 
-	DFS(loc->location(), visited, progress, output);
+	DFS(NULL, loc->location(), visited, progress, output, "");
 	
 	return output;
 }
@@ -489,8 +509,7 @@ string ConnRep::attribute(const string& name) {
 		Ptr<LocationRep> loc = dynamic_cast<LocationRep *>(manager_->instance(*token).ptr());
 		if (!loc) return "";
 		advance(token, 1);
-		if (token == tokens.end() || *token != ":") return "";
-		advance(token, 1);
+		if (token != tokens.end() && *token == ":") advance(token, 1);
 
 		while (token != tokens.end()) {
 			string attr = *token;
@@ -521,8 +540,7 @@ string ConnRep::attribute(const string& name) {
 		if (!loc1) return "";
 		return connect(loc0, loc1);
 	}
-	else
-		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+	else cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 	
 	return "";
 }
@@ -535,13 +553,10 @@ string LocationRep::attribute(const string& name) {
 	
     int i = segmentNumber(name);
     if (i != 0) {
-		if (location_->segment(i))
-			return location_->segment(i)->name();
-		else
-			cerr << "Segment not found with index: " << i << endl;
+		if (location_->segment(i)) return location_->segment(i)->name();
+		else cerr << "Segment not found with index: " << i << endl;
     }
-	else
-		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+	else cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 		
     return "";
 }
@@ -567,8 +582,7 @@ string SegmentRep::attribute(const string& name) {
 		else if (segment_->expeditedState() == Segment::notExpedited())
 			return "no";
 	}
-	else
-		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+	else cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 		
 	return "";
 }
@@ -593,8 +607,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 			try { segment_->returnSegmentIs(ptr->segment()); }
 			catch (Fwk::Exception e) { cerr << "Return segment given to " << this->name() << " must have the same entity type."; }
 		}
-		else
-			cerr << "Instance given to 'return segment' is not a segment: " << v << endl;
+		else cerr << "Instance given to 'return segment' is not a segment: " << v << endl;
 	}
 	else if (name == "difficulty") {
 		try { segment_->difficultyIs(Segment::Difficulty(atof(v.c_str()))); }
@@ -608,9 +621,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 		else
 			cerr << "Invalid expedite support: " << v << endl;
 	}
-	else {
-		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
-	}
+	else cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 }
 
 static const string segmentStr = "segment";
