@@ -241,6 +241,12 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		connRep_ = new ConnRep("connRep", this);
 	}
 	
+	// Instance name is invalid
+	if (name == "") {
+		cerr << "Invalid instance name." << endl;
+		return NULL;
+	}
+	
 	// Instance name already exists
 	if (instance(name)) {
 		cerr << "An instance already exists with the name: " << name << endl;
@@ -661,7 +667,10 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 		catch (Fwk::Exception e) { cerr << "Invalid length: " << v << endl; }			
 	}
 	else if (name == "return segment") {
-		if (v == "") segment_->returnSegmentIs(NULL);
+		if (v == "") {
+			segment_->returnSegmentIs(NULL);
+			return;
+		}
 		Ptr<SegmentRep> ptr = dynamic_cast<SegmentRep *>(manager_->instance(v).ptr());
 		if (ptr) {
 			try { segment_->returnSegmentIs(ptr->segment()); }

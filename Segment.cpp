@@ -33,6 +33,7 @@ namespace Shipping {
 		if (_returnSegment == NULL) {
 			returnSegment_->returnSegment_ = NULL;
 			returnSegment_ = NULL;
+			return;
 		}
 	
     if(_returnSegment->entityType() != this->entityType())

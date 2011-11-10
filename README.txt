@@ -1,6 +1,26 @@
 user: pabloc11
+user: nch25
 
-*** Engine Layer ***
+*************** MIDDLE LAYER *************** 
+
+The middle layer is divided into several classes, all of which inherit from the Instance class:
+
+--StatsRep class - this class represents the stats entity to the client.  It overrides the attribute() and attributeIs() methods of the Instance class and performs error checking relevant to the Stats entity.  The attributeIs() method is empty since writing to the stats entity is not supported.
+
+--FleetRep class - this class represents the fleet entity to the client.  It overrides the attribute() and attributeIs() methods of the Instance class and performs error checking relevant to the Fleet entity.
+
+--ConnRep class - this class represents a connectivity entity which doesn't exist in the engine layer.  It overrides the attribute() and attributeIs() methods of the Instance class and performs error checking relevant to this entity as outlined in the assignment description.  The class also includes several private methods to aid in the graph traversals required by the attribute() method.  The attributeIs() method is empty since writing to this class is not supported.
+
+--LocationRep class - this class represents the location entity to the client.  It overrides the attribute() and attributeIs() methods of the Instance class and performs error checking relevant to the location entity.  The attributeIs() method is empty since writing to the location entity is not supported.
+
+--SegmentRep class - this class represents the segment entity to the client.  It overrides the attribute() and attributeIs() methods of the Instance class and performs error checking relevant to the segment entity.
+
+The following classes inherit from LocationRep: CustomerLocationRep, PortLocationRep, TruckTerminalRep, BoatTerminalRep and PlaneTerminalRep, all of which represent respective entities in the engine layer.  Similarly, the following classes inherit from SegmentRep: TruckSegmentRep, BoatSegmentRep and PlaneSegmentRep.
+
+Finally the ManagerImpl class inherits from Instance::Manager, and provides functionality for creating new instance objects (instanceNew) and deleting instance objects (instanceDel).
+
+*************** ENGINE LAYER *************** 
+
 The engine layer is divided into several classes enumerated below:
 
 --Network class - this class is a collection of shipping entities maintained in a hash map. Entities are added/removed from the Network by calling entityIs()/entityDel(). The Network also provides a notifier interface for a single notifiee, in this case intended for the Stats object to track the number of each kind of entity in the network.
