@@ -15,6 +15,15 @@ namespace Shipping {
     if(source_ == _source)
       return;
     
+    if(_source && _source->entityType() == Entity::truckTerminal() && this->entityType() != Entity::truckSegment())
+        return;
+
+    if(_source && _source->entityType() == Entity::planeTerminal() && this->entityType() != Entity::planeSegment())
+        return;
+
+    if(_source && _source->entityType() == Entity::boatTerminal() && this->entityType() != Entity::boatSegment())
+        return;
+
     if(source_) {
       //remove from Location array
       source_->segment_.deleteMember(this);
