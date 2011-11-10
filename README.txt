@@ -1,0 +1,18 @@
+user: pabloc11
+
+*** Engine Layer ***
+The engine layer is divided into several classes enumerated below:
+
+--Network class - this class is a collection of shipping entities maintained in a hash map. Entities are added/removed from the Network by calling entityIs()/entityDel(). The Network also provides a notifier interface for a single notifiee, in this case intended for the Stats object to track the number of each kind of entity in the network.
+
+--Stats class - this class keeps a number of counters about information pertaining to the entities in a network. It registers with a Network object to be notified when entities are added/removed from the network. In addition when a Segment is added to the Network the Stats object will also register to be notified of changes to the expedited state of the segment so that it can accurately maintain the percentage of expedited segments in the network.
+
+--Fleet class - this class provides simple accessors/mutators for a number of attributes pertaining to speed/cost/capacity of the different modes of transportation in a network.
+
+--Entity class - this class is the root of the entity hierarchy and defines a single attribute entityType which is an enumeration of all the possible entities. This is easily expandable if more entities are created.
+
+--Segment class - this class has a number of attributes pertaining to segments, source, returnSegment, length, difficulty, and expeditedState. It also provides a notifier interface for a single notifiee, in this case intended to notify the Stats object when the expeditedState changes. 
+
+--Location class - this class maintains a linked list of segments that originate from the Location. A linked list is used so that arbitrary elements can be easily removed. This list can be read by index, but cannot be written directly. Instead the Segment class is made a friend class of the Location class so that setting the source attribute on a Segment can also modify the segment list in a Location object. This ensures that it is impossible to create inconsistency between the two.
+
+--the remaining classes fill out the rest of the entity hierarchy but do not have any relevant attributes.

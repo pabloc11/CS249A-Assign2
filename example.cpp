@@ -117,6 +117,10 @@ int main(int argc, char *argv[]) {
     assert(truckSeg1->attribute("expedite support") == "yes");
     truckSeg2->attributeIs("expedite support", "yes");
     assert(truckSeg2->attribute("expedite support") == "yes");
+    truckSeg2->attributeIs("expedite support", "no");
+    assert(truckSeg2->attribute("expedite support") == "no");
+    truckSeg2->attributeIs("expedite support", "yes");
+    assert(truckSeg2->attribute("expedite support") == "yes");
 
     // -- Connectivity queries
 
@@ -135,6 +139,7 @@ int main(int argc, char *argv[]) {
     cout << conn->attribute("connect customer2 : customer1") << endl;
     cout << endl;
 
+    manager->instanceDel("boatSeg1");
 
     // -- Statistics queries
     cout << "===== Stats attributes =====" << endl;
@@ -142,7 +147,7 @@ int main(int argc, char *argv[]) {
     cout << "# Truck segments : " << stats->attribute("Truck segment") << endl;
     assert(stats->attribute("Truck segment") == "2");
     cout << "# Boat segments  : " << stats->attribute("Boat segment") << endl;
-    assert(stats->attribute("Boat segment") == "2");
+    assert(stats->attribute("Boat segment") == "1");
     cout << "# Plane segments : " << stats->attribute("Plane segment") << endl;
     assert(stats->attribute("Plane segment") == "0");
     cout << "Expediting %     : " << stats->attribute("expedite percentage") << endl;

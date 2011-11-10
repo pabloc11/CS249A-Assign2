@@ -42,31 +42,6 @@ namespace Shipping {
     static inline EntityType boatTerminal() { return boatTerminal_; }
     static inline EntityType planeTerminal() { return planeTerminal_; }
     
-    /*
-     * TODO: this shouldn't be needed, but comment it back in and let me know if it is
-    static Entity::Ptr EntityNew(Fwk::String _name, EntityType _type) {
-      Ptr m = new Entity(_name, _type);
-      return m;   
-    }
-    */
-    /*
-    class NotifieeConst : public virtual Fwk::NamedInterface::NotifieeConst
-    {
-    public:
-      typedef Fwk::Ptr<NotifieeConst const> PtrConst;
-      
-      Entity::PtrConst notifier() const { return notifier_; }
-      virtual void notifierIs(const Entity::PtrConst& _notifier);
-      
-      //TODO: don't think this is needed either
-      //~NotifieeConst();
-    protected:
-      NotifieeConst() : Fwk::NamedInterface::NotifieeConst() {}
-      Entity::PtrConst notifier_; 
-    };
-
-    Entity::NotifieeConst::PtrConst notifiee() const { return notifiee_; }
-    */
     Entity const * fwkHmNext() const { return fwkHmNext_.ptr(); }
     Entity * fwkHmNext() { return fwkHmNext_.ptr(); }
     void fwkHmNextIs(Entity * _fwkHmNext) const {
@@ -80,14 +55,6 @@ namespace Shipping {
 
     Entity(Fwk::String _name, EntityType _entityType);
     Entity(const Entity&);
-    /*
-    void notifieeIs(Entity::NotifieeConst::PtrConst n) const 
-    {
-      Entity* me = const_cast<Entity*>(this);
-      me->notifiee_ = n;
-    }
-    */
-    //Entity::NotifieeConst::PtrConst notifiee_;
   };
 
 /************************** NETWORK **************************/
@@ -334,14 +301,6 @@ namespace Shipping {
 		void lengthIs(Length _length);
     void difficultyIs(Difficulty _difficulty);
     void expeditedIs(Expedited _expedited);
- 
-    // public constructor
-    /*
-    static Segment::Ptr SegmentIs(Fwk::String _name) {
-      Segment::Ptr m = new Segment(_name);
-      return m;
-    }
-    */
     
     // Notifier Class
     class NotifieeConst : public virtual Fwk::NamedInterface::NotifieeConst
@@ -401,21 +360,6 @@ namespace Shipping {
       TruckSegment::Ptr m = new TruckSegment(_name);
       return m;
     }
-    /*
-    // Notifier Interfaces
-    class NotifieeConst : public virtual Segment::NotifieeConst
-    {
-    public:
-      typedef Fwk::Ptr<NotifieeConst const> PtrConst;
-      
-      Segment::PtrConst notifier() const { return dynamic_cast<TruckSegment const *>(Segment::NotifieeConst::notifier().ptr()); }
-
-      virtual void onTruckSegmentNew() {}
-			virtual void onTruckSegmentDel() {}
-    protected:
-      NotifieeConst() : Segment::NotifieeConst() {}
-		};
-    */
  
   protected:
     // Constructors
@@ -436,22 +380,7 @@ namespace Shipping {
       BoatSegment::Ptr m = new BoatSegment(_name);
       return m;
     }
-    /*
-    // Notifier Interfaces
-    class NotifieeConst : public virtual Segment::NotifieeConst
-    {
-    public:
-      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
-      
-      Segment::PtrConst notifier() const { return dynamic_cast<BoatSegment const *>(Segment::NotifieeConst::notifier().ptr()); }
 
-      virtual void onBoatSegmentNew() {}
-			virtual void onBoatSegmentDel() {}
-
-    protected:
-      NotifieeConst() : Segment::NotifieeConst() {}
-		};
-    */
   protected:
     // Constructors
     BoatSegment( const BoatSegment& );
@@ -471,22 +400,7 @@ namespace Shipping {
       PlaneSegment::Ptr m = new PlaneSegment(_name);
       return m;
     }
-    /*
-    // Notifier Interfaces
-    class NotifieeConst : public virtual Segment::NotifieeConst
-    {
-    public:
-      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
-      
-      Segment::PtrConst notifier() const { return dynamic_cast<PlaneSegment const *>(Segment::NotifieeConst::notifier().ptr()); }
 
-      virtual void onPlaneSegmentNew() {}
-			virtual void onPlaneSegmentDel() {}
-
-    protected:
-      NotifieeConst() : Segment::NotifieeConst() {}
-		};
-    */
   protected:
     // Constructors
     PlaneSegment( const PlaneSegment& );
@@ -509,25 +423,6 @@ namespace Shipping {
     inline U32 segments() { return segment_.members(); }
     inline SegmentListIteratorConst segmentIterConst() const { return segment_.iterator(); }
     
-    // Attribute Mutators 
-    // NOTE: array is read-only use "source" attribute of Segment to set instead
-    //Segment::Ptr segmentDel(Fwk::String _str);
-    //Segment::Ptr segmentIs(Fwk::String _str);
-    /*
-    // Notifier Class
-    class NotifieeConst : public virtual Entity::NotifieeConst
-    {
-    public:
-      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
-      
-      Location::PtrConst notifier() const { return dynamic_cast<Location const *>(Entity::NotifieeConst::notifier().ptr()); }
-      
-      virtual void onSegmentNew() {}
-      virtual void onSegmentDel() {}
-    protected:
-      NotifieeConst() : Entity::NotifieeConst() {}
-		};
-    */
   protected:
     friend class Segment;
     SegmentList segment_;
@@ -542,22 +437,7 @@ namespace Shipping {
   public:
     typedef Fwk::Ptr<CustomerLocation const> PtrConst;
     typedef Fwk::Ptr<CustomerLocation> Ptr; 
-    /*
-    // Notifier Class
-    class NotifieeConst : public virtual Location::NotifieeConst
-    {
-    public:
-      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
-      
-      CustomerLocation::PtrConst notifier() const { return dynamic_cast<CustomerLocation const *>(Location::NotifieeConst::notifier().ptr()); }
 
-      virtual void onCustomerLocationNew() {}
-			virtual void onCustomerLocationDel() {}
-
-    protected:
-      NotifieeConst() : Location::NotifieeConst() {}
-		};
-    */
     static CustomerLocation::Ptr CustomerLocationIs(Fwk::String _name) {
        Ptr m = new CustomerLocation(_name);
        return m;
@@ -575,22 +455,7 @@ namespace Shipping {
   public:
     typedef Fwk::Ptr<PortLocation const> PtrConst;
     typedef Fwk::Ptr<PortLocation> Ptr;
-    /*
-    // Notifier Class
-    class NotifieeConst : public virtual Location::NotifieeConst
-    {
-    public:
-      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
-      
-      PortLocation::PtrConst notifier() const { return dynamic_cast<PortLocation const *>(Location::NotifieeConst::notifier().ptr()); }
 
-      virtual void onPortLocationNew() {}
-			virtual void onPortLocationDel() {}
-
-    protected:
-      NotifieeConst() : Location::NotifieeConst() {}
-		};
-    */
     static PortLocation::Ptr PortLocationIs(Fwk::String _name) {
        Ptr m = new PortLocation(_name);
        return m;
@@ -608,19 +473,7 @@ namespace Shipping {
   public:
     typedef Fwk::Ptr<TerminalLocation const> PtrConst;
     typedef Fwk::Ptr<TerminalLocation> Ptr;
-    /*
-    // Notifier Class
-    class NotifieeConst : public virtual Location::NotifieeConst
-    {
-    public:
-      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
-      
-      TerminalLocation::PtrConst notifier() const { return dynamic_cast<TerminalLocation const *>(Location::NotifieeConst::notifier().ptr()); }
 
-    protected:
-      NotifieeConst() : Location::NotifieeConst() {}
-		};
-    */
   protected:
     TerminalLocation(Fwk::String _name, Entity::EntityType _entity);
     TerminalLocation( const TerminalLocation& );
@@ -633,22 +486,7 @@ namespace Shipping {
   public:
     typedef Fwk::Ptr<TruckTerminal const> PtrConst;
     typedef Fwk::Ptr<TruckTerminal> Ptr;
-    /*
-    // Notifier Class
-    class NotifieeConst : public virtual TerminalLocation::NotifieeConst
-    {
-    public:
-      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
-      
-      TruckTerminal::PtrConst notifier() const { return dynamic_cast<TruckTerminal const *>(TerminalLocation::NotifieeConst::notifier().ptr()); }
 
-      virtual void onTruckTerminalNew() {}
-			virtual void onTruckTerminalDel() {}
-
-    protected:
-      NotifieeConst() : TerminalLocation::NotifieeConst() {}
-		};
-    */
     static TruckTerminal::Ptr TruckTerminalIs(Fwk::String _name) {
        Ptr m = new TruckTerminal(_name);
        return m;
@@ -666,22 +504,7 @@ namespace Shipping {
   public:
     typedef Fwk::Ptr<BoatTerminal const> PtrConst;
     typedef Fwk::Ptr<BoatTerminal> Ptr; 
-    /*
-    // Notifier Class
-    class NotifieeConst : public virtual TerminalLocation::NotifieeConst
-    {
-    public:
-      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
-      
-      BoatTerminal::PtrConst notifier() const { return dynamic_cast<BoatTerminal const *>(TerminalLocation::NotifieeConst::notifier().ptr()); }
 
-      virtual void onBoatTerminalNew() {}
-			virtual void onBoatTerminalDel() {}
-
-    protected:
-      NotifieeConst() : TerminalLocation::NotifieeConst() {}
-		};
-    */
     static BoatTerminal::Ptr BoatTerminalIs(Fwk::String _name) {
        Ptr m = new BoatTerminal(_name);
        return m;
@@ -699,22 +522,7 @@ namespace Shipping {
   public:
     typedef Fwk::Ptr<PlaneTerminal const> PtrConst;
     typedef Fwk::Ptr<PlaneTerminal> Ptr;
-    /*
-    // Notifier Class
-    class NotifieeConst : public virtual TerminalLocation::NotifieeConst
-    {
-    public:
-      typedef Fwk::PtrInterface<NotifieeConst const> PtrConst;
-      
-      PlaneTerminal::PtrConst notifier() const { return dynamic_cast<PlaneTerminal const *>(TerminalLocation::NotifieeConst::notifier().ptr()); }
 
-      virtual void onPlaneTerminalNew() {}
-			virtual void onPlaneTerminalDel() {}
-
-    protected:
-      NotifieeConst() : TerminalLocation::NotifieeConst() {}
-		};
-    */
     static PlaneTerminal::Ptr PlaneTerminalIs(Fwk::String _name) {
        Ptr m = new PlaneTerminal(_name);
        return m;
