@@ -330,7 +330,7 @@ namespace Shipping {
     void lrNextIs(Segment * _lrNext) {
          lrNext_ = _lrNext;
     }
- 
+  
   protected:
     // Constructors
     Segment( const Segment& );
