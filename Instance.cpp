@@ -636,12 +636,20 @@ void LocationRep::attributeIs(const string& name, const string& v) {
 
 string SegmentRep::attribute(const string& name) {
 	
-    if (name == "source")
-		return segment_->source()->name();
+    if (name == "source") {
+        Location::PtrConst l = segment_->source();
+        if(l)
+    		return l->name();
+        return "";
+    }
 	else if (name == "length")
 		return FloatToString(segment_->length().value());
-	else if (name == "return segment")
-		return segment_->returnSegment()->name();
+	else if (name == "return segment") {
+        Segment::PtrConst s = segment_->returnSegment();
+        if(s)
+    		return s->name();
+        return "";
+    }
 	else if (name == "difficulty")
 		return FloatToString(segment_->difficulty().value());
 	else if (name == "expedite support") {

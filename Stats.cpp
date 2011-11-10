@@ -71,7 +71,9 @@ namespace Shipping {
           if(((TruckSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
             stats_->expeditedSegmentCountDec();
           }
-          ((TruckSegment*)_ptr.ptr())->sourceIs(NULL);
+          TruckSegment* s = ((TruckSegment*)_ptr.ptr());
+          s->sourceIs(NULL);
+          s->returnSegmentIs(NULL);
         }
        
         else if(_ptr->entityType() == Entity::boatSegment()) {
@@ -79,7 +81,9 @@ namespace Shipping {
           if(((BoatSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
             stats_->expeditedSegmentCountDec();
           }
-          ((BoatSegment*)_ptr.ptr())->sourceIs(NULL);
+          BoatSegment* s = ((BoatSegment*)_ptr.ptr());
+          s->sourceIs(NULL);
+          s->returnSegmentIs(NULL);
         }
         
         else if(_ptr->entityType() == Entity::planeSegment()) {
@@ -87,27 +91,49 @@ namespace Shipping {
           if(((PlaneSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
             stats_->expeditedSegmentCountDec();
           }
-          ((PlaneSegment*)_ptr.ptr())->sourceIs(NULL);
+          PlaneSegment* s = ((PlaneSegment*)_ptr.ptr());
+          s->sourceIs(NULL);
+          s->returnSegmentIs(NULL);
         }
         
         else if(_ptr->entityType() == Entity::customerLocation()) {
           stats_->customerLocationCountDec();
+          CustomerLocation * l = (CustomerLocation *)_ptr.ptr();
+          for(Segment::Ptr p = l->segment(1); p.ptr(); p = l->segment(1)) {
+            p->sourceIs(NULL);
+          }
         }
         
         else if(_ptr->entityType() == Entity::portLocation()) {
           stats_->portLocationCountDec();
+          PortLocation * l = (PortLocation *)_ptr.ptr();
+          for(Segment::Ptr p = l->segment(1); p.ptr(); p = l->segment(1)) {
+            p->sourceIs(NULL);
+          }
         }
         
         else if(_ptr->entityType() == Entity::truckTerminal()) {
           stats_->truckTerminalCountDec();
+          TruckTerminal * l = (TruckTerminal *)_ptr.ptr();
+          for(Segment::Ptr p = l->segment(1); p.ptr(); p = l->segment(1)) {
+            p->sourceIs(NULL);
+          }
         }
         
         else if(_ptr->entityType() == Entity::boatTerminal()) {
           stats_->boatTerminalCountDec();
+          BoatTerminal * l = (BoatTerminal *)_ptr.ptr();
+          for(Segment::Ptr p = l->segment(1); p.ptr(); p = l->segment(1)) {
+            p->sourceIs(NULL);
+          }
         }
         
         else if(_ptr->entityType() == Entity::planeTerminal()) {
           stats_->planeTerminalCountDec();
+          PlaneTerminal * l = (PlaneTerminal *)_ptr.ptr();
+          for(Segment::Ptr p = l->segment(1); p.ptr(); p = l->segment(1)) {
+            p->sourceIs(NULL);
+          }
         }
       }
       NetworkReactor(Network::Ptr _n, Stats* _stats) : Network::NotifieeConst(), stats_(_stats) {

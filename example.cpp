@@ -140,6 +140,10 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     manager->instanceDel("boatSeg1");
+    cout << boatSeg2->attribute("return segment") << endl;
+    manager->instanceDel("port1");
+    assert(truckSeg2->attribute("source") == "");
+    assert(boatSeg2->attribute("source") == "");
 
     // -- Statistics queries
     cout << "===== Stats attributes =====" << endl;
@@ -161,7 +165,7 @@ int main(int argc, char *argv[]) {
     assert(stats->attribute("Plane terminal") == "0");
     cout << " --- Ports and customers --- " << endl;
     cout << "# Ports          : " << stats->attribute("Port") << endl;
-    assert(stats->attribute("Port") == "1");
+    assert(stats->attribute("Port") == "0");
     cout << "# Customers      : " << stats->attribute("Customer") << endl;
     assert(stats->attribute("Customer") == "2");
 
