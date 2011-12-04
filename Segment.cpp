@@ -6,9 +6,12 @@ namespace Shipping {
     Entity(_name, _type),
     source_(NULL),
     returnSegment_(NULL),
-		length_(0.0f),
+	length_(0.0f),
     difficulty_(1.0f),
-    expeditedState_(Segment::notExpedited())
+    expeditedState_(Segment::notExpedited()),
+    shipmentsReceived_(0),
+    shipmentsRefused_(0),
+    capacity_(10)
   {}
     
   void Segment::sourceIs(Fwk::Ptr<Location> _source) {
@@ -66,6 +69,10 @@ namespace Shipping {
     difficulty_ = _difficulty;
   }
   
+  void Segment::capacityIs(NumShipments _capacity) {
+    capacity_ = _capacity;
+  }
+
   void Segment::expeditedIs(Expedited _expedited) {
     if(expeditedState_ == _expedited)
       return;

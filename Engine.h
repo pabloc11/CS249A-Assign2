@@ -9,6 +9,7 @@
 #include "fwk/NamedInterface.h"
 #include "fwk/HashMap.h"
 #include "fwk/ListRaw.h"
+#include "Activity.h"
 
 namespace Shipping {
 
@@ -122,9 +123,9 @@ namespace Shipping {
 				if (num < 0.0f || num > 1.0f)
           throw Fwk::RangeException("Invalid range passed to Percent constructor\n");
 				value_ = num;
-		  } 
+		  }
 		};
-  
+
 		inline U32 truckSegmentCount() const { return truckSegmentCount_; }
 		inline U32 boatSegmentCount() const { return boatSegmentCount_; }
 		inline U32 planeSegmentCount() const { return planeSegmentCount_; }
@@ -133,14 +134,14 @@ namespace Shipping {
 		inline U32 truckTerminalCount() const { return truckTerminalCount_; }
 		inline U32 boatTerminalCount() const { return boatTerminalCount_; }
 		inline U32 planeTerminalCount() const { return planeTerminalCount_; }
-		inline Percent expeditePercentage() const { 
+		inline Percent expeditePercentage() const {
 			int total = truckSegmentCount_ + boatSegmentCount_ + planeSegmentCount_;
 			if (total > 0)
 				return Percent(expeditedSegmentCount_/(float)(total));
 			else
 				return Percent(0.0f);
 		}
-  
+
     void truckSegmentCountInc();
     void boatSegmentCountInc();
     void planeSegmentCountInc();
@@ -150,7 +151,7 @@ namespace Shipping {
     void boatTerminalCountInc();
     void planeTerminalCountInc();
     void expeditedSegmentCountInc();
-  
+
     void truckSegmentCountDec();
     void boatSegmentCountDec();
     void planeSegmentCountDec();
@@ -160,16 +161,16 @@ namespace Shipping {
     void boatTerminalCountDec();
     void planeTerminalCountDec();
     void expeditedSegmentCountDec();
-    
+
     static Stats::Ptr StatsNew(Network::Ptr _n) {
       Ptr m = new Stats(_n);
-      return m;   
+      return m;
     }
-  
+
   protected:
     Stats(const Stats&);
     Stats(Network::Ptr);
-   
+
 		U32 expeditedSegmentCount_;
 
 		U32 truckSegmentCount_;
@@ -251,6 +252,14 @@ namespace Shipping {
   class Location;
 
 /************************** SEGMENT **************************/
+  class NumShipments : public Ordinal<NumShipments, int> {
+	public:
+  	NumShipments(int num) : Ordinal<NumShipments, int>(num) {
+		if(num < 0)
+		  throw Fwk::RangeException("Invalid range passed to NumShipments constructor\n");
+		value_ = num;
+	  }
+	};
 
   class Segment : public Entity 
   {
@@ -258,16 +267,16 @@ namespace Shipping {
     typedef Fwk::Ptr<Segment const> PtrConst;
     typedef Fwk::Ptr<Segment> Ptr;
 
-		class Length : public Nominal<Length, float>
+	class Length : public Ordinal<Length, float>
+	{
+	public:
+		Length(float num) : Ordinal<Length, float>(num)
 		{
-		public:
-			Length(float num) : Nominal<Length, float>(num)
-			{
-				if(num < 0.0f)
-					throw Fwk::RangeException("Invalid range passed to Length constructor\n");
-				value_ = num;
-			}
-		};
+			if(num < 0.0f)
+				throw Fwk::RangeException("Invalid range passed to Length constructor\n");
+			value_ = num;
+		}
+	};
 
     class Difficulty : public Ordinal<Difficulty, float> 
     {
@@ -291,16 +300,21 @@ namespace Shipping {
     // Attribute Accessors
     Fwk::Ptr<Location const> source() const { return source_; }
     Segment::PtrConst returnSegment() const { return returnSegment_; }
-		Length length() const { return length_; }
+	Length length() const { return length_; }
     Difficulty difficulty() const { return difficulty_; }
     Expedited expeditedState() const { return expeditedState_; }
+    NumShipments shipmentsReceived() const { return shipmentsReceived_; }
+    NumShipments shipmentsRefused() const { return shipmentsRefused_; }
+    NumShipments capacity() const { return capacity_; }
     
+
     // Attribute Mutators
     void sourceIs(Fwk::Ptr<Location> _source);
     void returnSegmentIs(Segment::Ptr _returnSegment);
-		void lengthIs(Length _length);
+	void lengthIs(Length _length);
     void difficultyIs(Difficulty _difficulty);
     void expeditedIs(Expedited _expedited);
+    void capacityIs(NumShipments _capacity);
     
     // Notifier Class
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee
@@ -341,6 +355,9 @@ namespace Shipping {
 		Length length_;
     Difficulty difficulty_;
     Expedited expeditedState_;
+    NumShipments shipmentsReceived_;
+    NumShipments shipmentsRefused_;
+    NumShipments capacity_;
     
     Segment::Notifiee::Ptr notifiee_;
     Segment *lrNext_;
@@ -437,6 +454,55 @@ namespace Shipping {
     typedef Fwk::Ptr<CustomerLocation const> PtrConst;
     typedef Fwk::Ptr<CustomerLocation> Ptr; 
 
+    class ShipmentsPerDay : public Ordinal<ShipmentsPerDay, int> {
+    public:
+    	ShipmentsPerDay(int num) : Ordinal<ShipmentsPerDay, int>(num) {
+        if(num < 0)
+          throw Fwk::RangeException("Invalid range passed to ShipmentsPerDay constructor\n");
+        value_ = num;
+      }
+    };
+
+    class PackagesPerShipment : public Ordinal<PackagesPerShipment, int> {
+	public:
+    	PackagesPerShipment(int num) : Ordinal<PackagesPerShipment, int>(num) {
+		if(num < 0)
+		  throw Fwk::RangeException("Invalid range passed to PackagesPerShipment constructor\n");
+		value_ = num;
+	  }
+	};
+
+    // Attribute Accessors
+    ShipmentsPerDay transferRate() const { return transferRate_; }
+    PackagesPerShipment shipmentSize() const { return shipmentSize_; }
+	Location::Ptr destination() const { return destination_; }
+	NumShipments shipmentsReceived() const { return shipmentsReceived_; }
+    Time averageLatency() const { return averageLatency_; }
+    Fleet::Cost totalCost() const { return totalCost_; }
+
+    // Attribute Mutators
+    void transferRateIs(ShipmentsPerDay _transferRate);
+    void shipmentSizeIs(PackagesPerShipment _ShipmentSize);
+	void destinationIs(Location::Ptr _destination);
+
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee
+    {
+    public:
+      typedef Fwk::Ptr<Notifiee> Ptr;
+
+      CustomerLocation::Ptr notifier() const { return notifier_; }
+      virtual void notifierIs(CustomerLocation::Ptr& _notifier);
+
+      virtual void onTransferRate(ShipmentsPerDay transferRate_) {};
+      virtual void onShipmentSize(PackagesPerShipment shipmentSize_) {};
+      virtual void onDestination(Location::Ptr destination_) {}
+
+      ~Notifiee();
+    protected:
+      Notifiee() : Fwk::NamedInterface::Notifiee() {}
+      CustomerLocation::Ptr notifier_;
+    };
+
     static CustomerLocation::Ptr CustomerLocationIs(Fwk::String _name) {
        Ptr m = new CustomerLocation(_name);
        return m;
@@ -445,6 +511,14 @@ namespace Shipping {
   protected:
     CustomerLocation( const CustomerLocation& );
     CustomerLocation(Fwk::String _name);
+    ShipmentsPerDay transferRate_;
+    PackagesPerShipment shipmentSize_;
+    Location::Ptr destination_;
+    NumShipments shipmentsReceived_;
+    Time averageLatency_;
+    Fleet::Cost totalCost_;
+
+    CustomerLocation::Notifiee::Ptr notifiee_;
   };
   
   /************************** PORT LOCATION **************************/
@@ -532,6 +606,41 @@ namespace Shipping {
     PlaneTerminal(Fwk::String _name);
   };
 
+  /************************** SHIPMENT **************************/
+
+  class Shipment : public Fwk::PtrInterface<Shipment>
+  {
+  public:
+    typedef Fwk::Ptr<Shipment const> PtrConst;
+    typedef Fwk::Ptr<Shipment> Ptr;
+
+    class NumPackages : public Ordinal<NumPackages, int> {
+  	public:
+    	NumPackages(int num) : Ordinal<NumPackages, int>(num) {
+  		if(num < 0)
+  		  throw Fwk::RangeException("Invalid range passed to NumPackages constructor\n");
+  		value_ = num;
+  	  }
+  	};
+
+    // Attribute Accessors
+    NumPackages numPackages() const { return numPackages_; }
+    Location::Ptr source() const { return source_; }
+    Location::Ptr destination() const { return destination_; }
+
+    static Shipment::Ptr ShipmentIs(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination) {
+       Ptr m = new Shipment(_numPackages, _source, _destination);
+       return m;
+    }
+
+  protected:
+    Shipment( const Shipment& );
+    Shipment(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination);
+
+    NumPackages numPackages_;
+    Location::Ptr source_;
+    Location::Ptr destination_;
+  };
 } /* end namespace */
 
 #endif
