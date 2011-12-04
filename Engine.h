@@ -82,21 +82,21 @@ namespace Shipping {
       return m;   
     }
 
-    class NotifieeConst : public virtual Fwk::NamedInterface::NotifieeConst
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee
     {
     public:
-      typedef Fwk::Ptr<NotifieeConst const> PtrConst;
+      typedef Fwk::Ptr<Notifiee> Ptr;
       
-      Network::PtrConst notifier() const { return notifier_; }
-      virtual void notifierIs(const Network::PtrConst& _notifier);
+      Network::Ptr notifier() const { return notifier_; }
+      virtual void notifierIs(Network::Ptr& _notifier);
       
       virtual void onEntityNew(Entity::Ptr _ptr) {};
       virtual void onEntityDel(Entity::Ptr _ptr) {};
       
-      ~NotifieeConst();
+      ~Notifiee();
     protected:
-      NotifieeConst() : Fwk::NamedInterface::NotifieeConst() {}
-      Network::PtrConst notifier_; 
+      Notifiee() : Fwk::NamedInterface::Notifiee() {}
+      Network::Ptr notifier_;
     };
 
   protected:  
@@ -104,7 +104,7 @@ namespace Shipping {
     Network(Fwk::String _name);
     Network( const Network& );
     
-    Network::NotifieeConst::PtrConst notifiee_;
+    Network::Notifiee::Ptr notifiee_;
   };
 
 /************************** STATS **************************/
@@ -303,21 +303,20 @@ namespace Shipping {
     void expeditedIs(Expedited _expedited);
     
     // Notifier Class
-    class NotifieeConst : public virtual Fwk::NamedInterface::NotifieeConst
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee
     {
     public:
-      typedef Fwk::Ptr<NotifieeConst const> PtrConst;
-      typedef Fwk::Ptr<NotifieeConst> Ptr;
+      typedef Fwk::Ptr<Notifiee> Ptr;
       
-      Segment::PtrConst notifier() const { return notifier_; }
-      virtual void notifierIs(const Segment::PtrConst& _notifier);
+      Segment::Ptr notifier() const { return notifier_; }
+      virtual void notifierIs(Segment::Ptr& _notifier);
       
       virtual void onExpedited(Segment::Expedited _expedited) {}
       
-      ~NotifieeConst();
+      ~Notifiee();
     protected:
-      NotifieeConst() : Fwk::NamedInterface::NotifieeConst() {}
-      Segment::PtrConst notifier_; 
+      Notifiee() : Fwk::NamedInterface::Notifiee() {}
+      Segment::Ptr notifier_;
 	  };
  
     Segment const * fwkHmNext() const { return dynamic_cast<Segment const *>(fwkHmNext_.ptr()); }
@@ -343,7 +342,7 @@ namespace Shipping {
     Difficulty difficulty_;
     Expedited expeditedState_;
     
-    Segment::NotifieeConst::Ptr notifiee_;
+    Segment::Notifiee::Ptr notifiee_;
     Segment *lrNext_;
   };
 

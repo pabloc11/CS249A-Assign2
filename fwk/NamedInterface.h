@@ -5,7 +5,8 @@
 #define FWK_NAMEDINTERFACE_H
 
 #include "PtrInterface.h"
-#include "BaseNotifiee.h"
+#include "Notifiee.h"
+#include "String.h"
 
 namespace Fwk {
 

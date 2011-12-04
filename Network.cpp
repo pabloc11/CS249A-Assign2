@@ -12,7 +12,7 @@ namespace Shipping {
     if(!m) return NULL;
     if(notifiee_) { 
       try {
-        const_cast<Network::NotifieeConst *>(notifiee_.ptr())->onEntityDel(m);
+        notifiee_->onEntityDel(m);
       } catch(...) {}
     }
     return m; 
@@ -29,26 +29,26 @@ namespace Shipping {
     }
     if(notifiee_) {   
       try {
-        const_cast<Network::NotifieeConst *>(notifiee_.ptr())->onEntityNew(m);
+        notifiee_->onEntityNew(m);
       } catch(...) {}
     }
     return _ptr;
   }
   
-  void Network::NotifieeConst::notifierIs(const Network::PtrConst& _notifier) {
-    Network::Ptr notifierSave(const_cast<Network *>(notifier_.ptr()));
+  void Network::Notifiee::notifierIs(Network::Ptr& _notifier) {
+    Network::Ptr notifierSave(notifier_.ptr());
     if(notifier_==_notifier)
       return;
     notifier_ = _notifier;
     if(notifierSave)
       notifierSave->notifiee_ == NULL;
     if(_notifier)
-      (const_cast<Network*>(_notifier.ptr()))->notifiee_ = this;
+      _notifier->notifiee_ = this;
   }
   
-  Network::NotifieeConst::~NotifieeConst() {
+  Network::Notifiee::~Notifiee() {
     if(notifier_) {
-      (const_cast<Network*>(notifier_.ptr()))->notifiee_ = NULL;
+      notifier_->notifiee_ = NULL;
     }
   }
 }

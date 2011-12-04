@@ -2,7 +2,7 @@
 
 namespace Shipping {
   
-  class SegmentReactor : public Segment::NotifieeConst {
+  class SegmentReactor : public Segment::Notifiee {
   public:
     void onExpedited(Segment::Expedited _expedited) {
       if(_expedited == Segment::expedited())
@@ -11,14 +11,14 @@ namespace Shipping {
         stats_->expeditedSegmentCountDec();
     }
     
-    SegmentReactor(Segment * _s, Stats* _stats) : Segment::NotifieeConst(), stats_(_stats) {
+    SegmentReactor(Segment::Ptr _s, Stats* _stats) : Segment::Notifiee(), stats_(_stats) {
       notifierIs(_s);
     }
   private:
     Fwk::Ptr<Stats> stats_;
   };
   
-  class NetworkReactor : public Network::NotifieeConst {
+  class NetworkReactor : public Network::Notifiee {
   public:
       void onEntityNew(Entity::Ptr _ptr) {        
         if(_ptr->entityType() == Entity::truckSegment()) {
@@ -136,7 +136,7 @@ namespace Shipping {
           }
         }
       }
-      NetworkReactor(Network::Ptr _n, Stats* _stats) : Network::NotifieeConst(), stats_(_stats) {
+      NetworkReactor(Network::Ptr _n, Stats* _stats) : Network::Notifiee(), stats_(_stats) {
         notifierIs(_n);
       }
   private:

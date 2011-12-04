@@ -72,25 +72,25 @@ namespace Shipping {
     expeditedState_ = _expedited;
     if(notifiee_) {
       try {
-        const_cast<Segment::NotifieeConst *>(notifiee_.ptr())->onExpedited(_expedited);
+        notifiee_->onExpedited(_expedited);
       } catch(...) {}
     }
   }
   
-  void Segment::NotifieeConst::notifierIs(const Segment::PtrConst& _notifier) {
-    Segment::Ptr notifierSave(const_cast<Segment *>(notifier_.ptr()));
+  void Segment::Notifiee::notifierIs(Segment::Ptr& _notifier) {
+    Segment::Ptr notifierSave(notifier_.ptr());
     if(notifier_==_notifier)
       return;
     notifier_ = _notifier;
     if(notifierSave)
       notifierSave->notifiee_ == NULL;
     if(_notifier)
-      (const_cast<Segment*>(_notifier.ptr()))->notifiee_ = this;
+      _notifier->notifiee_ = this;
   }
   
-  Segment::NotifieeConst::~NotifieeConst() {
+  Segment::Notifiee::~Notifiee() {
     if(notifier_) {
-      (const_cast<Segment*>(notifier_.ptr()))->notifiee_ = NULL;
+      notifier_->notifiee_ = NULL;
     }
   }
 }

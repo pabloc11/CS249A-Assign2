@@ -55,6 +55,7 @@
 #include <stdlib.h>
 #include "BaseCollection.h"
 #include "String.h"
+#include <cstring>
 
 namespace Fwk {
 
