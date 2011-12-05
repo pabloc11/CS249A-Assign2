@@ -194,24 +194,30 @@ namespace Shipping {
     class Speed : public Ordinal<Speed, float> {
     public:
       Speed(float num) : Ordinal<Speed, float>(num) {
-				if(num < 0.0f)
-					throw Fwk::RangeException("Invalid range passed to Speed constructor\n");
+				if(num < 0.0f) {
+					cerr << "Invalid value passed to Speed constructor: " << num << endl;
+					throw Fwk::RangeException("Invalid value passed to Speed constructor\n");
+				}
         value_ = num;
       }    
     };
     class Cost : public Ordinal<Cost, float> {
     public:
       Cost(float num) : Ordinal<Cost, float>(num) {
-				if(num < 0.0f)
+				if(num < 0.0f) {
+					cerr << "Invalid value passed to Cost constructor: " << num << endl;
 					throw Fwk::RangeException("Invalid range passed to Cost constructor\n");
+				}
         value_ = num;
       }    
     };
     class Capacity : public Ordinal<Capacity, int> {
     public:
       Capacity(int num) : Ordinal<Capacity, int>(num) {
-				if(num < 0)
+				if(num < 0) {
+					cerr << "Invalid value passed to Capacity constructor: " << num << endl;
 					throw Fwk::RangeException("Invalid range passed to Capacity constructor\n");
+				}
         value_ = num;
       }    
     };
@@ -272,8 +278,10 @@ namespace Shipping {
 	public:
 		Length(float num) : Ordinal<Length, float>(num)
 		{
-			if(num < 0.0f)
+			if(num < 0.0f) {
+				cerr << "Invalid value passed to Length constructor: " << num << endl;
 				throw Fwk::RangeException("Invalid range passed to Length constructor\n");
+			}
 			value_ = num;
 		}
 	};
@@ -283,8 +291,10 @@ namespace Shipping {
     public:
       Difficulty(float num) : Ordinal<Difficulty, float>(num)
       {
-        if(num < 1.0f || num > 5.0f)
-          throw Fwk::RangeException("Invalid range passed to Difficulty constructor\n");
+        if(num < 1.0f || num > 5.0f) {
+					cerr << "Invalid value passed to Difficulty constructor: " << num << endl;
+          throw Fwk::RangeException("Invalid value passed to Difficulty constructor\n");
+				}
         value_ = num;
       }    
     };
@@ -300,7 +310,7 @@ namespace Shipping {
     // Attribute Accessors
     Fwk::Ptr<Location const> source() const { return source_; }
     Segment::PtrConst returnSegment() const { return returnSegment_; }
-	Length length() const { return length_; }
+		Length length() const { return length_; }
     Difficulty difficulty() const { return difficulty_; }
     Expedited expeditedState() const { return expeditedState_; }
     NumShipments shipmentsReceived() const { return shipmentsReceived_; }
@@ -311,7 +321,7 @@ namespace Shipping {
     // Attribute Mutators
     void sourceIs(Fwk::Ptr<Location> _source);
     void returnSegmentIs(Segment::Ptr _returnSegment);
-	void lengthIs(Length _length);
+		void lengthIs(Length _length);
     void difficultyIs(Difficulty _difficulty);
     void expeditedIs(Expedited _expedited);
     void capacityIs(NumShipments _capacity);
