@@ -1,7 +1,7 @@
 CPPFLAGS = -I.
 CXXFLAGS = -Wall -g
 
-OBJECTS = Instance.o Entity.o Network.o Stats.o Fleet.o Segment.o TruckSegment.o PlaneSegment.o BoatSegment.o Location.o CustomerLocation.o PortLocation.o TerminalLocation.o TruckTerminal.o BoatTerminal.o PlaneTerminal.o Shipment.o SegmentReactor.o NetworkReactor.o
+OBJECTS = Instance.o Entity.o Network.o Stats.o Fleet.o Segment.o TruckSegment.o PlaneSegment.o BoatSegment.o Location.o CustomerLocation.o PortLocation.o TerminalLocation.o TruckTerminal.o BoatTerminal.o PlaneTerminal.o Shipment.o SegmentReactor.o NetworkReactor.o LocationReactor.o CustomerReactor.o
 LIBS = fwk/BaseCollection.o fwk/BaseNotifiee.o fwk/Exception.o
 
 default: test1 example test2 sample

@@ -22,6 +22,22 @@ namespace Shipping {
    private:
      Fwk::Ptr<Stats> stats_;
    };
+
+  class LocationReactor : public Location::Notifiee {
+  public:
+    typedef Fwk::Ptr<LocationReactor> Ptr;
+
+    LocationReactor(Location::Ptr _l);
+  private:
+  };
+
+  class CustomerReactor : public CustomerLocation::Notifiee {
+  public:
+    typedef Fwk::Ptr<CustomerReactor> Ptr;
+
+    CustomerReactor(CustomerLocation::Ptr _l);
+  private:
+  };
 }
 
 #endif

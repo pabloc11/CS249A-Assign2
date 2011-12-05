@@ -139,6 +139,7 @@ public:
 protected:
     Ptr<ManagerImpl> manager_;
 	Location::Ptr location_;
+	LocationReactor::Ptr locationReactor_;
     int segmentNumber(const string& name);
 };
 
@@ -161,7 +162,11 @@ public:
 		CustomerLocation::Ptr ptr = CustomerLocation::CustomerLocationIs(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
+		locationReactor_ = new LocationReactor(location_);
+		customerReactor_ = new CustomerReactor(ptr);
 	}
+protected:
+    CustomerReactor::Ptr customerReactor_;
 };
 
 class PortLocationRep : public LocationRep {
@@ -170,6 +175,7 @@ public:
 		PortLocation::Ptr ptr = PortLocation::PortLocationIs(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
+		locationReactor_ = new LocationReactor(location_);
 	}
 };
 
@@ -179,6 +185,7 @@ public:
 		TruckTerminal::Ptr ptr = TruckTerminal::TruckTerminalIs(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
+		locationReactor_ = new LocationReactor(location_);
 	}
 };
 
@@ -188,6 +195,7 @@ public:
 		BoatTerminal::Ptr ptr = BoatTerminal::BoatTerminalIs(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
+		locationReactor_ = new LocationReactor(location_);
 	}
 };
 
@@ -197,6 +205,7 @@ public:
 		PlaneTerminal::Ptr ptr = PlaneTerminal::PlaneTerminalIs(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
+		locationReactor_ = new LocationReactor(location_);
 	}
 };
 

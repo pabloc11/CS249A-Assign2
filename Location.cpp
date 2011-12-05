@@ -22,4 +22,21 @@ namespace Shipping {
     }
     return NULL;
   }
+
+  void Location::Notifiee::notifierIs(Location::Ptr& _notifier) {
+    Location::Ptr notifierSave(notifier_.ptr());
+    if(notifier_==_notifier)
+      return;
+    notifier_ = _notifier;
+    if(notifierSave)
+      notifierSave->notifiee_ == NULL;
+    if(_notifier)
+      _notifier->notifiee_ = this;
+  }
+
+  Location::Notifiee::~Notifiee() {
+    if(notifier_) {
+      notifier_->notifiee_ = NULL;
+    }
+  }
 }

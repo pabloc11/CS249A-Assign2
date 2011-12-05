@@ -438,12 +438,27 @@ namespace Shipping {
     Segment::Ptr segment(unsigned _index);
     inline U32 segments() { return segment_.members(); }
     inline SegmentListIteratorConst segmentIterConst() const { return segment_.iterator(); }
+
+    class Notifiee : public virtual Fwk::NamedInterface::Notifiee
+    {
+    public:
+      typedef Fwk::Ptr<Notifiee> Ptr;
+
+      Location::Ptr notifier() const { return notifier_; }
+      virtual void notifierIs(Location::Ptr& _notifier);
+
+      ~Notifiee();
+    protected:
+      Notifiee() : Fwk::NamedInterface::Notifiee() {}
+      Location::Ptr notifier_;
+    };
     
   protected:
     friend class Segment;
     SegmentList segment_;
     Location(Fwk::String _name, Entity::EntityType _type);
     Location( const Location& );
+    Location::Notifiee::Ptr notifiee_;
   };
   
   /************************** CUSTOMER LOCATION **************************/
