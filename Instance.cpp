@@ -8,6 +8,7 @@
 #include <iterator>
 #include "Instance.h"
 #include "Engine.h"
+#include "Reactors.h"
 
 namespace Shipping {
 
@@ -51,10 +52,12 @@ public:
 
 	Network::Ptr network() { return network_; }
 	Ptr<FleetRep> fleetRep() { return fleetRep_; }
+	Ptr<StatsRep> statsRep() { return statsRep_; }
 
 private:
     map<string,Ptr<Instance> > instance_;
 	Network::Ptr network_;
+	NetworkReactor::Ptr networkReactor_;
 	Ptr<StatsRep> statsRep_;
 	Ptr<FleetRep> fleetRep_;
 	Ptr<ConnRep> connRep_;
@@ -149,6 +152,7 @@ public:
 protected:
     Ptr<ManagerImpl> manager_;
 	Segment::Ptr segment_;
+	SegmentReactor::Ptr segmentReactor_;
 };
                                                                                                   
 class CustomerLocationRep : public LocationRep {
@@ -202,6 +206,7 @@ public:
  		TruckSegment::Ptr ptr = TruckSegment::TruckSegmentIs(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
+		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats());
 	}
 };
 
@@ -211,6 +216,7 @@ public:
 		BoatSegment::Ptr ptr = BoatSegment::BoatSegmentIs(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
+		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats());
 	}
 };
 
@@ -220,6 +226,7 @@ public:
 		PlaneSegment::Ptr ptr = PlaneSegment::PlaneSegmentIs(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
+		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats());
 	}
 };
 
@@ -227,6 +234,7 @@ public:
 
 ManagerImpl::ManagerImpl() {
 	network_ = NULL;
+	networkReactor_ = NULL;
 	statsRep_ = NULL;
 	fleetRep_ = NULL;
 }
@@ -237,6 +245,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 	if (!network_) {
 		network_ = Network::NetworkNew("network");
 		statsRep_ = new StatsRep("statsRep", this);
+		networkReactor_ = new NetworkReactor(network_, statsRep_->stats());
 		fleetRep_ = new FleetRep("fleetRep", this);
 		connRep_ = new ConnRep("connRep", this);
 	}

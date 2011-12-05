@@ -1,148 +1,7 @@
 #include "Engine.h"
+#include "Reactors.h"
 
 namespace Shipping {
-  
-  class SegmentReactor : public Segment::Notifiee {
-  public:
-    void onExpedited(Segment::Expedited _expedited) {
-      if(_expedited == Segment::expedited())
-        stats_->expeditedSegmentCountInc();
-      else if(_expedited == Segment::notExpedited())
-        stats_->expeditedSegmentCountDec();
-    }
-    
-    SegmentReactor(Segment::Ptr _s, Stats* _stats) : Segment::Notifiee(), stats_(_stats) {
-      notifierIs(_s);
-    }
-  private:
-    Fwk::Ptr<Stats> stats_;
-  };
-  
-  class NetworkReactor : public Network::Notifiee {
-  public:
-      void onEntityNew(Entity::Ptr _ptr) {        
-        if(_ptr->entityType() == Entity::truckSegment()) {
-          stats_->truckSegmentCountInc();
-          if(((TruckSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
-            stats_->expeditedSegmentCountInc();
-          }
-          Fwk::Ptr<SegmentReactor> m = new SegmentReactor((Segment*)_ptr.ptr(), stats_.ptr());
-        }
-       
-        else if(_ptr->entityType() == Entity::boatSegment()) {
-          stats_->boatSegmentCountInc();
-          if(((BoatSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
-            stats_->expeditedSegmentCountInc();
-          }
-          Fwk::Ptr<SegmentReactor> m = new SegmentReactor((Segment*)_ptr.ptr(), stats_.ptr());
-        }
-        
-        else if(_ptr->entityType() == Entity::planeSegment()) {
-          stats_->planeSegmentCountInc();
-          if(((PlaneSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
-            stats_->expeditedSegmentCountInc();
-          }
-          Fwk::Ptr<SegmentReactor> m = new SegmentReactor((Segment*)_ptr.ptr(), stats_.ptr());
-        }
-        
-        else if(_ptr->entityType() == Entity::customerLocation()) {
-          stats_->customerLocationCountInc();
-        }
-        
-        else if(_ptr->entityType() == Entity::portLocation()) {
-          stats_->portLocationCountInc();
-        }
-        
-        else if(_ptr->entityType() == Entity::truckTerminal()) {
-          stats_->truckTerminalCountInc();
-        }
-        
-        else if(_ptr->entityType() == Entity::boatTerminal()) {
-          stats_->boatTerminalCountInc();
-        }
-        
-        else if(_ptr->entityType() == Entity::planeTerminal()) {
-          stats_->planeTerminalCountInc();
-        }
-      }
-      void onEntityDel(Entity::Ptr _ptr) {
-        if(_ptr->entityType() == Entity::truckSegment()) {
-          stats_->truckSegmentCountDec();
-          if(((TruckSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
-            stats_->expeditedSegmentCountDec();
-          }
-          TruckSegment* s = ((TruckSegment*)_ptr.ptr());
-          s->sourceIs(NULL);
-          s->returnSegmentIs(NULL);
-        }
-       
-        else if(_ptr->entityType() == Entity::boatSegment()) {
-          stats_->boatSegmentCountDec();
-          if(((BoatSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
-            stats_->expeditedSegmentCountDec();
-          }
-          BoatSegment* s = ((BoatSegment*)_ptr.ptr());
-          s->sourceIs(NULL);
-          s->returnSegmentIs(NULL);
-        }
-        
-        else if(_ptr->entityType() == Entity::planeSegment()) {
-          stats_->planeSegmentCountDec();
-          if(((PlaneSegment*)_ptr.ptr())->expeditedState() == Segment::expedited()) {
-            stats_->expeditedSegmentCountDec();
-          }
-          PlaneSegment* s = ((PlaneSegment*)_ptr.ptr());
-          s->sourceIs(NULL);
-          s->returnSegmentIs(NULL);
-        }
-        
-        else if(_ptr->entityType() == Entity::customerLocation()) {
-          stats_->customerLocationCountDec();
-          CustomerLocation * l = (CustomerLocation *)_ptr.ptr();
-          for(Segment::Ptr p = l->segment(1); p.ptr(); p = l->segment(1)) {
-            p->sourceIs(NULL);
-          }
-        }
-        
-        else if(_ptr->entityType() == Entity::portLocation()) {
-          stats_->portLocationCountDec();
-          PortLocation * l = (PortLocation *)_ptr.ptr();
-          for(Segment::Ptr p = l->segment(1); p.ptr(); p = l->segment(1)) {
-            p->sourceIs(NULL);
-          }
-        }
-        
-        else if(_ptr->entityType() == Entity::truckTerminal()) {
-          stats_->truckTerminalCountDec();
-          TruckTerminal * l = (TruckTerminal *)_ptr.ptr();
-          for(Segment::Ptr p = l->segment(1); p.ptr(); p = l->segment(1)) {
-            p->sourceIs(NULL);
-          }
-        }
-        
-        else if(_ptr->entityType() == Entity::boatTerminal()) {
-          stats_->boatTerminalCountDec();
-          BoatTerminal * l = (BoatTerminal *)_ptr.ptr();
-          for(Segment::Ptr p = l->segment(1); p.ptr(); p = l->segment(1)) {
-            p->sourceIs(NULL);
-          }
-        }
-        
-        else if(_ptr->entityType() == Entity::planeTerminal()) {
-          stats_->planeTerminalCountDec();
-          PlaneTerminal * l = (PlaneTerminal *)_ptr.ptr();
-          for(Segment::Ptr p = l->segment(1); p.ptr(); p = l->segment(1)) {
-            p->sourceIs(NULL);
-          }
-        }
-      }
-      NetworkReactor(Network::Ptr _n, Stats* _stats) : Network::Notifiee(), stats_(_stats) {
-        notifierIs(_n);
-      }
-  private:
-    Fwk::Ptr<Stats> stats_;
-  };
-  
   Stats::Stats(Network::Ptr _n) :
     expeditedSegmentCount_(0),
     truckSegmentCount_(0),
@@ -154,7 +13,7 @@ namespace Shipping {
     boatTerminalCount_(0),
     planeTerminalCount_(0)
   {
-    Fwk::Ptr<NetworkReactor> n = new NetworkReactor(_n, this);
+	  //nothing to do here
   }
   
   void Stats::truckSegmentCountInc() {
