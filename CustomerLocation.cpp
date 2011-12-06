@@ -12,15 +12,30 @@ namespace Shipping {
   {}
 
   void CustomerLocation::transferRateIs(ShipmentsPerDay _transferRate) {
-    transferRate_ = _transferRate;
+	transferRate_ = _transferRate;
+	if(notifiee_) {
+	  try {
+		notifiee_->onTransferRate(transferRate_);
+	  } catch(...) {}
+	}
   }
 
   void CustomerLocation::shipmentSizeIs(PackagesPerShipment _shipmentSize) {
     shipmentSize_ = _shipmentSize;
+	if(notifiee_) {
+	  try {
+		notifiee_->onShipmentSize(shipmentSize_);
+	  } catch(...) {}
+	}
   }
 
   void CustomerLocation::destinationIs(Location::Ptr _destination) {
     destination_ = _destination;
+	if(notifiee_) {
+	  try {
+		notifiee_->onDestination(destination_);
+	  } catch(...) {}
+	}
   }
 
   void CustomerLocation::Notifiee::notifierIs(CustomerLocation::Ptr& _notifier) {

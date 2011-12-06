@@ -109,6 +109,8 @@ namespace Shipping {
   };
 
 /************************** STATS **************************/
+  class NetworkReactor;
+  class SegmentReactor;
 
   class Stats : public Fwk::PtrInterface<Stats>
   {
@@ -142,6 +144,17 @@ namespace Shipping {
 				return Percent(0.0f);
 		}
 
+    static Stats::Ptr StatsNew(Network::Ptr _n) {
+      Ptr m = new Stats(_n);
+      return m;
+    }
+
+  protected:
+    friend class NetworkReactor;
+    friend class SegmentReactor;
+    Stats(const Stats&);
+    Stats(Network::Ptr);
+
     void truckSegmentCountInc();
     void boatSegmentCountInc();
     void planeSegmentCountInc();
@@ -162,25 +175,17 @@ namespace Shipping {
     void planeTerminalCountDec();
     void expeditedSegmentCountDec();
 
-    static Stats::Ptr StatsNew(Network::Ptr _n) {
-      Ptr m = new Stats(_n);
-      return m;
-    }
 
-  protected:
-    Stats(const Stats&);
-    Stats(Network::Ptr);
+	U32 expeditedSegmentCount_;
 
-		U32 expeditedSegmentCount_;
-
-		U32 truckSegmentCount_;
-		U32 boatSegmentCount_;
-		U32 planeSegmentCount_;
-		U32 customerLocationCount_;
-		U32 portLocationCount_;
-		U32 truckTerminalCount_;
-		U32 boatTerminalCount_;
-		U32 planeTerminalCount_;
+	U32 truckSegmentCount_;
+	U32 boatSegmentCount_;
+	U32 planeSegmentCount_;
+	U32 customerLocationCount_;
+	U32 portLocationCount_;
+	U32 truckTerminalCount_;
+	U32 boatTerminalCount_;
+	U32 planeTerminalCount_;
   };
 
 /************************** FLEET **************************/
@@ -252,6 +257,8 @@ namespace Shipping {
   class Location;
 
 /************************** SEGMENT **************************/
+  class Shipment;
+
   class NumShipments : public Ordinal<NumShipments, int> {
 	public:
   	NumShipments(int num) : Ordinal<NumShipments, int>(num) {
@@ -315,6 +322,7 @@ namespace Shipping {
     void difficultyIs(Difficulty _difficulty);
     void expeditedIs(Expedited _expedited);
     void capacityIs(NumShipments _capacity);
+    void shipmentIs(Fwk::Ptr<Shipment> _ptr);
     
     // Notifier Class
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee
@@ -325,6 +333,8 @@ namespace Shipping {
       Segment::Ptr notifier() const { return notifier_; }
       virtual void notifierIs(Segment::Ptr& _notifier);
       
+      virtual void onShipmentNew(Fwk::Ptr<Shipment> _ptr) {};
+
       virtual void onExpedited(Segment::Expedited _expedited) {}
       
       ~Notifiee();
@@ -439,6 +449,9 @@ namespace Shipping {
     inline U32 segments() { return segment_.members(); }
     inline SegmentListIteratorConst segmentIterConst() const { return segment_.iterator(); }
 
+    // Attribute Mutators
+    void shipmentIs(Fwk::Ptr<Shipment> _ptr);
+
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee
     {
     public:
@@ -446,6 +459,8 @@ namespace Shipping {
 
       Location::Ptr notifier() const { return notifier_; }
       virtual void notifierIs(Location::Ptr& _notifier);
+
+      virtual void onShipmentNew(Fwk::Ptr<Shipment> _ptr) {};
 
       ~Notifiee();
     protected:
@@ -462,30 +477,29 @@ namespace Shipping {
   };
   
   /************************** CUSTOMER LOCATION **************************/
-  
-  class CustomerLocation: public Location {
-    
+  class ShipmentsPerDay : public Ordinal<ShipmentsPerDay, int> {
   public:
-    typedef Fwk::Ptr<CustomerLocation const> PtrConst;
-    typedef Fwk::Ptr<CustomerLocation> Ptr; 
+  	ShipmentsPerDay(int num) : Ordinal<ShipmentsPerDay, int>(num) {
+      if(num < 0)
+        throw Fwk::RangeException("Invalid range passed to ShipmentsPerDay constructor\n");
+      value_ = num;
+    }
+  };
 
-    class ShipmentsPerDay : public Ordinal<ShipmentsPerDay, int> {
-    public:
-    	ShipmentsPerDay(int num) : Ordinal<ShipmentsPerDay, int>(num) {
-        if(num < 0)
-          throw Fwk::RangeException("Invalid range passed to ShipmentsPerDay constructor\n");
-        value_ = num;
-      }
-    };
-
-    class PackagesPerShipment : public Ordinal<PackagesPerShipment, int> {
+  class PackagesPerShipment : public Ordinal<PackagesPerShipment, int> {
 	public:
-    	PackagesPerShipment(int num) : Ordinal<PackagesPerShipment, int>(num) {
+  	PackagesPerShipment(int num) : Ordinal<PackagesPerShipment, int>(num) {
 		if(num < 0)
 		  throw Fwk::RangeException("Invalid range passed to PackagesPerShipment constructor\n");
 		value_ = num;
 	  }
 	};
+
+  class CustomerLocation: public Location {
+
+  public:
+    typedef Fwk::Ptr<CustomerLocation const> PtrConst;
+    typedef Fwk::Ptr<CustomerLocation> Ptr;
 
     // Attribute Accessors
     ShipmentsPerDay transferRate() const { return transferRate_; }
@@ -623,7 +637,7 @@ namespace Shipping {
 
   /************************** SHIPMENT **************************/
 
-  class Shipment : public Fwk::PtrInterface<Shipment>
+  class Shipment : public Fwk::NamedInterface
   {
   public:
     typedef Fwk::Ptr<Shipment const> PtrConst;
@@ -642,19 +656,23 @@ namespace Shipping {
     NumPackages numPackages() const { return numPackages_; }
     Location::Ptr source() const { return source_; }
     Location::Ptr destination() const { return destination_; }
+    Time startTime() const { return startTime_; }
 
-    static Shipment::Ptr ShipmentIs(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination) {
-       Ptr m = new Shipment(_numPackages, _source, _destination);
-       return m;
+    static Shipment::Ptr ShipmentIs(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination, Time _startTime) {
+      std::stringstream s;
+      s << _numPackages.value() << _source->name() << _destination->name() << _startTime.value();
+      Ptr m = new Shipment(_numPackages, _source, _destination, _startTime, s.str());
+      return m;
     }
 
   protected:
     Shipment( const Shipment& );
-    Shipment(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination);
+    Shipment(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination, Time _startTime, Fwk::String _name);
 
     NumPackages numPackages_;
     Location::Ptr source_;
     Location::Ptr destination_;
+    Time startTime_;
   };
 } /* end namespace */
 

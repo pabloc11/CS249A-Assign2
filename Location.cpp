@@ -14,6 +14,7 @@ namespace Shipping {
     }
     return NULL;
   }
+
   Segment::Ptr Location::segment(unsigned _index) {
     unsigned i = 1;
     for( SegmentList::Iterator iter = segment_.iterator(); iter.ptr() && i <= _index; ++iter, i++) {
@@ -21,6 +22,16 @@ namespace Shipping {
         return iter.ptr();
     }
     return NULL;
+  }
+
+  void Location::shipmentIs(Shipment::Ptr _ptr) {
+	// TODO: update statistics here
+	// the location doesn't actually store the shipment since this is not needed
+	if(notifiee_) {
+	  try {
+		notifiee_->onShipmentNew(_ptr);
+	  } catch(...) {}
+	}
   }
 
   void Location::Notifiee::notifierIs(Location::Ptr& _notifier) {

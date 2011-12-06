@@ -84,6 +84,16 @@ namespace Shipping {
     }
   }
   
+  void Segment::shipmentIs(Shipment::Ptr _ptr) {
+	// TODO: update statistics here
+	// TODO: only call the notifier if there is capacity
+	if(notifiee_) {
+	  try {
+		notifiee_->onShipmentNew(_ptr);
+	  } catch(...) {}
+	}
+  }
+
   void Segment::Notifiee::notifierIs(Segment::Ptr& _notifier) {
     Segment::Ptr notifierSave(notifier_.ptr());
     if(notifier_==_notifier)
