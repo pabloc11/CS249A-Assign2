@@ -47,10 +47,13 @@ class Activity : public Fwk::PtrInterface<Activity>
 
 	protected:
 	  Activity(const string &name) : name_(name) {}
-
+		Fwk::Ptr<Manager> manager_;
+		enum Status status_;
+		Time nextTime_;
+		Fwk::Ptr<Notifiee> lastNotifiee_;
+		
 	private:
 	  string name_;
-		Fwk::Ptr<Manager> manager_;
 };
 
 class Activity::Manager : public Fwk::PtrInterface<Activity::Manager>
@@ -66,15 +69,6 @@ class Activity::Manager : public Fwk::PtrInterface<Activity::Manager>
 
 		virtual Time now() const = 0;
 		virtual void nowIs(Time) = 0;
-};
-
-class ActivityComparator
-{
-	public:
-  	bool operator() (const Activity::Ptr lhs, const Activity::Ptr rhs) const
-  	{	
-			return lhs->nextTime().value() < rhs->nextTime().value();
-  	}
 };
 
 extern Fwk::Ptr<Activity::Manager> activityManagerInstance();

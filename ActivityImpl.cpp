@@ -2,20 +2,23 @@
 #include <time.h>
 #include "ActivityImpl.h"
 
-void ActivityImpl::statusIs(Status s) {
-	status_ = s;
+Fwk::Ptr<Activity::Manager> activityManagerInstance() {
+  return ActivityImpl::ManagerImpl::activityManagerInstance();
 }
 
-void ActivityImpl::nextTimeIs(Time t) {
-	nextTime_ = t;
-}
-
-void ActivityImpl::lastNotifieeIs(Notifiee* n) {
-	lastNotifiee_ = n;
-}
-
-ManagerImpl::ManagerImpl() {
+namespace ActivityImpl {
 	
+//Definition of static member
+Fwk::Ptr<Activity::Manager> ManagerImpl::activityInstance_ = NULL;
+
+//Gets the singleton instance of ManagerImpl
+Fwk::Ptr<Activity::Manager> ManagerImpl::activityManagerInstance() {
+
+	if (activityInstance_ == NULL) {
+	  activityInstance_ = new ManagerImpl();
+	}
+
+	return activityInstance_;
 }
   
 Activity::Ptr ManagerImpl::activityNew(const string& name) {
@@ -25,7 +28,7 @@ Activity::Ptr ManagerImpl::activityNew(const string& name) {
 	  cerr << "Activity already exists!" << endl;
 	  return NULL;
 	}	
-	activity = new ActivityImpl(name);
+	activity = new ActivityImpl(name, this);
 	activities_[name] = activity;
 
 	return activity;
@@ -83,4 +86,6 @@ void ManagerImpl::nowIs(Time t) {
 
 	//syncrhonize the time
 	now_ = t;
+}
+
 }
