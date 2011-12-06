@@ -50,13 +50,13 @@ class Activity : public Fwk::PtrInterface<Activity>
 
 	private:
 	  string name_;
+		Fwk::Ptr<Manager> manager_;
 };
 
 class Activity::Manager : public Fwk::PtrInterface<Activity::Manager>
 {
 	public:
 	 	typedef Fwk::Ptr<Activity::Manager> Ptr;
-		Ptr activityManagerInstance();
 
 		virtual Fwk::Ptr<Activity> activityNew(const string &name) = 0;
 		virtual Fwk::Ptr<Activity> activity(const string &name) const = 0;
