@@ -44,7 +44,7 @@ class ManagerImpl : public Activity::Manager
 	private:
 		Time now_;
 		map<string, Activity::Ptr> activities_;
-		priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComparator>* scheduledActivities_;
+		priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComparator> scheduledActivities_;
 };
 
 

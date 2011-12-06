@@ -99,6 +99,7 @@ namespace Shipping {
 	}
 	else if (this->queuedShipment(_ptr->name()) == NULL) {
 	  shipmentQueue_.push_back(_ptr);
+	  ++shipmentsRefused_;
 	}
   }
 
@@ -113,7 +114,7 @@ namespace Shipping {
   }
 
   void Segment::activeShipmentIs(Shipment::Ptr _ptr) {
-	// TODO: update statistics here
+	++shipmentsReceived_;
 	Fwk::String name = _ptr->name();
 	Shipment::Ptr m = activeShipment_[name];
 	if(m) {

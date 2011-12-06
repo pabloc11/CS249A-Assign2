@@ -25,7 +25,6 @@ namespace Shipping {
   }
 
   void Location::shipmentIs(Shipment::Ptr _ptr) {
-	// TODO: update statistics here
 	Fwk::String name = _ptr->name();
 	Shipment::Ptr m = shipment_[name];
 	if(m) {

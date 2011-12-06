@@ -551,7 +551,7 @@ namespace Shipping {
     // Attribute Accessors
     ShipmentsPerDay transferRate() const { return transferRate_; }
     PackagesPerShipment shipmentSize() const { return shipmentSize_; }
-	Location::Ptr destination() const { return destination_; }
+	CustomerLocation::Ptr destination() const { return destination_; }
 	NumShipments shipmentsReceived() const { return shipmentsReceived_; }
     Time averageLatency() const { return averageLatency_; }
     Fleet::Cost totalCost() const { return totalCost_; }
@@ -559,7 +559,7 @@ namespace Shipping {
     // Attribute Mutators
     void transferRateIs(ShipmentsPerDay _transferRate);
     void shipmentSizeIs(PackagesPerShipment _ShipmentSize);
-	void destinationIs(Location::Ptr _destination);
+	void destinationIs(CustomerLocation::Ptr _destination);
 
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee
     {
@@ -571,7 +571,7 @@ namespace Shipping {
 
       virtual void onTransferRate(ShipmentsPerDay transferRate_) {};
       virtual void onShipmentSize(PackagesPerShipment shipmentSize_) {};
-      virtual void onDestination(Location::Ptr destination_) {}
+      virtual void onDestination(CustomerLocation::Ptr destination_) {}
 
       ~Notifiee();
     protected:
@@ -589,7 +589,7 @@ namespace Shipping {
     CustomerLocation(Fwk::String _name);
     ShipmentsPerDay transferRate_;
     PackagesPerShipment shipmentSize_;
-    Location::Ptr destination_;
+    CustomerLocation::Ptr destination_;
     NumShipments shipmentsReceived_;
     Time averageLatency_;
     Fleet::Cost totalCost_;
