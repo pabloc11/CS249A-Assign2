@@ -1,0 +1,8 @@
+*.o
+.cproject
+.metadata
+.project
+test/example
+test/sample
+test/test1
+test/test2

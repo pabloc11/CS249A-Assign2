@@ -46,6 +46,15 @@ namespace Shipping {
     return m;
   }
 
+  void Location::routeIs(Fwk::String _name, U32 _val) {
+	routes_[_name] = _val;
+  }
+  U32 Location::routeDel(Fwk::String _name) {
+	U32 m = routes_[_name];
+	routes_[_name] = 0;
+	return m;
+  }
+
   void Location::Notifiee::notifierIs(Location::Ptr& _notifier) {
     Location::Ptr notifierSave(notifier_.ptr());
     if(notifier_==_notifier)

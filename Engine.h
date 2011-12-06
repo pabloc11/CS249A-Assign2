@@ -10,6 +10,7 @@
 #include "fwk/HashMap.h"
 #include "fwk/ListRaw.h"
 #include <deque>
+#include <map>
 #include "Activity.h"
 
 namespace Shipping {
@@ -474,6 +475,7 @@ namespace Shipping {
     typedef Fwk::ListRaw<Segment> SegmentList;
     typedef SegmentList::IteratorConst SegmentListIteratorConst;
     typedef Fwk::HashMap< Shipment, Fwk::String, Shipment, Fwk::Ptr<Shipment const>, Fwk::Ptr<Shipment> > ShipmentMap;
+    typedef map<Fwk::String, U32> RouteMap;
     
     // Attribute Accessors
     Segment::PtrConst segment(unsigned _index) const;
@@ -485,6 +487,11 @@ namespace Shipping {
     inline U32 shipments() const { return shipment_.members(); }
     void shipmentIs(Fwk::Ptr<Shipment> _ptr);
     Fwk::Ptr<Shipment> shipmentDel(Fwk::String _name);
+
+    inline U32 route(Fwk::String _name) { return routes_[_name]; }
+    inline U32 routes() const { return routes_.size(); }
+    void routeIs(Fwk::String _name, U32 _val);
+    U32 routeDel(Fwk::String _name);
 
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee
     {
@@ -501,11 +508,12 @@ namespace Shipping {
       Notifiee() : Fwk::NamedInterface::Notifiee() {}
       Location::Ptr notifier_;
     };
-    
+
   protected:
     friend class Segment;
     SegmentList segment_;
     ShipmentMap shipment_;
+    RouteMap routes_;
     Location(Fwk::String _name, Entity::EntityType _type);
     Location( const Location& );
     Location::Notifiee::Ptr notifiee_;
