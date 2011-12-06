@@ -48,8 +48,10 @@ namespace Shipping {
 			return;
 		}
 	
-    if(_returnSegment->entityType() != this->entityType())
+    if(_returnSegment->entityType() != this->entityType()) {
+			cerr << "A segment and its return segment must have the same entity type." << endl;
       throw Fwk::InternalException("A segment and its return segment must have the same entity type");
+		}
     
     if(returnSegment_ == _returnSegment)
       return;
