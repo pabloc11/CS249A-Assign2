@@ -4,49 +4,95 @@
 #include <map>
 #include <queue>
 #include "Activity.h"
+#include "Queue.h"
 
-class ManagerImpl;
+Fwk::Ptr<Activity::Manager> activityManagerInstance();
+
+namespace ActivityImpl {
+	
+class ActivityComp : public binary_function<Activity::Ptr, Activity::Ptr, bool>
+{
+	public:
+		ActivityComp() {}
+  	bool operator() (const Activity::Ptr lhs, const Activity::Ptr rhs) const {	
+			return lhs->nextTime().value() < rhs->nextTime().value();
+  	}
+};
 
 class ActivityImpl : public Activity
 {
-	public:
-		ActivityImpl(const string& name) : Activity(name) {}
-		
-		Status status() const {return status_;}
-		void statusIs(Status s);
-	
-		Time nextTime() const {return nextTime_;}
-		void nextTimeIs(Time t);
-	
-		Fwk::Ptr<Notifiee> notifiee() const {return lastNotifiee_;}
-		void lastNotifieeIs(Notifiee* n);
+  protected:
+  	ActivityImpl(const string& name, Fwk::Ptr<class ManagerImpl> manager) :
+				Activity(name), status_(free), nextTime_(0.0), notifiee_(NULL), manager_(manager) {}
+    
+		Fwk::Ptr<class ManagerImpl> manager() const { return manager_; }
 
-	private:
-		Fwk::Ptr<Manager> manager_;
-		enum Status status_;
+		virtual Status status() const { return status_; }
+		virtual void statusIs(Status s) {
+    	status_ = s;
+    	if (notifiee_ != NULL) {
+				notifiee_->onStatus();
+    	}
+		}
+
+		virtual Time nextTime() const { return nextTime_; }
+		virtual void nextTimeIs(Time t) {
+    	nextTime_ = t;
+    	if (notifiee_ != NULL) {
+    		notifiee_->onNextTime();
+    	}
+		}
+
+		virtual Notifiee::Ptr notifiee() const { return notifiee_; }
+		virtual void lastNotifieeIs(Notifiee* n) {
+    	ActivityImpl* me = const_cast<ActivityImpl*>(this);
+    	me->notifiee_ = n;
+		}
+
+  private:
+    friend class ManagerImpl;
+    Status status_;
 		Time nextTime_;
-		Fwk::Ptr<Notifiee> lastNotifiee_;
+		Notifiee* notifiee_;
+    Fwk::Ptr<class ManagerImpl> manager_;
 };
 
 class ManagerImpl : public Activity::Manager
 {
-	public:
-		ManagerImpl();		
-		Fwk::Ptr<Activity> activityNew(const string &name);
-		Fwk::Ptr<Activity> activity(const string &name) const;
-	
-		void activityDel(const string &name);
-		void lastActivityIs(Activity::Ptr);
-   
-		Time now() const {return now_;}
-		void nowIs(Time);
+  public:
+    typedef Fwk::Ptr<ManagerImpl> Ptr;
 		
-	private:
-		Time now_;
-		map<string, Activity::Ptr> activities_;
-		priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComparator> scheduledActivities_;
+	  virtual Activity::Ptr activityNew(const string& name);
+	  virtual Activity::Ptr activity(const string& name) const;
+	  virtual void activityDel(const string& name);
+
+	  virtual Time now() const { return now_; }
+	  virtual void nowIs(Time time);
+
+	  static Fwk::Ptr<Activity::Manager> activityManagerInstance();
+
+	  virtual void lastActivityIs(Activity::Ptr activity);
+
+		Queue::Ptr queue() const { return queue_; }
+  
+	protected:
+    ManagerImpl() : now_(0) {
+    	queue_ = new Queue();
+		}
+
+    //Data members
+    priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComp> scheduledActivities_;
+    map<string, Activity::Ptr> activities_; //pool of all activities
+    Time now_;
+
+		//specific to this example
+		Queue::Ptr queue_;
+
+    //singleton instance
+    static Fwk::Ptr<Activity::Manager> activityInstance_;
 };
 
+}
 
 #endif /* __ACTIVITY_IMPL_H__ */
 

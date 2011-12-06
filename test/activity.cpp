@@ -3,7 +3,7 @@
 
 int main(int argc, char* argv[]) {
 
-	Activity::Manager::Ptr manager = new ManagerImpl::ManagerImpl();
+	Activity::Manager::Ptr manager = activityManagerInstance();
 
 	Activity::Ptr prod1 = manager->activityNew("producer 1");
 	Activity::Ptr prod2 = manager->activityNew("producer 2");
