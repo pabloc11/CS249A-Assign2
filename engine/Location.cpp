@@ -26,12 +26,24 @@ namespace Shipping {
 
   void Location::shipmentIs(Shipment::Ptr _ptr) {
 	// TODO: update statistics here
-	// the location doesn't actually store the shipment since this is not needed
+	Fwk::String name = _ptr->name();
+	Shipment::Ptr m = shipment_[name];
+	if(m) {
+	  throw Fwk::NameInUseException(name);
+	} else {
+	  shipment_.newMember(_ptr);
+	}
 	if(notifiee_) {
 	  try {
 		notifiee_->onShipmentNew(_ptr);
 	  } catch(...) {}
 	}
+  }
+
+  Shipment::Ptr Location::shipmentDel(Fwk::String _name){
+    Shipment::Ptr m = shipment_.deleteMember(_name);
+    if(!m) return NULL;
+    return m;
   }
 
   void Location::Notifiee::notifierIs(Location::Ptr& _notifier) {

@@ -86,14 +86,60 @@ namespace Shipping {
     }
   }
   
-  void Segment::shipmentIs(Shipment::Ptr _ptr) {
+  Shipment::Ptr Segment::queuedShipment(Fwk::String _name) {
+    for(ShipmentQueueIterator i = shipmentQueue_.begin(); i != shipmentQueue_.end(); ++i) {
+    	if ((*i)->name() == _name) return *i;
+    }
+    return NULL;
+  }
+
+  void Segment::queuedShipmentIs(Shipment::Ptr _ptr) {
+	if(activeShipments() < (U32)capacity_.value()) {
+	  activeShipmentIs(_ptr);
+	}
+	else if (this->queuedShipment(_ptr->name()) == NULL) {
+	  shipmentQueue_.push_back(_ptr);
+	}
+  }
+
+  Shipment::Ptr Segment::queuedShipmentDel(Fwk::String _name) {
+	for(ShipmentQueueIterator i = shipmentQueue_.begin(); i != shipmentQueue_.end(); ++i) {
+		if ((*i)->name() == _name) {
+			shipmentQueue_.erase(i);
+			return *i;
+		}
+	}
+	return NULL;
+  }
+
+  void Segment::activeShipmentIs(Shipment::Ptr _ptr) {
 	// TODO: update statistics here
-	// TODO: only call the notifier if there is capacity
+	Fwk::String name = _ptr->name();
+	Shipment::Ptr m = activeShipment_[name];
+	if(m) {
+	  throw Fwk::NameInUseException(name);
+	} else {
+	  m = _ptr;
+	  activeShipment_.newMember(m);
+	}
 	if(notifiee_) {
 	  try {
-		notifiee_->onShipmentNew(_ptr);
+		notifiee_->onActiveShipmentNew(_ptr);
 	  } catch(...) {}
 	}
+  }
+
+  Fwk::Ptr<Shipment> Segment::activeShipmentDel(Fwk::String _name) {
+	Shipment::Ptr m = activeShipment_.deleteMember(_name);
+	if(!m) {
+	  return NULL;
+	}
+	if(!shipmentQueue_.empty()) {
+		Shipment::Ptr ptr = shipmentQueue_.back();
+		shipmentQueue_.pop_back();
+		activeShipmentIs(ptr);
+	}
+	return m;
   }
 
   void Segment::Notifiee::notifierIs(Segment::Ptr& _notifier) {

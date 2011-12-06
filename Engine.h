@@ -9,6 +9,7 @@
 #include "fwk/NamedInterface.h"
 #include "fwk/HashMap.h"
 #include "fwk/ListRaw.h"
+#include <deque>
 #include "Activity.h"
 
 namespace Shipping {
@@ -279,6 +280,9 @@ namespace Shipping {
   public:
     typedef Fwk::Ptr<Segment const> PtrConst;
     typedef Fwk::Ptr<Segment> Ptr;
+    typedef deque<Fwk::Ptr<Shipment> > ShipmentQueue;
+    typedef deque<Fwk::Ptr<Shipment> >::iterator ShipmentQueueIterator;
+    typedef Fwk::HashMap< Shipment, Fwk::String, Shipment, Fwk::Ptr<Shipment const>, Fwk::Ptr<Shipment> > ShipmentMap;
 
 	class Length : public Ordinal<Length, float>
 	{
@@ -317,7 +321,7 @@ namespace Shipping {
     // Attribute Accessors
     Fwk::Ptr<Location const> source() const { return source_; }
     Segment::PtrConst returnSegment() const { return returnSegment_; }
-		Length length() const { return length_; }
+	Length length() const { return length_; }
     Difficulty difficulty() const { return difficulty_; }
     Expedited expeditedState() const { return expeditedState_; }
     NumShipments shipmentsReceived() const { return shipmentsReceived_; }
@@ -328,11 +332,19 @@ namespace Shipping {
     // Attribute Mutators
     void sourceIs(Fwk::Ptr<Location> _source);
     void returnSegmentIs(Segment::Ptr _returnSegment);
-		void lengthIs(Length _length);
+	void lengthIs(Length _length);
     void difficultyIs(Difficulty _difficulty);
     void expeditedIs(Expedited _expedited);
     void capacityIs(NumShipments _capacity);
-    void shipmentIs(Fwk::Ptr<Shipment> _ptr);
+
+    Fwk::Ptr<Shipment> queuedShipment(Fwk::String _name);
+    inline U32 queuedShipments() const { return shipmentQueue_.size(); }
+    void queuedShipmentIs(Fwk::Ptr<Shipment> _ptr);
+    Fwk::Ptr<Shipment> queuedShipmentDel(Fwk::String _name);
+
+    inline Fwk::Ptr<Shipment> activeShipment(Fwk::String _name) { return activeShipment_[_name]; }
+    inline U32 activeShipments() const { return activeShipment_.members(); }
+    Fwk::Ptr<Shipment> activeShipmentDel(Fwk::String _name);
     
     // Notifier Class
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee
@@ -343,7 +355,7 @@ namespace Shipping {
       Segment::Ptr notifier() const { return notifier_; }
       virtual void notifierIs(Segment::Ptr& _notifier);
       
-      virtual void onShipmentNew(Fwk::Ptr<Shipment> _ptr) {};
+      virtual void onActiveShipmentNew(Fwk::Ptr<Shipment> _ptr) {};
 
       virtual void onExpedited(Segment::Expedited _expedited) {}
       
@@ -369,16 +381,21 @@ namespace Shipping {
     Segment( const Segment& );
     Segment(Fwk::String _name, Entity::EntityType _type);
 
+    void activeShipmentIs(Fwk::Ptr<Shipment> _ptr);
+
     // Attributes
     Fwk::Ptr<Location> source_;
     Segment::Ptr returnSegment_;
-		Length length_;
+	Length length_;
     Difficulty difficulty_;
     Expedited expeditedState_;
     NumShipments shipmentsReceived_;
     NumShipments shipmentsRefused_;
     NumShipments capacity_;
     
+    ShipmentMap activeShipment_;
+    ShipmentQueue shipmentQueue_;
+
     Segment::Notifiee::Ptr notifiee_;
     Segment *lrNext_;
   };
@@ -452,6 +469,7 @@ namespace Shipping {
     typedef Fwk::Ptr<Location> Ptr;
     typedef Fwk::ListRaw<Segment> SegmentList;
     typedef SegmentList::IteratorConst SegmentListIteratorConst;
+    typedef Fwk::HashMap< Shipment, Fwk::String, Shipment, Fwk::Ptr<Shipment const>, Fwk::Ptr<Shipment> > ShipmentMap;
     
     // Attribute Accessors
     Segment::PtrConst segment(unsigned _index) const;
@@ -459,8 +477,10 @@ namespace Shipping {
     inline U32 segments() { return segment_.members(); }
     inline SegmentListIteratorConst segmentIterConst() const { return segment_.iterator(); }
 
-    // Attribute Mutators
+    inline Fwk::Ptr<Shipment> shipment(Fwk::String _name) { return shipment_[_name]; }
+    inline U32 shipments() const { return shipment_.members(); }
     void shipmentIs(Fwk::Ptr<Shipment> _ptr);
+    Fwk::Ptr<Shipment> shipmentDel(Fwk::String _name);
 
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee
     {
@@ -481,6 +501,7 @@ namespace Shipping {
   protected:
     friend class Segment;
     SegmentList segment_;
+    ShipmentMap shipment_;
     Location(Fwk::String _name, Entity::EntityType _type);
     Location( const Location& );
     Location::Notifiee::Ptr notifiee_;
@@ -668,16 +689,25 @@ namespace Shipping {
     Location::Ptr destination() const { return destination_; }
     Time startTime() const { return startTime_; }
 
-    static Shipment::Ptr ShipmentIs(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination, Time _startTime) {
+    static Shipment::Ptr ShipmentNew(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination, Time _startTime) {
       std::stringstream s;
       s << _numPackages.value() << _source->name() << _destination->name() << _startTime.value();
       Ptr m = new Shipment(_numPackages, _source, _destination, _startTime, s.str());
       return m;
     }
 
+    Shipment const * fwkHmNext() const { return fwkHmNext_.ptr(); }
+    Shipment * fwkHmNext() { return fwkHmNext_.ptr(); }
+    void fwkHmNextIs(Shipment * _fwkHmNext) const {
+      fwkHmNext_ = _fwkHmNext;
+    }
+    Fwk::String fwkKey() const { return name(); }
+
   protected:
     Shipment( const Shipment& );
     Shipment(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination, Time _startTime, Fwk::String _name);
+
+    mutable Shipment::Ptr fwkHmNext_;
 
     NumPackages numPackages_;
     Location::Ptr source_;
