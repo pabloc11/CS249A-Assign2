@@ -123,8 +123,10 @@ namespace Shipping {
 		{
     public:
 	  	Percent(float num) : Ordinal<Percent, float>(num) {
-				if (num < 0.0f || num > 1.0f)
-          throw Fwk::RangeException("Invalid range passed to Percent constructor\n");
+				if (num < 0.0f || num > 1.0f) {
+					cerr << "Invalid value passed to Percent constructor: " << num << endl;
+          throw Fwk::RangeException("Invalid value passed to Percent constructor.");
+				}
 				value_ = num;
 		  }
 		};
@@ -202,7 +204,7 @@ namespace Shipping {
       Speed(float num) : Ordinal<Speed, float>(num) {
 				if(num < 0.0f) {
 					cerr << "Invalid value passed to Speed constructor: " << num << endl;
-					throw Fwk::RangeException("Invalid value passed to Speed constructor\n");
+					throw Fwk::RangeException("Invalid value passed to Speed constructor.");
 				}
         value_ = num;
       }    
@@ -212,7 +214,7 @@ namespace Shipping {
       Cost(float num) : Ordinal<Cost, float>(num) {
 				if(num < 0.0f) {
 					cerr << "Invalid value passed to Cost constructor: " << num << endl;
-					throw Fwk::RangeException("Invalid range passed to Cost constructor\n");
+					throw Fwk::RangeException("Invalid value passed to Cost constructor.");
 				}
         value_ = num;
       }    
@@ -222,7 +224,7 @@ namespace Shipping {
       Capacity(int num) : Ordinal<Capacity, int>(num) {
 				if(num < 0) {
 					cerr << "Invalid value passed to Capacity constructor: " << num << endl;
-					throw Fwk::RangeException("Invalid range passed to Capacity constructor\n");
+					throw Fwk::RangeException("Invalid value passed to Capacity constructor.");
 				}
         value_ = num;
       }    
@@ -269,8 +271,10 @@ namespace Shipping {
   class NumShipments : public Ordinal<NumShipments, int> {
 	public:
   	NumShipments(int num) : Ordinal<NumShipments, int>(num) {
-		if(num < 0)
-		  throw Fwk::RangeException("Invalid range passed to NumShipments constructor\n");
+		if(num < 0) {
+			cerr << "Invalid value passed to NumShipments constructor: " << num << endl;
+		  throw Fwk::RangeException("Invalid value passed to NumShipments constructor.");
+		}
 		value_ = num;
 	  }
 	};
@@ -291,7 +295,7 @@ namespace Shipping {
 		{
 			if(num < 0.0f) {
 				cerr << "Invalid value passed to Length constructor: " << num << endl;
-				throw Fwk::RangeException("Invalid range passed to Length constructor\n");
+				throw Fwk::RangeException("Invalid value passed to Length constructor.");
 			}
 			value_ = num;
 		}
@@ -304,7 +308,7 @@ namespace Shipping {
       {
         if(num < 1.0f || num > 5.0f) {
 					cerr << "Invalid value passed to Difficulty constructor: " << num << endl;
-          throw Fwk::RangeException("Invalid value passed to Difficulty constructor\n");
+          throw Fwk::RangeException("Invalid value passed to Difficulty constructor.");
 				}
         value_ = num;
       }    
@@ -511,8 +515,10 @@ namespace Shipping {
   class ShipmentsPerDay : public Ordinal<ShipmentsPerDay, int> {
   public:
   	ShipmentsPerDay(int num) : Ordinal<ShipmentsPerDay, int>(num) {
-      if(num < 0)
-        throw Fwk::RangeException("Invalid range passed to ShipmentsPerDay constructor\n");
+      if(num < 0) {
+				cerr << "Invalid value passed to ShipmentsPerDay constructor: " << num << endl;
+        throw Fwk::RangeException("Invalid value passed to ShipmentsPerDay constructor.");
+			}
       value_ = num;
     }
   };
@@ -520,8 +526,10 @@ namespace Shipping {
   class PackagesPerShipment : public Ordinal<PackagesPerShipment, int> {
 	public:
   	PackagesPerShipment(int num) : Ordinal<PackagesPerShipment, int>(num) {
-		if(num < 0)
-		  throw Fwk::RangeException("Invalid range passed to PackagesPerShipment constructor\n");
+		if(num < 0) {
+			cerr << "Invalid value passed to PackagesPerShipment constructor: " << num << endl;
+		  throw Fwk::RangeException("Invalid value passed to PackagesPerShipment constructor.");
+		}
 		value_ = num;
 	  }
 	};
@@ -677,8 +685,10 @@ namespace Shipping {
     class NumPackages : public Ordinal<NumPackages, int> {
   	public:
     	NumPackages(int num) : Ordinal<NumPackages, int>(num) {
-  		if(num < 0)
-  		  throw Fwk::RangeException("Invalid range passed to NumPackages constructor\n");
+  		if(num < 0) {
+				cerr << "Invalid value passed to NumPackages constructor: " << num << endl;
+  		  throw Fwk::RangeException("Invalid value passed to NumPackages constructor.");
+			}
   		value_ = num;
   	  }
   	};
