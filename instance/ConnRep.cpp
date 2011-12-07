@@ -200,6 +200,14 @@ string ConnRep::attribute(const string& name) {
 		if (!loc1) return "";
 		return connect(loc0, loc1);
 	}
+	else if (*token == "routing")
+	{
+		Connectivity::Algorithm alg = connectivity_->algorithm();
+		if(alg == Connectivity::dfs())
+			return "dfs";
+		else if(alg == Connectivity::ucs())
+			return "ucs";
+	}
 	else {
 		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 		throw Fwk::UnknownArgException("Incompatible type-attribute pair.");
