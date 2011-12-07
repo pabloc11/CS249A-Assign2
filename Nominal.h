@@ -45,6 +45,14 @@ public:
 	Ordinal<UnitType, RepType> operator+(const Ordinal<UnitType,
 					     RepType>& other)
 	{ return (Nominal<UnitType, RepType>::value_ + other.value_); }
+
+	Ordinal<UnitType, RepType> operator-(const Ordinal<UnitType,
+					     RepType>& other)
+	{ return (Nominal<UnitType, RepType>::value_ - other.value_); }
+
+	Ordinal<UnitType, RepType> operator*(const Ordinal<UnitType,
+					     RepType>& other)
+	{ return (Nominal<UnitType, RepType>::value_ * other.value_); }
 	
 	Ordinal<UnitType, RepType> operator/(const Ordinal<UnitType,
 					     RepType>& other)

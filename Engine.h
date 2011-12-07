@@ -11,6 +11,8 @@
 #include "fwk/ListRaw.h"
 #include <deque>
 #include <map>
+#include <vector>
+#include <set>
 #include "Activity.h"
 
 namespace Shipping {
@@ -731,6 +733,50 @@ namespace Shipping {
     Location::Ptr source_;
     Location::Ptr destination_;
     Time startTime_;
+  };
+
+  /************************** CONNECTIVITY **************************/
+
+  class Connectivity : public Fwk::PtrInterface<Fleet>
+  {
+  public:
+	typedef Fwk::Ptr<Connectivity const> PtrConst;
+	typedef Fwk::Ptr<Connectivity> Ptr;
+
+	struct Connection {
+	  Connection();
+	  vector<Segment::PtrConst> segments_;
+	  Fleet::Cost cost_;
+	  Time time_;
+	  Segment::Length distance_;
+	  Segment::Expedited expedited_;
+	};
+
+	Connectivity::Connection connect(Location::PtrConst start_, Location::PtrConst end_);
+	vector<Connectivity::Connection> connectAll(Location::PtrConst start_, Location::PtrConst end_);
+	vector<Connectivity::Connection> exploreAll(Location::PtrConst start_, Segment::Length distance_, Fleet::Cost cost_, Time time_, Segment::Expedited expedited_);
+
+    static Connectivity::Ptr ConnectivityNew(Fleet::Ptr _fleet) {
+      Ptr m = new Connectivity(_fleet);
+      return m;
+    }
+
+  protected:
+    Fleet::Ptr fleet_;
+    bool simpleDFS(Location::PtrConst currentLocation, Location::PtrConst goal, set<Fwk::String> & visited, Connectivity::Connection &path);
+    void DFSall(Segment::PtrConst prevSegment, Location::PtrConst currentLocation,
+  		  Location::PtrConst goal, set<Fwk::String> visited,
+  		  Connectivity::Connection path,
+  		  vector<Connectivity::Connection> & results,
+  		  Segment::Expedited expedited);
+    void DFSallWithLimit(Segment::PtrConst prevSegment, Location::PtrConst currentLocation,
+  		  set<Fwk::String> visited,
+  		  Connectivity::Connection path,
+  		  vector<Connectivity::Connection> & results,
+  		  Segment::Expedited expedited,
+  		  Fleet::Cost maxCost, Time maxTime, Segment::Length maxDist);
+    Connectivity( const Connectivity& );
+    Connectivity(Fleet::Ptr _fleet);
   };
 } /* end namespace */
 
