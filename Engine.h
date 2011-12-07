@@ -754,6 +754,18 @@ namespace Shipping {
 	  Segment::Expedited expedited_;
 	};
 
+    enum Algorithm {
+       dfs_ = 0,
+       ucs_ = 1
+    };
+
+
+    Algorithm algorithm() const { return algorithm_; }
+    void algorithmIs(Algorithm _alg);
+
+    static inline Algorithm dfs() { return dfs_; }
+    static inline Algorithm ucs() { return ucs_; }
+
 	Connectivity::Connection connect(Location::Ptr start_, Location::Ptr end_);
 	vector<Connectivity::Connection> connectAll(Location::Ptr start_, Location::Ptr end_);
 	vector<Connectivity::Connection> exploreAll(Location::Ptr start_, Segment::Length distance_, Fleet::Cost cost_, Time time_, Segment::Expedited expedited_);
@@ -765,7 +777,9 @@ namespace Shipping {
 
   protected:
     Fleet::Ptr fleet_;
+    Algorithm algorithm_;
     bool simpleDFS(Location::Ptr currentLocation, Location::Ptr goal, set<Fwk::String> & visited, Connectivity::Connection &path);
+    bool simpleUCS(Location::Ptr start, Location::Ptr goal, Connectivity::Connection &path);
     void DFSall(Segment::Ptr prevSegment, Location::Ptr currentLocation,
   		  Location::Ptr goal, set<Fwk::String> visited,
   		  Connectivity::Connection path,

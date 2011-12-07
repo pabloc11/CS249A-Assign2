@@ -1,8 +1,10 @@
 #include "Engine.h"
+#include <queue>
 
 namespace Shipping {
   Connectivity::Connectivity(Fleet::Ptr _fleet) :
-    fleet_(_fleet)
+    fleet_(_fleet),
+  	algorithm_(dfs_)
   {
 	// does nothing
   }
@@ -14,13 +16,17 @@ namespace Shipping {
 	expedited_(Segment::notExpedited())
   {}
 
+  void Connectivity::algorithmIs(Algorithm _alg) {
+	algorithm_ = _alg;
+  }
+
   bool Connectivity::simpleDFS(Location::Ptr currentLocation, Location::Ptr goal, set<Fwk::String> & visited, Connectivity::Connection &path) {
 	if (visited.count(currentLocation->name()))
 	  return false;
 
 	if (currentLocation->name() == goal->name())
 	  return true;
-
+	visited.insert(currentLocation->name());
 	for (Location::SegmentListIterator iter = currentLocation->segmentIter(); iter.ptr(); ++iter) {
 	  Segment::Ptr segment = iter.ptr();
 	  if (segment->returnSegment()) {
@@ -33,12 +39,57 @@ namespace Shipping {
 	return false;
   }
 
-  Connectivity::Connection Connectivity::connect(Location::Ptr start_, Location::Ptr end_) {
+  class mycomparison
+  {
+  public:
+    bool operator() (const Connectivity::Connection& lhs, const Connectivity::Connection&rhs) const
+    {
+      return lhs.distance_.value() < rhs.distance_.value();
+    }
+  };
+
+  bool Connectivity::simpleUCS(Location::Ptr start, Location::Ptr goal, Connectivity::Connection &path) {
+	priority_queue<Connectivity::Connection, vector<Connectivity::Connection>, mycomparison> p_queue;
 	set<Fwk::String> visited;
+	Connectivity::Connection startPath;
+	p_queue.push(startPath);
+	while(!p_queue.empty()) {
+	  Connectivity::Connection curPath = p_queue.top();
+	  p_queue.pop();
+	  Location::Ptr curLocation = curPath.segments_.back()->returnSegment()->source();
+	  if(curLocation->name() == goal->name())
+	  {
+		path = curPath;
+		return true;
+	  }
+	  visited.insert(curLocation->name());
+
+	  for (Location::SegmentListIterator iter = curLocation->segmentIter(); iter.ptr(); ++iter) {
+	  	Segment::Ptr segment = iter.ptr();
+	  	if (segment->returnSegment() && !visited.count(segment->returnSegment()->source()->name())) {
+	  	  Connectivity::Connection newPath = curPath;
+	  	  curPath.segments_.push_back(segment);
+	  	  curPath.distance_ = Segment::Length(curPath.distance_.value() + segment->length().value());
+	  	  p_queue.push(newPath);
+	  	}
+	  }
+	}
+	return false;
+  }
+
+  Connectivity::Connection Connectivity::connect(Location::Ptr start_, Location::Ptr end_) {
 	Connectivity::Connection path;
-	if(!simpleDFS(start_, end_, visited, path)) {
-		//TODO: throw an error if route isn't found
-		cerr << "No route found!" << endl;
+	bool error = false;
+	if(algorithm_ == dfs_) {
+		set<Fwk::String> visited;
+		error = !simpleDFS(start_, end_, visited, path);
+	}
+	else if(algorithm_ == ucs_) {
+		error = !simpleUCS(start_, end_, path);
+	}
+	if(error) {
+		// TODO: throw an error here
+		cerr << "No route found from " << start_->name() << " to " << end_->name() << endl;
 	}
 	return path;
   }

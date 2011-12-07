@@ -212,14 +212,14 @@ void ConnRep::attributeIs(const string& name, const string& v)
 {
 	if (name == "routing")
 	{
-		if(v == "bfs")
+		if(v == "dfs")
 		{
-			//TODO:
+			connectivity_->algorithmIs(Connectivity::dfs());
 			return;
 		}
-		else if(v == "dijkstra")
+		else if(v == "ucs")
 		{
-			//TODO:
+			connectivity_->algorithmIs(Connectivity::ucs());
 			return;
 		}
 		else
