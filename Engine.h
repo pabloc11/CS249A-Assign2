@@ -11,6 +11,8 @@
 #include "fwk/ListRaw.h"
 #include <deque>
 #include <map>
+#include <vector>
+#include <set>
 #include "Activity.h"
 
 namespace Shipping {
@@ -731,6 +733,37 @@ namespace Shipping {
     Location::Ptr source_;
     Location::Ptr destination_;
     Time startTime_;
+  };
+
+  /************************** CONNECTIVITY **************************/
+
+  class Connectivity : public Fwk::PtrInterface<Fleet>
+  {
+  public:
+	typedef Fwk::Ptr<Connectivity const> PtrConst;
+	typedef Fwk::Ptr<Connectivity> Ptr;
+
+	struct Connection {
+	  Connection();
+	  vector<Segment::Ptr> segments_;
+	  Fleet::Cost cost_;
+	  Time time_;
+	  Segment::Expedited expedited_;
+	};
+
+	Connectivity::Connection connect(Location::Ptr start_, Location::Ptr end_);
+	vector<Connectivity::Connection> connectAll(Location::Ptr start_, Location::Ptr end_);
+	vector<Connectivity::Connection> exploreAll(Location::Ptr start_, Segment::Length distance_, Fleet::Cost cost_, Time time_, Segment::Expedited expedited_);
+
+    static Connectivity::Ptr ConnectivityNew() {
+      Ptr m = new Connectivity();
+      return m;
+    }
+
+  protected:
+    bool simpleDFS(Location::Ptr currentLocation, Location::Ptr goal, set<Fwk::String> & visited, Connectivity::Connection &path);
+    Connectivity( const Connectivity& );
+    Connectivity();
   };
 } /* end namespace */
 
