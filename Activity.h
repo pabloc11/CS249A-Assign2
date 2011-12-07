@@ -33,7 +33,7 @@ class Activity : public Fwk::PtrInterface<Activity>
 		};
 
 	  class Manager;
-	  enum Status {free, waiting, ready, executing, nextTimeScheduled, deleted};
+	  enum Status {queued, executing, nextTimeScheduled, done};
 
 	  virtual Status status() const = 0;
 	  virtual void statusIs(Status s)  = 0;
@@ -47,10 +47,6 @@ class Activity : public Fwk::PtrInterface<Activity>
 
 	protected:
 	  Activity(const string &name) : name_(name) {}
-		Fwk::Ptr<Manager> manager_;
-		enum Status status_;
-		Time nextTime_;
-		Fwk::Ptr<Notifiee> lastNotifiee_;
 		
 	private:
 	  string name_;

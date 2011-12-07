@@ -1,32 +1,34 @@
 #include <iostream>
 #include "ActivityImpl.h"
+#include "ActivityReactor.h"
 
 int main(int argc, char* argv[]) {
 
-	Activity::Manager::Ptr manager = activityManagerInstance();
+  Activity::Manager::Ptr manager = activityManagerInstance();
 
-	Activity::Ptr prod1 = manager->activityNew("producer 1");
-	Activity::Ptr prod2 = manager->activityNew("producer 2");
-	Activity::Ptr prod3 = manager->activityNew("producer 3");
+	// Create activities
+  Activity::Ptr activity1 = manager->activityNew("activity 1");
+  Activity::Ptr activity2 = manager->activityNew("activity 2");
+  Activity::Ptr activity3 = manager->activityNew("activity 3");
 
-	Activity::Ptr consumer1 = manager->activityNew("consumer 1");
+	// Create activity reactors
+  activity1->lastNotifieeIs(new ActivityReactor(manager, activity1.ptr())); 
+  activity2->lastNotifieeIs(new ActivityReactor(manager, activity2.ptr())); 
+  activity3->lastNotifieeIs(new ActivityReactor(manager, activity3.ptr())); 
 
-	//schedule producer and consumer to run for the first time
-	prod1->statusIs(Activity::nextTimeScheduled);
+	// Add activities to activity manager queue
+	manager->lastActivityIs(activity1);
+	manager->lastActivityIs(activity2);
+	manager->lastActivityIs(activity3);
 
-	//producer 2 starts at time 2.0
-	prod2->nextTimeIs(2.0);
-	prod2->statusIs(Activity::nextTimeScheduled);
-
-	//producer 3 starts at time 3.0
-	prod3->nextTimeIs(3.0);
-	prod3->statusIs(Activity::nextTimeScheduled);
-
-	consumer1->statusIs(Activity::nextTimeScheduled);
-
-	//set the time to 20.0
+	// Set activity start times
+	activity1->nextTimeIs(0.0);
+	activity2->nextTimeIs(2.0);
+	activity3->nextTimeIs(1.0);
+  
+	// Start simulation
 	manager->nowIs(20.0);
 
-	return 0;
+  return 0;
 }
 

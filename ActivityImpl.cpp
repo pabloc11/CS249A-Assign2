@@ -56,12 +56,14 @@ void ManagerImpl::nowIs(Time t) {
 
 	//find the most recent activites to run and run them in order
 	while (!scheduledActivities_.empty()) {
+
+		cout << "Size of activities queue: " << scheduledActivities_.size() << endl;
    
 	  //figure out the next activity to run
 	  Activity::Ptr nextToRun = scheduledActivities_.top();
+		scheduledActivities_.pop();
 
-	  //if the next time is greater than the specified time, break
-   	//the loop
+	  //if the next time is greater than the specified time, break the loop
    	if (nextToRun->nextTime() > t) {
 			break;
 	  }
@@ -70,18 +72,13 @@ void ManagerImpl::nowIs(Time t) {
 		Time diff = Time(nextToRun->nextTime().value() - now_.value());
 
 		//sleep 100ms (100,000 microseconds) for every unit of time
-		usleep(( ((int)diff.value()) * 100000));
+		//usleep(( ((int)diff.value()) * 100000));
 
 		now_ = nextToRun->nextTime();
 
-		//print out size of queue
-		cout << "size of queue: " << scheduledActivities_.size() << endl;
-
 		//run the minimum time activity and remove it from the queue
-		scheduledActivities_.pop();
-
 		nextToRun->statusIs(Activity::executing);
-		nextToRun->statusIs(Activity::free);
+		nextToRun->statusIs(Activity::done);
 	}
 
 	//syncrhonize the time

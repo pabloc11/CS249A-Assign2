@@ -14,8 +14,8 @@ class ActivityComp : public binary_function<Activity::Ptr, Activity::Ptr, bool>
 {
 	public:
 		ActivityComp() {}
-  	bool operator() (const Activity::Ptr lhs, const Activity::Ptr rhs) const {	
-			return lhs->nextTime().value() < rhs->nextTime().value();
+  	bool operator() (Activity::Ptr lhs, Activity::Ptr rhs) const {	
+			return lhs->nextTime() > rhs->nextTime();
   	}
 };
 
@@ -23,7 +23,7 @@ class ActivityImpl : public Activity
 {
   protected:
   	ActivityImpl(const string& name, Fwk::Ptr<class ManagerImpl> manager) :
-				Activity(name), status_(free), nextTime_(0.0), notifiee_(NULL), manager_(manager) {}
+				Activity(name), status_(queued), nextTime_(0.0), notifiee_(NULL), manager_(manager) {}
     
 		Fwk::Ptr<class ManagerImpl> manager() const { return manager_; }
 
@@ -72,21 +72,14 @@ class ManagerImpl : public Activity::Manager
 	  static Fwk::Ptr<Activity::Manager> activityManagerInstance();
 
 	  virtual void lastActivityIs(Activity::Ptr activity);
-
-		Queue::Ptr queue() const { return queue_; }
   
 	protected:
-    ManagerImpl() : now_(0) {
-    	queue_ = new Queue();
-		}
+    ManagerImpl() : now_(0) {}
 
     //Data members
     priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComp> scheduledActivities_;
     map<string, Activity::Ptr> activities_; //pool of all activities
     Time now_;
-
-		//specific to this example
-		Queue::Ptr queue_;
 
     //singleton instance
     static Fwk::Ptr<Activity::Manager> activityInstance_;
