@@ -628,8 +628,31 @@ string ConnRep::attribute(const string& name) {
 	return "";
 }
 
-void ConnRep::attributeIs(const string& name, const string& v) {
-    //nothing to do
+void ConnRep::attributeIs(const string& name, const string& v)
+{
+	if (name == "routing")
+	{
+		if(v == "bfs")
+		{
+			//TODO:
+			return;
+		}
+		else if(v == "dijkstra")
+		{
+			//TODO:
+			return;
+		}
+		else
+		{
+			cerr << "Unsupported routing algorithm: " << v << endl;
+			throw Fwk::UnknownArgException("Unsupported routing algorithm");
+		}
+	}
+	else
+	{
+		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
+		throw Fwk::UnknownArgException("Incompatible type-attribute pair.");
+	}
 }
 
 string LocationRep::attribute(const string& name) {

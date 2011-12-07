@@ -7,6 +7,14 @@ namespace Shipping {
 	}
 
 	void LocationReactor::onShipmentNew(Shipment::Ptr _ptr) {
-		//TODO: do forwarding (or not if not needed)
+		if(_ptr->destination()->name() == notifier_->name()) {
+			// it has arrived at its destination, TODO: update the stats
+			return;
+		}
+
+		// do forwarding
+		notifier_->shipmentDel(_ptr->name());
+		U32 nextSegment = notifier_->route(_ptr->destination()->name());
+		notifier_->segment(nextSegment)->queuedShipmentIs(_ptr);
 	}
 }

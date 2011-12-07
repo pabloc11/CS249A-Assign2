@@ -37,9 +37,13 @@ namespace Shipping {
     typedef Fwk::Ptr<CustomerReactor> Ptr;
     void onTransferRate(ShipmentsPerDay transferRate_);
     void onShipmentSize(PackagesPerShipment shipmentSize_);
-    void onDestination(Location::Ptr destination_);
+    void onDestination(CustomerLocation::Ptr destination_);
     CustomerReactor(CustomerLocation::Ptr _l);
   private:
+    void createOrUpdateActivity();
+    bool transferRateInit_;
+    bool shipmentSizeInit_;
+    bool destinationInit_;
   };
 }
 

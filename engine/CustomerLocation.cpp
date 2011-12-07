@@ -29,7 +29,7 @@ namespace Shipping {
 	}
   }
 
-  void CustomerLocation::destinationIs(Location::Ptr _destination) {
+  void CustomerLocation::destinationIs(CustomerLocation::Ptr _destination) {
     destination_ = _destination;
 	if(notifiee_) {
 	  try {
