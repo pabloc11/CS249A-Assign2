@@ -14,7 +14,7 @@ namespace Shipping {
 
 		// do forwarding
 		notifier_->shipmentDel(_ptr->name());
-		U32 nextSegment = notifier_->route(_ptr->destination()->name());
-		notifier_->segment(nextSegment)->queuedShipmentIs(_ptr);
+		Segment::Ptr nextSegment = notifier_->route(_ptr->destination()->name());
+		nextSegment->queuedShipmentIs(_ptr);
 	}
 }

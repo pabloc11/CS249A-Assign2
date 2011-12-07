@@ -14,15 +14,15 @@ namespace Shipping {
 	expedited_(Segment::notExpedited())
   {}
 
-  bool Connectivity::simpleDFS(Location::PtrConst currentLocation, Location::PtrConst goal, set<Fwk::String> & visited, Connectivity::Connection &path) {
+  bool Connectivity::simpleDFS(Location::Ptr currentLocation, Location::Ptr goal, set<Fwk::String> & visited, Connectivity::Connection &path) {
 	if (visited.count(currentLocation->name()))
 	  return false;
 
 	if (currentLocation->name() == goal->name())
 	  return true;
 
-	for (Location::SegmentListIteratorConst iter = currentLocation->segmentIterConst(); iter.ptr(); ++iter) {
-	  Segment::PtrConst segment = iter.ptr();
+	for (Location::SegmentListIterator iter = currentLocation->segmentIter(); iter.ptr(); ++iter) {
+	  Segment::Ptr segment = iter.ptr();
 	  if (segment->returnSegment()) {
 		path.segments_.push_back(segment);
 		if(simpleDFS(segment->returnSegment()->source(), goal, visited, path))
@@ -33,7 +33,7 @@ namespace Shipping {
 	return false;
   }
 
-  Connectivity::Connection Connectivity::connect(Location::PtrConst start_, Location::PtrConst end_) {
+  Connectivity::Connection Connectivity::connect(Location::Ptr start_, Location::Ptr end_) {
 	set<Fwk::String> visited;
 	Connectivity::Connection path;
 	if(!simpleDFS(start_, end_, visited, path)) {
@@ -43,8 +43,8 @@ namespace Shipping {
 	return path;
   }
 
-  void Connectivity::DFSall(Segment::PtrConst prevSegment, Location::PtrConst currentLocation,
-		  Location::PtrConst goal, set<Fwk::String> visited,
+  void Connectivity::DFSall(Segment::Ptr prevSegment, Location::Ptr currentLocation,
+		  Location::Ptr goal, set<Fwk::String> visited,
 		  Connectivity::Connection path,
 		  vector<Connectivity::Connection> & results,
 		  Segment::Expedited expedited)
@@ -81,14 +81,14 @@ namespace Shipping {
 
 	visited.insert(currentLocation->name());
 
-	for (Location::SegmentListIteratorConst iter = currentLocation->segmentIterConst(); iter.ptr(); ++iter) {
-	  Segment::PtrConst segment = iter.ptr();
+	for (Location::SegmentListIterator iter = currentLocation->segmentIter(); iter.ptr(); ++iter) {
+	  Segment::Ptr segment = iter.ptr();
 	  if (segment->returnSegment() && (expedited == Segment::notExpedited() || segment->expedited() == Segment::expedited()))
 		DFSall(segment, segment->returnSegment()->source(), goal, visited, path, results, expedited);
     }
   }
 
-  vector<Connectivity::Connection> Connectivity::connectAll(Location::PtrConst start_, Location::PtrConst end_)
+  vector<Connectivity::Connection> Connectivity::connectAll(Location::Ptr start_, Location::Ptr end_)
   {
 	vector<Connectivity::Connection> paths;
 	set<Fwk::String> visited;
@@ -98,7 +98,7 @@ namespace Shipping {
     return paths;
   }
 
-  void Connectivity::DFSallWithLimit(Segment::PtrConst prevSegment, Location::PtrConst currentLocation,
+  void Connectivity::DFSallWithLimit(Segment::Ptr prevSegment, Location::Ptr currentLocation,
 		  set<Fwk::String> visited,
 		  Connectivity::Connection path,
 		  vector<Connectivity::Connection> & results,
@@ -142,14 +142,14 @@ namespace Shipping {
 
 	visited.insert(currentLocation->name());
 
-	for (Location::SegmentListIteratorConst iter = currentLocation->segmentIterConst(); iter.ptr(); ++iter) {
-	  Segment::PtrConst segment = iter.ptr();
+	for (Location::SegmentListIterator iter = currentLocation->segmentIter(); iter.ptr(); ++iter) {
+	  Segment::Ptr segment = iter.ptr();
 	  if (segment->returnSegment() && (expedited == Segment::notExpedited() || segment->expedited() == Segment::expedited()))
 		DFSallWithLimit(segment, segment->returnSegment()->source(), visited, path, results, expedited, maxCost, maxTime, maxDist);
     }
   }
 
-  vector<Connectivity::Connection> Connectivity::exploreAll(Location::PtrConst start_, Segment::Length distance_, Fleet::Cost cost_, Time time_, Segment::Expedited expedited_) {
+  vector<Connectivity::Connection> Connectivity::exploreAll(Location::Ptr start_, Segment::Length distance_, Fleet::Cost cost_, Time time_, Segment::Expedited expedited_) {
 	vector<Connectivity::Connection> paths;
 	set<Fwk::String> visited;
 	Connectivity::Connection path;

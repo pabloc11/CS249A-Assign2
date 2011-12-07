@@ -10,7 +10,7 @@ namespace Shipping {
 		stats_->expeditedSegmentCountDec();
 	}
 
-    void SegmentReactor::onShipmentNew(Shipment::Ptr _ptr) {
+    void SegmentReactor::onActiveShipmentNew(Shipment::Ptr _ptr) {
     	//TODO: create the forwarding activity and kick it off
     }
 

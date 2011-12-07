@@ -2,7 +2,11 @@
 
 namespace Shipping {
 
-ConnRep::ConnRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {	
+ConnRep::ConnRep(const string& name, ManagerImpl* manager) :
+  Instance(name),
+  manager_(manager),
+  connectivity_(Connectivity::ConnectivityNew(manager_->fleetRep()->fleet()))
+{
 	params_.dist = 0;
 	params_.cost = 0;
 	params_.time = 0;
