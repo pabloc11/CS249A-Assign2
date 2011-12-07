@@ -113,10 +113,10 @@ int main(int argc, char *argv[]) {
     assert(boatSeg1->attribute("expedite support") == "yes");
     boatSeg2->attributeIs("expedite support", "yes");
     assert(boatSeg2->attribute("expedite support") == "yes");
-    truckSeg1->attributeIs("expedite support", "yes");
-    assert(truckSeg1->attribute("expedite support") == "yes");
-    truckSeg2->attributeIs("expedite support", "yes");
-    assert(truckSeg2->attribute("expedite support") == "yes");
+    truckSeg1->attributeIs("expedite support", "no");
+    assert(truckSeg1->attribute("expedite support") == "no");
+    truckSeg2->attributeIs("expedite support", "no");
+    assert(truckSeg2->attribute("expedite support") == "no");
     truckSeg2->attributeIs("expedite support", "no");
     assert(truckSeg2->attribute("expedite support") == "no");
     truckSeg2->attributeIs("expedite support", "yes");
