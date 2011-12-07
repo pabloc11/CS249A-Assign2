@@ -1,7 +1,7 @@
 CPPFLAGS = -I.
 CXXFLAGS = -Wall -g
 
-OBJECTS = ActivityImpl.o ActivityReactor.o instance/InstanceImpl.o instance/ConnRep.o instance/FleetRep.o instance/LocationRep.o instance/ManagerImpl.o instance/SegmentRep.o instance/StatsRep.o engine/Entity.o engine/Network.o engine/Stats.o engine/Fleet.o engine/Segment.o engine/TruckSegment.o engine/PlaneSegment.o engine/BoatSegment.o engine/Location.o engine/CustomerLocation.o engine/PortLocation.o engine/TerminalLocation.o engine/TruckTerminal.o engine/BoatTerminal.o engine/PlaneTerminal.o engine/Shipment.o engine/SegmentReactor.o engine/NetworkReactor.o engine/LocationReactor.o engine/CustomerReactor.o engine/Connectivity.o
+OBJECTS = ActivityImpl.o ActivityReactor.o instance/InstanceImpl.o instance/ConnRep.o instance/FleetRep.o instance/ClockRep.o instance/LocationRep.o instance/ManagerImpl.o instance/SegmentRep.o instance/StatsRep.o engine/Entity.o engine/Network.o engine/Stats.o engine/Fleet.o engine/Segment.o engine/TruckSegment.o engine/PlaneSegment.o engine/BoatSegment.o engine/Location.o engine/CustomerLocation.o engine/PortLocation.o engine/TerminalLocation.o engine/TruckTerminal.o engine/BoatTerminal.o engine/PlaneTerminal.o engine/Shipment.o engine/SegmentReactor.o engine/NetworkReactor.o engine/LocationReactor.o engine/CustomerReactor.o engine/Connectivity.o
 LIBS = fwk/BaseCollection.o fwk/BaseNotifiee.o fwk/Exception.o
 
 default: test/activity #test/test1 #test/test2 #test/sample #test/example 

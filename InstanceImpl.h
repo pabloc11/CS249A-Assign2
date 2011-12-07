@@ -40,6 +40,7 @@ public:
 class StatsRep;
 class FleetRep;
 class ConnRep;
+class ClockRep;
 class LocationRep;
 
 class ManagerImpl : public Instance::Manager {
@@ -55,19 +56,20 @@ public:
   // Manager method
   void instanceDel(const string& name);
 
-	Activity::Manager::Ptr activityManager() { return activityManager_; }
+	Activity::Manager::Ptr activityManager();
 	Network::Ptr network() { return network_; }
 	Ptr<FleetRep> fleetRep() { return fleetRep_; }
 	Ptr<StatsRep> statsRep() { return statsRep_; }
 
 private:
 	Activity::Manager::Ptr activityManager_;
-  map<string,Ptr<Instance> > instance_;
+    map<string,Ptr<Instance> > instance_;
 	Network::Ptr network_;
 	NetworkReactor::Ptr networkReactor_;
 	Ptr<StatsRep> statsRep_;
 	Ptr<FleetRep> fleetRep_;
 	Ptr<ConnRep> connRep_;
+	Ptr<ClockRep> clockRep_;
 };
 
 /************************** REPRESENTATION CLASSES **************************/
@@ -98,6 +100,20 @@ public:
 private:
   Ptr<ManagerImpl> manager_;
 	Fleet::Ptr fleet_;
+};
+
+class ClockRep : public Instance {
+public:
+	ClockRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
+		activityManager_ = activityManagerInstance();
+	}
+	Activity::Manager::Ptr activityManager() { return activityManager_; }
+	string attribute(const string& name);
+	void attributeIs(const string& name, const string& v);
+
+private:
+  Ptr<ManagerImpl> manager_;
+  Activity::Manager::Ptr activityManager_;
 };
 
 class ConnRep : public Instance {

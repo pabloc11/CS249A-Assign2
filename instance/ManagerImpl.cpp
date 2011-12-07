@@ -20,6 +20,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		networkReactor_ = new NetworkReactor(network_, statsRep_->stats());
 		fleetRep_ = new FleetRep("fleetRep", this);
 		connRep_ = new ConnRep("connRep", this);
+		clockRep_ = new ClockRep("clockRep", this);
 	}
 	
 	// Instance name is invalid
@@ -103,4 +104,7 @@ void ManagerImpl::instanceDel(const string& name) {
 	instance_.erase(name);
 }
 
+Activity::Manager::Ptr ManagerImpl::activityManager() {
+	return clockRep_->activityManager();
+}
 }
