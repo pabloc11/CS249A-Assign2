@@ -2,6 +2,7 @@
 #define REACTORS_H
 
 #include "Engine.h"
+#include "Activity.h"
 
 namespace Shipping {
   class SegmentReactor : public Segment::Notifiee {

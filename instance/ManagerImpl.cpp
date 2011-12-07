@@ -1,8 +1,10 @@
 #include "InstanceImpl.h"
+#include "Activity.h"
 
 namespace Shipping {
 
 ManagerImpl::ManagerImpl() {
+	activityManager_ = NULL;
 	network_ = NULL;
 	networkReactor_ = NULL;
 	statsRep_ = NULL;
@@ -33,8 +35,8 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		cerr << "An instance already exists with the name: " << name << endl;
 		return NULL;
 	}
-
-	if (type == "Stats" ) {
+	
+ 	if (type == "Stats" ) {
 		return statsRep_;
 	}
 	else if (type == "Fleet" ) {
@@ -43,31 +45,31 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 	else if (type == "Conn") {
 		return connRep_;
 	}
-    else if (type == "Customer") {
-        Ptr<CustomerLocationRep> t = new CustomerLocationRep(name, this);
-        instance_[name] = t;
-        return t;
-    }
-    else if (type == "Port") {
-        Ptr<PortLocationRep> t = new PortLocationRep(name, this);
-        instance_[name] = t;
-        return t;
-    }
-    else if (type == "Truck terminal") {
-        Ptr<TruckTerminalRep> t = new TruckTerminalRep(name, this);
-        instance_[name] = t;
-        return t;
-    }
-    else if (type == "Boat terminal") {
-        Ptr<BoatTerminalRep> t = new BoatTerminalRep(name, this);
-        instance_[name] = t;
-        return t;
-    }
-    else if (type == "Plane terminal") {
-        Ptr<PlaneTerminalRep> t = new PlaneTerminalRep(name, this);
-        instance_[name] = t;
-        return t;
-    }
+  else if (type == "Customer") {
+      Ptr<CustomerLocationRep> t = new CustomerLocationRep(name, this);
+      instance_[name] = t;
+      return t;
+  }
+  else if (type == "Port") {
+      Ptr<PortLocationRep> t = new PortLocationRep(name, this);
+      instance_[name] = t;
+      return t;
+  }
+  else if (type == "Truck terminal") {
+      Ptr<TruckTerminalRep> t = new TruckTerminalRep(name, this);
+      instance_[name] = t;
+      return t;
+  }
+  else if (type == "Boat terminal") {
+      Ptr<BoatTerminalRep> t = new BoatTerminalRep(name, this);
+      instance_[name] = t;
+      return t;
+  }
+  else if (type == "Plane terminal") {
+      Ptr<PlaneTerminalRep> t = new PlaneTerminalRep(name, this);
+      instance_[name] = t;
+      return t;
+  }
 	else if (type == "Truck segment") {
 		Ptr<TruckSegmentRep> t = new TruckSegmentRep(name, this);
 		instance_[name] = t;
@@ -83,9 +85,12 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		instance_[name] = t;
 		return t;
 	}
-	else cerr << "Invalid type: " << type << endl;
+	else {
+		cerr << "Invalid type: " << type << endl;
+		throw Fwk::UnknownTypeException("Invalid type.");
+	}
 
-    return NULL;
+  return NULL;
 }
 
 Ptr<Instance> ManagerImpl::instance(const string& name) {

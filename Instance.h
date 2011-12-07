@@ -4,6 +4,7 @@
 #include <string>
 #include "Ptr.h"
 #include "PtrInterface.h"
+#include "Activity.h"
 
 using std::string;
 using Fwk::Ptr;
@@ -85,6 +86,11 @@ public:
     /// associated with the instance.
     ///
     virtual void instanceDel(const string& name) = 0;
+
+		///
+		/// Return the pointer to the associated activity manager
+		///
+		virtual Ptr<Activity::Manager> activityManager() = 0;
 
 };
 

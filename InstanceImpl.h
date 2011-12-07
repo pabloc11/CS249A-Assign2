@@ -6,6 +6,7 @@
 #include <set>
 #include <vector>
 #include <iterator>
+#include "Activity.h"
 #include "Instance.h"
 #include "Engine.h"
 #include "Reactors.h"
@@ -54,11 +55,13 @@ public:
   // Manager method
   void instanceDel(const string& name);
 
+	Activity::Manager::Ptr activityManager() { return activityManager_; }
 	Network::Ptr network() { return network_; }
 	Ptr<FleetRep> fleetRep() { return fleetRep_; }
 	Ptr<StatsRep> statsRep() { return statsRep_; }
 
 private:
+	Activity::Manager::Ptr activityManager_;
   map<string,Ptr<Instance> > instance_;
 	Network::Ptr network_;
 	NetworkReactor::Ptr networkReactor_;
@@ -76,7 +79,7 @@ public:
 	}
 	Stats::Ptr stats() { return stats_; }
 	string attribute(const string& name);
-    void attributeIs(const string& name, const string& v);
+  void attributeIs(const string& name, const string& v);
 
 private:
     Ptr<ManagerImpl> manager_;
@@ -93,7 +96,7 @@ public:
 	void attributeIs(const string& name, const string& v);
 
 private:
-    Ptr<ManagerImpl> manager_;
+  Ptr<ManagerImpl> manager_;
 	Fleet::Ptr fleet_;
 };
 
@@ -136,28 +139,28 @@ private:
 class LocationRep : public Instance {
 public:
     LocationRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
-	Location::Ptr location() { return location_; }
+		Location::Ptr location() { return location_; }
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
 
 protected:
     Ptr<ManagerImpl> manager_;
-	Location::Ptr location_;
-	LocationReactor::Ptr locationReactor_;
+		Location::Ptr location_;
+		LocationReactor::Ptr locationReactor_;
     int segmentNumber(const string& name);
 };
 
 class SegmentRep : public Instance {
 public:
     SegmentRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
-	Segment::Ptr segment() { return segment_; }
+		Segment::Ptr segment() { return segment_; }
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
 
 protected:
     Ptr<ManagerImpl> manager_;
-	Segment::Ptr segment_;
-	SegmentReactor::Ptr segmentReactor_;
+		Segment::Ptr segment_;
+		SegmentReactor::Ptr segmentReactor_;
 };
                                                                                                   
 class CustomerLocationRep : public LocationRep {

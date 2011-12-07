@@ -1,11 +1,14 @@
 #include <iostream>
-#include "ActivityImpl.h"
+#include "Instance.h"
+#include "Activity.h"
 #include "ActivityReactor.h"
 
 int main(int argc, char* argv[]) {
+	
+	Ptr<Instance::Manager> shippingManager = shippingInstanceManager();
+	Ptr<Activity::Manager> activityManager = shippingManager->activityManager();
 
-  Activity::Manager::Ptr manager = activityManagerInstance();
-
+/*
 	// Create activities
   Activity::Ptr activity1 = manager->activityNew("activity 1");
   Activity::Ptr activity2 = manager->activityNew("activity 2");
@@ -28,7 +31,7 @@ int main(int argc, char* argv[]) {
   
 	// Start simulation
 	manager->nowIs(20.0);
-
+*/
   return 0;
 }
 

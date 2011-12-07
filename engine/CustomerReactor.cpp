@@ -1,5 +1,6 @@
 #include "Reactors.h"
 #include "Engine.h"
+#include "Activity.h"
 
 namespace Shipping {
 	CustomerReactor::CustomerReactor(CustomerLocation::Ptr _l) :
@@ -27,12 +28,9 @@ namespace Shipping {
     void CustomerReactor::createOrUpdateActivity(){
     	if(!transferRateInit_ || !shipmentSizeInit_ ||  !destinationInit_)
     		return;
-    	/*if(activity pointer == null)
-    	{
-    		create new injecting activity
-    		return;
-    	}
-    	update the properties of the existing injecting activity
-    	*/
+				//     	if (injectActivity_ == NULL)
+				//     	{
+				// injectActivity_ = activityManager_->activityNew("inject activity");
+				//     	}
     }
 }
