@@ -4,7 +4,6 @@
 #include <map>
 #include <queue>
 #include "Activity.h"
-#include "Queue.h"
 
 Fwk::Ptr<Activity::Manager> activityManagerInstance();
 

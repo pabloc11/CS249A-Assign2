@@ -1,3 +1,4 @@
+#include <iostream>
 #include "ActivityReactor.h"
 
 void ActivityReactor::onStatus() {
