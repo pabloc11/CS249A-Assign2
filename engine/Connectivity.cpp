@@ -57,7 +57,11 @@ namespace Shipping {
 	while(!p_queue.empty()) {
 	  Connectivity::Connection curPath = p_queue.top();
 	  p_queue.pop();
-	  Location::Ptr curLocation = curPath.segments_.back()->returnSegment()->source();
+	  Location::Ptr curLocation;
+	  if(curPath.segments_.empty())
+		  curLocation = start;
+	  else
+		  curLocation = curPath.segments_.back()->returnSegment()->source();
 	  if(curLocation->name() == goal->name())
 	  {
 		path = curPath;
@@ -89,8 +93,8 @@ namespace Shipping {
 		error = !simpleUCS(start_, end_, path);
 	}
 	if(error) {
-		throw new Fwk::InternalException("No route found.");
 		cerr << "No route found from " << start_->name() << " to " << end_->name() << endl;
+		throw new Fwk::InternalException("No route found.");
 	}
 	return path;
   }

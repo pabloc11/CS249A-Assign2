@@ -4,6 +4,7 @@
 
 ForwardActivityReactor::ForwardActivityReactor(Activity* _a, Fleet::Ptr _fleet, Stats::Ptr _stats, Segment::Ptr _seg, Shipment::Ptr _ship) : 
 	Activity::Notifiee(_a),
+	activity_(_a),
 	fleet_(_fleet),
 	stats_(_stats),
 	segment_(_seg),

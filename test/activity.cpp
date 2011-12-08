@@ -6,8 +6,8 @@
 int main(int argc, char* argv[]) {
 	
 	Ptr<Instance::Manager> manager = shippingInstanceManager();
-	manager->instanceNew("clock", "Clock");
-	Ptr<Activity::Manager> activityManager = manager->activityManager();
+	Ptr<Instance> clock = manager->instanceNew("clock", "Clock");
+	//Ptr<Activity::Manager> activityManager = manager->activityManager();
 	
 	/* Set up the network */
 	vector< Ptr<Instance> > loc;
@@ -46,7 +46,8 @@ int main(int argc, char* argv[]) {
 	loc[1]->attributeIs("shipment size", "10");
 	loc[1]->attributeIs("destination", "customer1");
 
-	activityManager->nowIs(24.0);
+	//activityManager->nowIs(24.0);
+	clock->attributeIs("now", "24");
 
 	cout << "Shipments Received: " << loc[1]->attribute("shipments received") << endl;
 	cout << "Average Latency: " << loc[1]->attribute("average latency") << endl;
