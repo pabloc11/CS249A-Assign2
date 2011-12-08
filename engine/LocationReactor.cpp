@@ -8,7 +8,9 @@ namespace Shipping {
 
 	void LocationReactor::onShipmentNew(Shipment::Ptr _ptr) {
 		if(_ptr->destination()->name() == notifier_->name()) {
-			// it has arrived at its destination, TODO: update the stats
+			_ptr->destination()->shipmentsReceived_ = NumShipments(_ptr->destination()->shipmentsReceived_.value() + 1);
+			_ptr->destination()->totalLatency_ = Time(_ptr->destination()->totalLatency_.value() + _ptr->timeTaken_.value());
+			_ptr->destination()->totalCost_ = Fleet::Cost(_ptr->destination()->totalCost_.value() + _ptr->costTaken_.value());
 			return;
 		}
 

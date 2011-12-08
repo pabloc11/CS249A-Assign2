@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
     cout << "# Plane segments : " << stats->attribute("Plane segment") << endl;
     assert(stats->attribute("Plane segment") == "0");
     cout << "Expediting %     : " << stats->attribute("expedite percentage") << endl;
-    assert(stats->attribute("expedite percentage") == "100.00");
+    assert(stats->attribute("expedite percentage") == "66.67");
     cout << " --- Terminals --- " << endl;
     cout << "# Truck terminals: " << stats->attribute("Truck terminal") << endl;
     assert(stats->attribute("Truck terminal") == "0");

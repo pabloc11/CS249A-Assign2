@@ -55,3 +55,4 @@ void ForwardActivityReactor::onStatus() {
 			activityManagerInstance()->activityDel(activity_->name());
 		}
 }
+
