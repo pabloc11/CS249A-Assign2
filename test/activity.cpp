@@ -1,7 +1,7 @@
 #include <iostream>
+#include <vector>
 #include "Instance.h"
 #include "Activity.h"
-#include "ActivityReactor.h"
 
 int main(int argc, char* argv[]) {
 	
