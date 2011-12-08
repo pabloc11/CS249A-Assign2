@@ -9,6 +9,7 @@ namespace Shipping {
 	destinationInit_(false),
 	transferRate_(0),
 	shipmentSize_(0),
+	source_(_l),
 	destination_(NULL)
 	{
 		notifierIs(_l);
@@ -36,8 +37,8 @@ namespace Shipping {
     	/*
 			if (injectActivity_ == NULL)
    		{
-				injectActivity_ = activityManager_->activityNew("inject activity");
-				reactor_ = new InjectActivityReactor(injectActivity_);
+				injectActivity_ = activityManagerInstance()->activityNew(notifier()->name());
+				reactor_ = new InjectActivityReactor(injectActivity_, source_);
 				injectActivity_->lastNotifieeIs(reactor_.ptr());
 				injectActivity_->statusIs(Activity::queued);
 			}	

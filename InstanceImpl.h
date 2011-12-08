@@ -245,7 +245,7 @@ public:
  		TruckSegment::Ptr ptr = TruckSegment::TruckSegmentNew(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
-		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats(), manager_->fleetRep()->fleet());
+		segmentReactor_ = new SegmentReactor(segment_, manager->fleetRep()->fleet(), manager->statsRep()->stats());
 	}
 };
 
@@ -255,7 +255,7 @@ public:
 		BoatSegment::Ptr ptr = BoatSegment::BoatSegmentNew(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
-		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats(), manager_->fleetRep()->fleet());
+		segmentReactor_ = new SegmentReactor(segment_, manager->fleetRep()->fleet(), manager->statsRep()->stats());
 	}
 };
 
@@ -265,7 +265,7 @@ public:
 		PlaneSegment::Ptr ptr = PlaneSegment::PlaneSegmentNew(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
-		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats(), manager_->fleetRep()->fleet());
+		segmentReactor_ = new SegmentReactor(segment_, manager->fleetRep()->fleet(), manager->statsRep()->stats());
 	}
 };
 

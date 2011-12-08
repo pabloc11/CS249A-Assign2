@@ -9,7 +9,7 @@ using namespace Shipping;
 class InjectActivityReactor : public Activity::Notifiee {
 public:
 	typedef Fwk::Ptr<InjectActivityReactor> Ptr;
-	InjectActivityReactor(Activity::Ptr _a);
+	InjectActivityReactor(Activity::Ptr _a, CustomerLocation::Ptr _l);
 	void transferRateIs(ShipmentsPerDay n);
 	void shipmentSizeIs(PackagesPerShipment n);
 	void destinationIs(CustomerLocation::Ptr l);
@@ -19,15 +19,22 @@ private:
 	Activity::Ptr activity_;
 	ShipmentsPerDay transferRate_;
 	PackagesPerShipment shipmentSize_;
+	CustomerLocation::Ptr source_;
 	CustomerLocation::Ptr destination_;
 };
 
 class ForwardActivityReactor : public Activity::Notifiee {
 public:
 	typedef Fwk::Ptr<ForwardActivityReactor> Ptr;
-	ForwardActivityReactor(Activity* _a);
+	ForwardActivityReactor(Activity* _a, Fleet::Ptr _fleet, Stats::Ptr _stats, Segment::Ptr _seg, Shipment::Ptr _ship);
 	void onNextTime();
 	void onStatus();	
+private:
+	Activity::Ptr activity_;
+	Fleet::Ptr fleet_;
+	Stats::Ptr stats_;
+	Segment::Ptr segment_;
+	Shipment::Ptr shipment_;
 };
 
 namespace Shipping {
@@ -36,10 +43,12 @@ namespace Shipping {
 	typedef Fwk::Ptr<SegmentReactor> Ptr;
     void onExpedited(Segment::Expedited _expedited);
     void onActiveShipmentNew(Shipment::Ptr _ptr);
-    SegmentReactor(Segment::Ptr _s, Stats::Ptr _stats, Fleet::Ptr _fleet);
+    SegmentReactor(Segment::Ptr _s, Fleet::Ptr _fleet, Stats::Ptr _stats);
   private:
-    Stats::Ptr stats_;
-    Fleet::Ptr fleet_;
+		Fleet::Ptr fleet_;
+    Fwk::Ptr<Stats> stats_;
+		Activity::Ptr forwardActivity_;
+		ForwardActivityReactor::Ptr reactor_;
   };
 
   class NetworkReactor : public Network::Notifiee {
@@ -76,6 +85,7 @@ namespace Shipping {
     bool destinationInit_;
 		ShipmentsPerDay transferRate_;
 		PackagesPerShipment shipmentSize_;
+		CustomerLocation::Ptr source_;
 		CustomerLocation::Ptr destination_;
   };
 
