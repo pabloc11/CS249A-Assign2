@@ -557,7 +557,7 @@ namespace Shipping {
     PackagesPerShipment shipmentSize() const { return shipmentSize_; }
 	CustomerLocation::Ptr destination() const { return destination_; }
 	NumShipments shipmentsReceived() const { return shipmentsReceived_; }
-    Time averageLatency() const { return averageLatency_; }
+    Time averageLatency() const { return Time(totalLatency_.value() / shipmentsReceived_.value()); }
     Fleet::Cost totalCost() const { return totalCost_; }
 
     // Attribute Mutators
@@ -589,13 +589,14 @@ namespace Shipping {
     }
     
   protected:
+    friend class LocationReactor;
     CustomerLocation( const CustomerLocation& );
     CustomerLocation(Fwk::String _name);
     ShipmentsPerDay transferRate_;
     PackagesPerShipment shipmentSize_;
     CustomerLocation::Ptr destination_;
     NumShipments shipmentsReceived_;
-    Time averageLatency_;
+    Time totalLatency_;
     Fleet::Cost totalCost_;
 
     CustomerLocation::Notifiee::Ptr notifiee_;
@@ -707,11 +708,11 @@ namespace Shipping {
 
     // Attribute Accessors
     NumPackages numPackages() const { return numPackages_; }
-    Location::Ptr source() const { return source_; }
-    Location::Ptr destination() const { return destination_; }
+    CustomerLocation::Ptr source() const { return source_; }
+    CustomerLocation::Ptr destination() const { return destination_; }
     Time startTime() const { return startTime_; }
 
-    static Shipment::Ptr ShipmentNew(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination, Time _startTime) {
+    static Shipment::Ptr ShipmentNew(NumPackages _numPackages, CustomerLocation::Ptr _source, CustomerLocation::Ptr _destination, Time _startTime) {
       std::stringstream s;
       s << _numPackages.value() << _source->name() << _destination->name() << _startTime.value();
       Ptr m = new Shipment(_numPackages, _source, _destination, _startTime, s.str());
@@ -726,15 +727,19 @@ namespace Shipping {
     Fwk::String fwkKey() const { return name(); }
 
   protected:
+    friend class LocationReactor;
+    friend class ForwardActivityReactor;
     Shipment( const Shipment& );
-    Shipment(NumPackages _numPackages, Location::Ptr _source, Location::Ptr _destination, Time _startTime, Fwk::String _name);
+    Shipment(NumPackages _numPackages, CustomerLocation::Ptr _source, CustomerLocation::Ptr _destination, Time _startTime, Fwk::String _name);
 
     mutable Shipment::Ptr fwkHmNext_;
 
     NumPackages numPackages_;
-    Location::Ptr source_;
-    Location::Ptr destination_;
+    CustomerLocation::Ptr source_;
+    CustomerLocation::Ptr destination_;
     Time startTime_;
+    Time timeTaken_;
+    Fleet::Cost costTaken_;
   };
 
   /************************** CONNECTIVITY **************************/

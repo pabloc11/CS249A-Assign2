@@ -7,7 +7,7 @@ namespace Shipping {
     shipmentSize_(0),
     destination_(NULL),
     shipmentsReceived_(0),
-    averageLatency_(0),
+    totalLatency_(0),
     totalCost_(0)
   {}
 

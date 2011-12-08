@@ -5,4 +5,6 @@ ForwardActivityReactor::ForwardActivityReactor(Activity* _a) : Activity::Notifie
 
 void ForwardActivityReactor::onNextTime() {}
 
-void ForwardActivityReactor::onStatus() {}
+void ForwardActivityReactor::onStatus() {
+	//TODO: update the shipments timeTaken_ and costTaken_ when done forwarding them
+}

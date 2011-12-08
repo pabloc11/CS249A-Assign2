@@ -200,7 +200,7 @@ string ConnRep::attribute(const string& name) {
 		if (!loc1) return "";
 		return connect(loc0, loc1);
 	}
-	else if (*token == "routing")
+	else if (*token == "routing algorithm")
 	{
 		Connectivity::Algorithm alg = connectivity_->algorithm();
 		if(alg == Connectivity::dfs())
@@ -218,7 +218,7 @@ string ConnRep::attribute(const string& name) {
 
 void ConnRep::attributeIs(const string& name, const string& v)
 {
-	if (name == "routing")
+	if (name == "routing algorithm")
 	{
 		if(v == "dfs")
 		{
