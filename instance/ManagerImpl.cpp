@@ -9,6 +9,7 @@ ManagerImpl::ManagerImpl() {
 	networkReactor_ = NULL;
 	statsRep_ = NULL;
 	fleetRep_ = NULL;
+	clockRep_ = NULL;
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
@@ -45,6 +46,9 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 	}
 	else if (type == "Conn") {
 		return connRep_;
+	}
+	else if (type == "Clock") {
+		return clockRep_;
 	}
   else if (type == "Customer") {
       Ptr<CustomerLocationRep> t = new CustomerLocationRep(name, this);
@@ -105,6 +109,9 @@ void ManagerImpl::instanceDel(const string& name) {
 }
 
 Activity::Manager::Ptr ManagerImpl::activityManager() {
-	return clockRep_->activityManager();
+	if (clockRep_)
+		return clockRep_->activityManager();
+	return NULL;
 }
+
 }

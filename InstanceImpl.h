@@ -60,10 +60,11 @@ public:
 	Network::Ptr network() { return network_; }
 	Ptr<FleetRep> fleetRep() { return fleetRep_; }
 	Ptr<StatsRep> statsRep() { return statsRep_; }
+	Ptr<ClockRep> clockRep() { return clockRep_; }
 
 private:
 	Activity::Manager::Ptr activityManager_;
-    map<string,Ptr<Instance> > instance_;
+  map<string,Ptr<Instance> > instance_;
 	Network::Ptr network_;
 	NetworkReactor::Ptr networkReactor_;
 	Ptr<StatsRep> statsRep_;
@@ -148,7 +149,7 @@ private:
  	string explore(Ptr<LocationRep> loc);
 	string connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1);
 	
-    Ptr<ManagerImpl> manager_;
+  Ptr<ManagerImpl> manager_;
 	SearchParams params_;	
 };
 
@@ -181,12 +182,12 @@ protected:
                                                                                                   
 class CustomerLocationRep : public LocationRep {
 public:
-    CustomerLocationRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
+  CustomerLocationRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
 		CustomerLocation::Ptr ptr = CustomerLocation::CustomerLocationIs(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
 		locationReactor_ = new LocationReactor(location_);
-		customerReactor_ = new CustomerReactor(ptr);
+		customerReactor_ = new CustomerReactor(ptr, manager_->clockRep()->activityManager());
 	}
 protected:
     CustomerReactor::Ptr customerReactor_;

@@ -6,8 +6,8 @@
 class ActivityReactor : public Activity::Notifiee {
  	public:
 		ActivityReactor(Fwk::Ptr<Activity::Manager> manager, Activity* activity) : 
-				Notifiee(activity), activity_(activity), manager_(manager) {}
-
+		Notifiee(activity), activity_(activity), manager_(manager) {}
+		void onNextTime();
     void onStatus();
 
 	protected:

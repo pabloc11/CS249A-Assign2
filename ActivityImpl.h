@@ -1,5 +1,5 @@
 #ifndef __ACTIVITY_IMPL_H__
-#define __ACTIVITY_IMPL_H__
+#define __ACTIVITY_IMPL_H__z
 
 #include <map>
 #include <queue>
@@ -22,7 +22,7 @@ class ActivityImpl : public Activity
 {
   protected:
   	ActivityImpl(const string& name, Fwk::Ptr<class ManagerImpl> manager) :
-				Activity(name), status_(queued), nextTime_(0.0), notifiee_(NULL), manager_(manager) {}
+				Activity(name), manager_(manager), status_(queued), nextTime_(0.0), notifiee_(NULL) {}
     
 		Fwk::Ptr<class ManagerImpl> manager() const { return manager_; }
 
@@ -50,10 +50,10 @@ class ActivityImpl : public Activity
 
   private:
     friend class ManagerImpl;
+    Fwk::Ptr<class ManagerImpl> manager_;
     Status status_;
 		Time nextTime_;
 		Notifiee* notifiee_;
-    Fwk::Ptr<class ManagerImpl> manager_;
 };
 
 class ManagerImpl : public Activity::Manager

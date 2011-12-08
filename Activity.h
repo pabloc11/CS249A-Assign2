@@ -33,7 +33,7 @@ class Activity : public Fwk::PtrInterface<Activity>
 		};
 
 	  class Manager;
-	  enum Status {queued, executing, nextTimeScheduled, done};
+	  enum Status {queued, executing, done};
 
 	  virtual Status status() const = 0;
 	  virtual void statusIs(Status s)  = 0;

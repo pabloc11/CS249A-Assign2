@@ -24,6 +24,15 @@ string SegmentRep::attribute(const string& name) {
 		else if (segment_->expeditedState() == Segment::notExpedited())
 			return "no";
 	}
+	else if (name == "shipments received") {
+		return Util::IntToString(segment_->shipmentsReceived().value());
+	}
+	else if (name == "shipments refused") {
+		return Util::IntToString(segment_->shipmentsRefused().value());
+	}
+	else if (name == "capacity") {
+		return Util::IntToString(segment_->capacity().value());
+	}
 	else {
 		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 		throw Fwk::UnknownArgException("Incompatible type-attribute pair.");
@@ -38,7 +47,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 		if (ptr) segment_->sourceIs(ptr->location());
 		else {
 			cerr << "Instance given to 'source' is not a location: " << v << endl;
-			throw Fwk::EntityNotFoundException("Instance given to 'source is not a location.");
+			throw Fwk::EntityNotFoundException("Instance given to 'source' is not a location.");
 		}
 	}
 	else if (name == "length")
@@ -53,7 +62,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 			segment_->returnSegmentIs(ptr->segment());
 		else {
 			cerr << "Instance given to 'return segment' is not a segment: " << v << endl;
-			throw Fwk::EntityNotFoundException("Instance given to 'return segment is not a segment.");
+			throw Fwk::EntityNotFoundException("Instance given to 'return segment' is not a segment.");
 		}
 	}
 	else if (name == "difficulty")
@@ -67,6 +76,9 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 			cerr << "Invalid expedite support: " << v << endl;
 			throw Fwk::UnknownArgException("Invalid expedite support.");
 		}
+	}
+	else if (name == "capacity") {
+		segment_->capacityIs(NumShipments(atoi(v.c_str())));
 	}
 	else {
 		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
