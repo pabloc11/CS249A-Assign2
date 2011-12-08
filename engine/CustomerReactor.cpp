@@ -34,7 +34,7 @@ namespace Shipping {
     void CustomerReactor::createOrUpdateActivity(){
     	if(!transferRateInit_ || !shipmentSizeInit_ ||  !destinationInit_)
     		return;
-    	/*
+
 			if (injectActivity_ == NULL)
    		{
 				injectActivity_ = activityManagerInstance()->activityNew(notifier()->name());
@@ -44,6 +44,6 @@ namespace Shipping {
 			}	
 			reactor_->transferRateIs(transferRate_);
 			reactor_->shipmentSizeIs(shipmentSize_);
-			reactor_->destinationIs(destination_);*/
+			reactor_->destinationIs(destination_);
     }
 }
