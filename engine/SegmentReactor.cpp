@@ -25,7 +25,7 @@ namespace Shipping {
   	forwardActivity_ = activityManagerInstance()->activityNew(_ptr->name());
 		reactor_ = new ForwardActivityReactor(forwardActivity_.ptr(), fleet_, stats_, notifier(), _ptr);
 		
-		float speed;
+		float speed = 1;
 		float length = segment_->length().value();
 		
 		// Truck segment
@@ -40,7 +40,10 @@ namespace Shipping {
 		PlaneSegment* planePtr = dynamic_cast<PlaneSegment *>(segment_.ptr());
 		if (planePtr) speed = fleet_->planeSpeed().value();
 		
-		forwardActivity_->nextTimeIs(activityManagerInstance()->now().value() + length/speed);
+		int numPackages = _ptr->numPackages().value();
+		int capacity = segment_->capacity().value();
+		int numTrips = ceil((float)numPackages/(float)capacity);
+		forwardActivity_->nextTimeIs(activityManagerInstance()->now().value() + numTrips*length/speed);
 		forwardActivity_->lastNotifieeIs(reactor_.ptr());
 		forwardActivity_->statusIs(Activity::queued);
   }
