@@ -11,7 +11,7 @@ namespace Shipping {
   public:
 	typedef Fwk::Ptr<SegmentReactor> Ptr;
     void onExpedited(Segment::Expedited _expedited);
-    void onShipmentNew(Shipment::Ptr _ptr);
+    void onActiveShipmentNew(Shipment::Ptr _ptr);
     SegmentReactor(Segment::Ptr _s, Stats::Ptr _stats);
   private:
     Fwk::Ptr<Stats> stats_;

@@ -68,6 +68,9 @@ class ManagerImpl : public Activity::Manager
 	  virtual Time now() const { return now_; }
 	  virtual void nowIs(Time time);
 
+	  virtual Type type() const { return type_; };
+	  virtual void typeIs(Type _type) { type_ = _type; };
+
 	  static Fwk::Ptr<Activity::Manager> activityManagerInstance();
 
 	  virtual void lastActivityIs(Activity::Ptr activity);
@@ -79,6 +82,7 @@ class ManagerImpl : public Activity::Manager
     priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComp> scheduledActivities_;
     map<string, Activity::Ptr> activities_; //pool of all activities
     Time now_;
+    Type type_;
 
     //singleton instance
     static Fwk::Ptr<Activity::Manager> activityInstance_;

@@ -45,12 +45,12 @@ namespace Shipping {
     return m;
   }
 
-  void Location::routeIs(Fwk::String _name, U32 _val) {
-	routes_[_name] = _val;
+  void Location::routeIs(Fwk::String _name, Segment::Ptr _ptr) {
+	routes_[_name] = _ptr;
   }
-  U32 Location::routeDel(Fwk::String _name) {
-	U32 m = routes_[_name];
-	routes_[_name] = 0;
+  Segment::Ptr Location::routeDel(Fwk::String _name) {
+	Segment::Ptr m = routes_[_name];
+	routes_[_name] = NULL;
 	return m;
   }
 

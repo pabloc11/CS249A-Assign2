@@ -5,7 +5,11 @@ namespace Shipping {
 string ClockRep::attribute(const string& name) {
 
 	if (name == "type"){
-		//return activityManager_->type()
+		Activity::Manager::Type type = activityManager_->type();
+		if(type == Activity::Manager::real())
+			return "real";
+		else if(type == Activity::Manager::virt())
+			return "virtual";
 	}
 	else if (name == "now") {
 		return Util::FloatToString(activityManager_->now().value());
@@ -20,10 +24,36 @@ string ClockRep::attribute(const string& name) {
 void ClockRep::attributeIs(const string& name, const string& v) {
 
 	if (name == "type"){
-		//activityManager_->typeIs(...)
+		if(v == "real")
+			activityManager_->typeIs(Activity::Manager::real());
+		else if (v == "virtual")
+			activityManager_->typeIs(Activity::Manager::virt());
+		else {
+			cerr << "Unsupported clock type argument: " << v << endl;
+			throw Fwk::UnknownArgException("Unsupported clock type argument");
+		}
 	}
 	else if (name == "now") {
-		//fleet_->planeCapacityIs(Fleet::Capacity(atoi(v.c_str())));
+		vector<Location::Ptr> allLocations;
+		map<string, Ptr<Instance> > entities = manager_->instance_;
+
+		for(map<string,Ptr<Instance> >::iterator i = entities.begin(); i != entities.end(); ++i){
+			Ptr<Instance> instance = i->second;
+			Ptr<LocationRep> ptr = dynamic_cast<LocationRep *>(instance.ptr());
+			if(ptr)
+				allLocations.push_back(ptr->location());
+		}
+
+		Connectivity::Ptr con = manager_->connRep()->connectivity();
+		for(vector<Location::Ptr>::iterator i = allLocations.begin(); i != allLocations.end(); ++i) {
+			for(vector<Location::Ptr>::iterator j = allLocations.begin(); j != allLocations.end(); ++j) {
+				if(i != j) {
+					(*i)->routeIs((*j)->name(), con->connect(*i, *j).segments_[0]);
+				}
+			}
+		}
+
+		activityManager_->nowIs(Time(atof(v.c_str())));
 	}
 	else {
 		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;

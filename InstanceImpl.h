@@ -57,12 +57,13 @@ public:
   void instanceDel(const string& name);
 
 	Activity::Manager::Ptr activityManager();
-	Network::Ptr network() { return network_; }
-	Ptr<FleetRep> fleetRep() { return fleetRep_; }
-	Ptr<StatsRep> statsRep() { return statsRep_; }
-	Ptr<ClockRep> clockRep() { return clockRep_; }
+	Network::Ptr network() const { return network_; }
+	Ptr<FleetRep> fleetRep() const { return fleetRep_; }
+	Ptr<StatsRep> statsRep() const { return statsRep_; }
+	Ptr<ConnRep> connRep() const { return connRep_; }
 
 private:
+	friend class ClockRep;
 	Activity::Manager::Ptr activityManager_;
   map<string,Ptr<Instance> > instance_;
 	Network::Ptr network_;
@@ -80,7 +81,7 @@ public:
 	StatsRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
 		stats_ = Stats::StatsNew(manager->network());
 	}
-	Stats::Ptr stats() { return stats_; }
+	Stats::Ptr stats() const { return stats_; }
 	string attribute(const string& name);
   void attributeIs(const string& name, const string& v);
 
@@ -94,7 +95,7 @@ public:
 	FleetRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
 		fleet_ = Fleet::FleetNew();
 	}
-	Fleet::Ptr fleet() { return fleet_; }
+	Fleet::Ptr fleet() const { return fleet_; }
 	string attribute(const string& name);
 	void attributeIs(const string& name, const string& v);
 
@@ -108,7 +109,7 @@ public:
 	ClockRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
 		activityManager_ = activityManagerInstance();
 	}
-	Activity::Manager::Ptr activityManager() { return activityManager_; }
+	Activity::Manager::Ptr activityManager() const { return activityManager_; }
 	string attribute(const string& name);
 	void attributeIs(const string& name, const string& v);
 
@@ -135,6 +136,7 @@ public:
 	};
 	
 	ConnRep(const string& name, ManagerImpl* manager);
+	Connectivity::Ptr connectivity() const { return connectivity_; }
 	string attribute(const string& name);
 	void attributeIs(const string& name, const string& v);
 
@@ -150,13 +152,14 @@ private:
 	string connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1);
 	
   Ptr<ManagerImpl> manager_;
-	SearchParams params_;	
+	SearchParams params_;
+	Connectivity::Ptr connectivity_;
 };
 
 class LocationRep : public Instance {
 public:
     LocationRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
-		Location::Ptr location() { return location_; }
+		Location::Ptr location() const { return location_; }
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
 
@@ -170,7 +173,7 @@ protected:
 class SegmentRep : public Instance {
 public:
     SegmentRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {}
-		Segment::Ptr segment() { return segment_; }
+		Segment::Ptr segment() const { return segment_; }
     string attribute(const string& name);
     void attributeIs(const string& name, const string& v);
 
@@ -182,8 +185,8 @@ protected:
                                                                                                   
 class CustomerLocationRep : public LocationRep {
 public:
-  CustomerLocationRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		CustomerLocation::Ptr ptr = CustomerLocation::CustomerLocationIs(name);
+ 		CustomerLocationRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
+		CustomerLocation::Ptr ptr = CustomerLocation::CustomerLocationNew(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
 		locationReactor_ = new LocationReactor(location_);
@@ -195,8 +198,8 @@ protected:
 
 class PortLocationRep : public LocationRep {
 public:
-    PortLocationRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		PortLocation::Ptr ptr = PortLocation::PortLocationIs(name);
+  	PortLocationRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
+		PortLocation::Ptr ptr = PortLocation::PortLocationNew(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
 		locationReactor_ = new LocationReactor(location_);
@@ -206,7 +209,7 @@ public:
 class TruckTerminalRep : public LocationRep {
 public:
     TruckTerminalRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		TruckTerminal::Ptr ptr = TruckTerminal::TruckTerminalIs(name);
+		TruckTerminal::Ptr ptr = TruckTerminal::TruckTerminalNew(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
 		locationReactor_ = new LocationReactor(location_);
@@ -216,7 +219,7 @@ public:
 class BoatTerminalRep : public LocationRep {
 public:
     BoatTerminalRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		BoatTerminal::Ptr ptr = BoatTerminal::BoatTerminalIs(name);
+		BoatTerminal::Ptr ptr = BoatTerminal::BoatTerminalNew(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
 		locationReactor_ = new LocationReactor(location_);
@@ -226,7 +229,7 @@ public:
 class PlaneTerminalRep : public LocationRep {
 public:
     PlaneTerminalRep(const string& name, ManagerImpl *manager) : LocationRep(name, manager) {
-		PlaneTerminal::Ptr ptr = PlaneTerminal::PlaneTerminalIs(name);
+		PlaneTerminal::Ptr ptr = PlaneTerminal::PlaneTerminalNew(name);
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
 		locationReactor_ = new LocationReactor(location_);
@@ -236,7 +239,7 @@ public:
 class TruckSegmentRep : public SegmentRep {
 public:
     TruckSegmentRep(const string& name, ManagerImpl *manager) : SegmentRep(name, manager) {
- 		TruckSegment::Ptr ptr = TruckSegment::TruckSegmentIs(name);
+ 		TruckSegment::Ptr ptr = TruckSegment::TruckSegmentNew(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
 		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats());
@@ -246,7 +249,7 @@ public:
 class BoatSegmentRep : public SegmentRep {
 public:
     BoatSegmentRep(const string& name, ManagerImpl *manager) : SegmentRep(name, manager) {
-		BoatSegment::Ptr ptr = BoatSegment::BoatSegmentIs(name);
+		BoatSegment::Ptr ptr = BoatSegment::BoatSegmentNew(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
 		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats());
@@ -256,7 +259,7 @@ public:
 class PlaneSegmentRep : public SegmentRep {
 public:
     PlaneSegmentRep(const string& name, ManagerImpl *manager) : SegmentRep(name, manager) {
-		PlaneSegment::Ptr ptr = PlaneSegment::PlaneSegmentIs(name);
+		PlaneSegment::Ptr ptr = PlaneSegment::PlaneSegmentNew(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
 		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats());

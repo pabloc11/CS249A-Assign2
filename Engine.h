@@ -326,8 +326,8 @@ namespace Shipping {
     static inline Expedited notExpedited() { return notExpedited_; }
 
     // Attribute Accessors
-    Fwk::Ptr<Location const> source() const { return source_; }
-    Segment::PtrConst returnSegment() const { return returnSegment_; }
+    Fwk::Ptr<Location> source() const { return source_; }
+    Segment::Ptr returnSegment() const { return returnSegment_; }
 	Length length() const { return length_; }
     Difficulty difficulty() const { return difficulty_; }
     Expedited expeditedState() const { return expeditedState_; }
@@ -416,7 +416,7 @@ namespace Shipping {
     typedef Fwk::Ptr<Segment> Ptr;
 
     // public constructor
-    static TruckSegment::Ptr TruckSegmentIs(Fwk::String _name) {
+    static TruckSegment::Ptr TruckSegmentNew(Fwk::String _name) {
       TruckSegment::Ptr m = new TruckSegment(_name);
       return m;
     }
@@ -436,7 +436,7 @@ namespace Shipping {
     typedef Fwk::Ptr<Segment> Ptr;
 
     // public constructor
-    static BoatSegment::Ptr BoatSegmentIs(Fwk::String _name) {
+    static BoatSegment::Ptr BoatSegmentNew(Fwk::String _name) {
       BoatSegment::Ptr m = new BoatSegment(_name);
       return m;
     }
@@ -456,7 +456,7 @@ namespace Shipping {
     typedef Fwk::Ptr<Segment> Ptr;
 
     // public constructor
-    static PlaneSegment::Ptr PlaneSegmentIs(Fwk::String _name) {
+    static PlaneSegment::Ptr PlaneSegmentNew(Fwk::String _name) {
       PlaneSegment::Ptr m = new PlaneSegment(_name);
       return m;
     }
@@ -476,24 +476,26 @@ namespace Shipping {
     typedef Fwk::Ptr<Location> Ptr;
     typedef Fwk::ListRaw<Segment> SegmentList;
     typedef SegmentList::IteratorConst SegmentListIteratorConst;
+    typedef SegmentList::Iterator SegmentListIterator;
     typedef Fwk::HashMap< Shipment, Fwk::String, Shipment, Fwk::Ptr<Shipment const>, Fwk::Ptr<Shipment> > ShipmentMap;
-    typedef map<Fwk::String, U32> RouteMap;
+    typedef map<Fwk::String, Segment::Ptr> RouteMap;
     
     // Attribute Accessors
     Segment::PtrConst segment(unsigned _index) const;
     Segment::Ptr segment(unsigned _index);
     inline U32 segments() { return segment_.members(); }
     inline SegmentListIteratorConst segmentIterConst() const { return segment_.iterator(); }
+    inline SegmentListIterator segmentIter() { return segment_.iterator(); }
 
     inline Fwk::Ptr<Shipment> shipment(Fwk::String _name) { return shipment_[_name]; }
     inline U32 shipments() const { return shipment_.members(); }
     void shipmentIs(Fwk::Ptr<Shipment> _ptr);
     Fwk::Ptr<Shipment> shipmentDel(Fwk::String _name);
 
-    inline U32 route(Fwk::String _name) { return routes_[_name]; }
+    inline Segment::Ptr route(Fwk::String _name) { return routes_[_name]; }
     inline U32 routes() const { return routes_.size(); }
-    void routeIs(Fwk::String _name, U32 _val);
-    U32 routeDel(Fwk::String _name);
+    void routeIs(Fwk::String _name, Segment::Ptr _ptr);
+    Segment::Ptr routeDel(Fwk::String _name);
 
     class Notifiee : public virtual Fwk::NamedInterface::Notifiee
     {
@@ -581,7 +583,7 @@ namespace Shipping {
       CustomerLocation::Ptr notifier_;
     };
 
-    static CustomerLocation::Ptr CustomerLocationIs(Fwk::String _name) {
+    static CustomerLocation::Ptr CustomerLocationNew(Fwk::String _name) {
        Ptr m = new CustomerLocation(_name);
        return m;
     }
@@ -607,7 +609,7 @@ namespace Shipping {
     typedef Fwk::Ptr<PortLocation const> PtrConst;
     typedef Fwk::Ptr<PortLocation> Ptr;
 
-    static PortLocation::Ptr PortLocationIs(Fwk::String _name) {
+    static PortLocation::Ptr PortLocationNew(Fwk::String _name) {
        Ptr m = new PortLocation(_name);
        return m;
     }
@@ -638,7 +640,7 @@ namespace Shipping {
     typedef Fwk::Ptr<TruckTerminal const> PtrConst;
     typedef Fwk::Ptr<TruckTerminal> Ptr;
 
-    static TruckTerminal::Ptr TruckTerminalIs(Fwk::String _name) {
+    static TruckTerminal::Ptr TruckTerminalNew(Fwk::String _name) {
        Ptr m = new TruckTerminal(_name);
        return m;
     }
@@ -656,7 +658,7 @@ namespace Shipping {
     typedef Fwk::Ptr<BoatTerminal const> PtrConst;
     typedef Fwk::Ptr<BoatTerminal> Ptr; 
 
-    static BoatTerminal::Ptr BoatTerminalIs(Fwk::String _name) {
+    static BoatTerminal::Ptr BoatTerminalNew(Fwk::String _name) {
        Ptr m = new BoatTerminal(_name);
        return m;
     }
@@ -674,7 +676,7 @@ namespace Shipping {
     typedef Fwk::Ptr<PlaneTerminal const> PtrConst;
     typedef Fwk::Ptr<PlaneTerminal> Ptr;
 
-    static PlaneTerminal::Ptr PlaneTerminalIs(Fwk::String _name) {
+    static PlaneTerminal::Ptr PlaneTerminalNew(Fwk::String _name) {
        Ptr m = new PlaneTerminal(_name);
        return m;
     }
@@ -745,16 +747,28 @@ namespace Shipping {
 
 	struct Connection {
 	  Connection();
-	  vector<Segment::PtrConst> segments_;
+	  vector<Segment::Ptr> segments_;
 	  Fleet::Cost cost_;
 	  Time time_;
 	  Segment::Length distance_;
 	  Segment::Expedited expedited_;
 	};
 
-	Connectivity::Connection connect(Location::PtrConst start_, Location::PtrConst end_);
-	vector<Connectivity::Connection> connectAll(Location::PtrConst start_, Location::PtrConst end_);
-	vector<Connectivity::Connection> exploreAll(Location::PtrConst start_, Segment::Length distance_, Fleet::Cost cost_, Time time_, Segment::Expedited expedited_);
+    enum Algorithm {
+       dfs_ = 0,
+       ucs_ = 1
+    };
+
+
+    Algorithm algorithm() const { return algorithm_; }
+    void algorithmIs(Algorithm _alg);
+
+    static inline Algorithm dfs() { return dfs_; }
+    static inline Algorithm ucs() { return ucs_; }
+
+	Connectivity::Connection connect(Location::Ptr start_, Location::Ptr end_);
+	vector<Connectivity::Connection> connectAll(Location::Ptr start_, Location::Ptr end_);
+	vector<Connectivity::Connection> exploreAll(Location::Ptr start_, Segment::Length distance_, Fleet::Cost cost_, Time time_, Segment::Expedited expedited_);
 
     static Connectivity::Ptr ConnectivityNew(Fleet::Ptr _fleet) {
       Ptr m = new Connectivity(_fleet);
@@ -763,13 +777,15 @@ namespace Shipping {
 
   protected:
     Fleet::Ptr fleet_;
-    bool simpleDFS(Location::PtrConst currentLocation, Location::PtrConst goal, set<Fwk::String> & visited, Connectivity::Connection &path);
-    void DFSall(Segment::PtrConst prevSegment, Location::PtrConst currentLocation,
-  		  Location::PtrConst goal, set<Fwk::String> visited,
+    Algorithm algorithm_;
+    bool simpleDFS(Location::Ptr currentLocation, Location::Ptr goal, set<Fwk::String> & visited, Connectivity::Connection &path);
+    bool simpleUCS(Location::Ptr start, Location::Ptr goal, Connectivity::Connection &path);
+    void DFSall(Segment::Ptr prevSegment, Location::Ptr currentLocation,
+  		  Location::Ptr goal, set<Fwk::String> visited,
   		  Connectivity::Connection path,
   		  vector<Connectivity::Connection> & results,
   		  Segment::Expedited expedited);
-    void DFSallWithLimit(Segment::PtrConst prevSegment, Location::PtrConst currentLocation,
+    void DFSallWithLimit(Segment::Ptr prevSegment, Location::Ptr currentLocation,
   		  set<Fwk::String> visited,
   		  Connectivity::Connection path,
   		  vector<Connectivity::Connection> & results,

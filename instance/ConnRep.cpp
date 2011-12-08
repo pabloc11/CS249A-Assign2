@@ -2,7 +2,11 @@
 
 namespace Shipping {
 
-ConnRep::ConnRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {	
+ConnRep::ConnRep(const string& name, ManagerImpl* manager) :
+  Instance(name),
+  manager_(manager),
+  connectivity_(Connectivity::ConnectivityNew(manager_->fleetRep()->fleet()))
+{
 	params_.dist = 0;
 	params_.cost = 0;
 	params_.time = 0;
@@ -196,6 +200,14 @@ string ConnRep::attribute(const string& name) {
 		if (!loc1) return "";
 		return connect(loc0, loc1);
 	}
+	else if (*token == "routing")
+	{
+		Connectivity::Algorithm alg = connectivity_->algorithm();
+		if(alg == Connectivity::dfs())
+			return "dfs";
+		else if(alg == Connectivity::ucs())
+			return "ucs";
+	}
 	else {
 		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;
 		throw Fwk::UnknownArgException("Incompatible type-attribute pair.");
@@ -208,14 +220,14 @@ void ConnRep::attributeIs(const string& name, const string& v)
 {
 	if (name == "routing")
 	{
-		if(v == "bfs")
+		if(v == "dfs")
 		{
-			//TODO:
+			connectivity_->algorithmIs(Connectivity::dfs());
 			return;
 		}
-		else if(v == "dijkstra")
+		else if(v == "ucs")
 		{
-			//TODO:
+			connectivity_->algorithmIs(Connectivity::ucs());
 			return;
 		}
 		else
