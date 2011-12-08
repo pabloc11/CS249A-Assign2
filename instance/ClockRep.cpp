@@ -47,7 +47,9 @@ void ClockRep::attributeIs(const string& name, const string& v) {
 		Connectivity::Ptr con = manager_->connRep()->connectivity();
 		for(vector<Location::Ptr>::iterator i = allLocations.begin(); i != allLocations.end(); ++i) {
 			for(vector<Location::Ptr>::iterator j = allLocations.begin(); j != allLocations.end(); ++j) {
-				if(i != j) {
+				CustomerLocation * iC = dynamic_cast<CustomerLocation *>(i->ptr());
+				CustomerLocation * jC = dynamic_cast<CustomerLocation *>(j->ptr());
+				if(i != j && (iC || jC)) {
 					(*i)->routeIs((*j)->name(), con->connect(*i, *j).segments_[0]);
 				}
 			}

@@ -30,10 +30,13 @@ namespace Shipping {
 	for (Location::SegmentListIterator iter = currentLocation->segmentIter(); iter.ptr(); ++iter) {
 	  Segment::Ptr segment = iter.ptr();
 	  if (segment->returnSegment()) {
-		path.segments_.push_back(segment);
-		if(simpleDFS(segment->returnSegment()->source(), goal, visited, path))
+		CustomerLocation * c = dynamic_cast<CustomerLocation*>(segment->returnSegment()->source().ptr());
+		if(!c || c->name() == goal->name()) { //don't transfer through customer locations unless it's the destination
+		  path.segments_.push_back(segment);
+		  if(simpleDFS(segment->returnSegment()->source(), goal, visited, path))
 			return true;
-		path.segments_.pop_back();
+		  path.segments_.pop_back();
+		}
 	  }
 	}
 	return false;
@@ -45,7 +48,7 @@ namespace Shipping {
     bool operator() (const Connectivity::Connection& lhs, const Connectivity::Connection&rhs) const
     {
       //TODO: check if this is in the correct direction
-      return lhs.distance_.value() < rhs.distance_.value();
+      return lhs.distance_.value() > rhs.distance_.value();
     }
   };
 
@@ -72,10 +75,13 @@ namespace Shipping {
 	  for (Location::SegmentListIterator iter = curLocation->segmentIter(); iter.ptr(); ++iter) {
 	  	Segment::Ptr segment = iter.ptr();
 	  	if (segment->returnSegment() && !visited.count(segment->returnSegment()->source()->name())) {
-	  	  Connectivity::Connection newPath = curPath;
-	  	  newPath.segments_.push_back(segment);
-	  	  newPath.distance_ = Segment::Length(curPath.distance_.value() + segment->length().value());
-	  	  p_queue.push(newPath);
+		  CustomerLocation * c = dynamic_cast<CustomerLocation*>(segment->returnSegment()->source().ptr());
+		  if(!c || c->name() == goal->name()) { //don't transfer through customer locations unless it's the destination
+		    Connectivity::Connection newPath = curPath;
+	  	    newPath.segments_.push_back(segment);
+	  	    newPath.distance_ = Segment::Length(curPath.distance_.value() + segment->length().value());
+	  	    p_queue.push(newPath);
+		  }
 	  	}
 	  }
 	}

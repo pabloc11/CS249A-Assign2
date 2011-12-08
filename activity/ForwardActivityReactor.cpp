@@ -47,12 +47,11 @@ void ForwardActivityReactor::onStatus() {
 	
 		int numTrips = ceil((float)numPackages/(float)capacity);
 		shipment_->costTakenIs(Fleet::Cost(shipment_->costTaken().value() + numTrips*cost*difficulty*length));
-		
+
 		Shipment::Ptr shipment = segment_->activeShipmentDel(shipment_->name());
-		shipment->destination()->shipmentIs(shipment);
-		
-		cout << "  Done executing " << activity_->name() << endl;
 		activityManagerInstance()->activityDel(activity_->name());
+		segment_->returnSegment()->source()->shipmentIs(shipment_);
+		cout << "  Done executing " << activity_->name() << endl;
 	}
 }
 
