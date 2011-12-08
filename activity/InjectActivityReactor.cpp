@@ -27,6 +27,7 @@ void InjectActivityReactor::onStatus() {
 		
 		case Activity::queued:
 			cout << "Queueing " << activity_->name() << endl;
+			activityManagerInstance()->lastActivityIs(activity_);
 			break;
 	
 	  case Activity::executing:
@@ -35,6 +36,8 @@ void InjectActivityReactor::onStatus() {
 			
 	  case Activity::done:
 			cout << "Done executing " << activity_->name() << endl;
+			activity_->nextTimeIs(activity_->nextTime().value() + 24.0/transferRate_.value());
+			activity_->statusIs(Activity::queued);
 			break;
 			
 	  default:

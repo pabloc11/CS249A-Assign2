@@ -64,6 +64,7 @@ void ManagerImpl::nowIs(Time t) {
 		scheduledActivities_.pop();
 
 	  //if the next time is greater than the specified time, break the loop
+		cout << "Next time for " << nextToRun->name() << " is " << nextToRun->nextTime().value() << endl;
    	if (nextToRun->nextTime() > t) {
 			break;
 	  }
@@ -76,7 +77,6 @@ void ManagerImpl::nowIs(Time t) {
 			usleep(( ((int)diff.value()) * 100000));
 
 		now_ = nextToRun->nextTime();
-
 		//run the minimum time activity and remove it from the queue
 		nextToRun->statusIs(Activity::executing);
 		nextToRun->statusIs(Activity::done);

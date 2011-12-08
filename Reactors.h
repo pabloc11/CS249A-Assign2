@@ -6,6 +6,30 @@
 
 using namespace Shipping;
 
+class InjectActivityReactor : public Activity::Notifiee {
+public:
+	typedef Fwk::Ptr<InjectActivityReactor> Ptr;
+	InjectActivityReactor(Activity::Ptr _a);
+	void transferRateIs(ShipmentsPerDay n);
+	void shipmentSizeIs(PackagesPerShipment n);
+	void destinationIs(CustomerLocation::Ptr l);
+	void onNextTime();
+	void onStatus();	
+private:
+	Activity::Ptr activity_;
+	ShipmentsPerDay transferRate_;
+	PackagesPerShipment shipmentSize_;
+	CustomerLocation::Ptr destination_;
+};
+
+class ForwardActivityReactor : public Activity::Notifiee {
+public:
+	typedef Fwk::Ptr<ForwardActivityReactor> Ptr;
+	ForwardActivityReactor(Activity* _a);
+	void onNextTime();
+	void onStatus();	
+};
+
 namespace Shipping {
   class SegmentReactor : public Segment::Notifiee {
   public:
@@ -33,7 +57,7 @@ namespace Shipping {
     void onShipmentNew(Shipment::Ptr _ptr);
     LocationReactor(Location::Ptr _l);
   private:
-  };
+	};
 
   class CustomerReactor : public CustomerLocation::Notifiee {
   public:
@@ -46,6 +70,7 @@ namespace Shipping {
     void createOrUpdateActivity();
 		Activity::Manager::Ptr activityManager_;
 		Activity::Ptr injectActivity_;
+		InjectActivityReactor::Ptr reactor_;
     bool transferRateInit_;
     bool shipmentSizeInit_;
     bool destinationInit_;
@@ -54,29 +79,5 @@ namespace Shipping {
 		CustomerLocation::Ptr destination_;
   };
 }
-
-class InjectActivityReactor : public Activity::Notifiee {
-public:
-	typedef Fwk::Ptr<InjectActivityReactor> Ptr;
-	InjectActivityReactor(Activity::Ptr _a);
-	void transferRateIs(ShipmentsPerDay n);
-	void shipmentSizeIs(PackagesPerShipment n);
-	void destinationIs(CustomerLocation::Ptr l);
-	void onNextTime();
-	void onStatus();	
-private:
-	Activity::Ptr activity_;
-	ShipmentsPerDay transferRate_;
-	PackagesPerShipment shipmentSize_;
-	CustomerLocation::Ptr destination_;
-};
-
-class ForwardActivityReactor : public Activity::Notifiee {
-public:
-	typedef Fwk::Ptr<ForwardActivityReactor> Ptr;
-	ForwardActivityReactor(Activity* _a);
-	void onNextTime();
-	void onStatus();	
-};
 
 #endif
