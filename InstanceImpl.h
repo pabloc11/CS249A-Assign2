@@ -61,6 +61,7 @@ public:
 	Ptr<FleetRep> fleetRep() const { return fleetRep_; }
 	Ptr<StatsRep> statsRep() const { return statsRep_; }
 	Ptr<ConnRep> connRep() const { return connRep_; }
+	Ptr<ClockRep> clockRep() const { return clockRep_; }
 
 private:
 	friend class ClockRep;
