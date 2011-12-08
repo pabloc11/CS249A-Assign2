@@ -47,7 +47,6 @@ namespace Shipping {
   public:
     bool operator() (const Connectivity::Connection& lhs, const Connectivity::Connection&rhs) const
     {
-      //TODO: check if this is in the correct direction
       return lhs.distance_.value() > rhs.distance_.value();
     }
   };
