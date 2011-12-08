@@ -4,6 +4,7 @@ namespace Shipping {
 	CustomerReactor::CustomerReactor(CustomerLocation::Ptr _l, Activity::Manager::Ptr _a) :
 	CustomerLocation::Notifiee(),
 	activityManager_(_a),
+	reactor_(NULL),
 	transferRateInit_(false),
 	shipmentSizeInit_(false),
 	destinationInit_(false),
@@ -36,12 +37,12 @@ namespace Shipping {
 			if (injectActivity_ == NULL)
    		{
 				injectActivity_ = activityManager_->activityNew("inject activity");
-				injectActivity_->lastNotifieeIs(new InjectActivityReactor(injectActivity_));
+				reactor_ = new InjectActivityReactor(injectActivity_);
+				injectActivity_->lastNotifieeIs(reactor_.ptr());
 				injectActivity_->statusIs(Activity::queued);
 			}	
-			InjectActivityReactor* reactor = dynamic_cast<InjectActivityReactor* >(injectActivity_->notifiee().ptr());
-			reactor->transferRateIs(transferRate_);
-			reactor->shipmentSizeIs(shipmentSize_);
-			reactor->destinationIs(destination_);
+			reactor_->transferRateIs(transferRate_);
+			reactor_->shipmentSizeIs(shipmentSize_);
+			reactor_->destinationIs(destination_);
     }
 }

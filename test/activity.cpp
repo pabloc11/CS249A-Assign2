@@ -35,12 +35,11 @@ int main(int argc, char* argv[]) {
 	seg[1]->attributeIs("capacity", "1");
 
 	Ptr<Instance> conn = manager->instanceNew("myConn", "Conn");
-	conn->attributeIs("routing algorithm", "bfs"); 
-
-	activityManager->nowIs(6.0);
-
-	// Stop injection activity from the first two customers
-	loc[0]->attributeIs("Transfer Rate", "1");
+	conn->attributeIs("routing", "dfs"); 
+	
+	loc[0]->attributeIs("transfer rate", "4");
+	loc[0]->attributeIs("shipment size", "5");
+	loc[0]->attributeIs("destination", "customer2");
 
 	activityManager->nowIs(24.0);
 
