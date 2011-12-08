@@ -738,7 +738,6 @@ namespace Shipping {
     CustomerLocation::Ptr source_;
     CustomerLocation::Ptr destination_;
     Time startTime_;
-    Time timeTaken_;
     Fleet::Cost costTaken_;
   };
 

@@ -7,7 +7,6 @@ namespace Shipping {
   source_(_source),
   destination_(_destination),
   startTime_(_startTime),
-  timeTaken_(0),
   costTaken_(0)
   {}
 }

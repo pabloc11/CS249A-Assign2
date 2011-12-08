@@ -95,6 +95,7 @@ class FleetRep : public Instance {
 public:	
 	FleetRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
 		fleet_ = Fleet::FleetNew();
+		fleetReactor_ = new FleetRepReactor();
 	}
 	Fleet::Ptr fleet() const { return fleet_; }
 	string attribute(const string& name);
@@ -102,7 +103,8 @@ public:
 
 private:
   Ptr<ManagerImpl> manager_;
-	Fleet::Ptr fleet_;
+  Fleet::Ptr fleet_;
+  FleetRepReactor::Ptr fleetReactor_;
 };
 
 class ClockRep : public Instance {
