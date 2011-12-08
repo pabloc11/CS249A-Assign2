@@ -92,13 +92,16 @@ namespace Shipping {
 
   class FleetRepReactor : public Fwk::PtrInterface<FleetRepReactor>{
   public:
-	FleetRepReactor();
-	typedef Fwk::Ptr<FleetRepReactor> Ptr;
-	Fleet::Speed truckSpeed_, boatSpeed_, planeSpeed_, specialTruckSpeed_, specialBoatSpeed_, specialPlaneSpeed_;
-	Fleet::Cost truckCost_, boatCost_, planeCost_, specialTruckCost_, specialBoatCost_, specialPlaneCost_;
-	Fleet::Capacity truckCapacity_, boatCapacity_, planeCapacity_, specialTruckCapacity_, specialBoatCapacity_, specialPlaneCapacity_;
-	bool tSpeed, bSpeed, pSpeed, tCost, bCost, pCost, tCapacity, bCapacity, pCapacity, start, end;
-	Time startTime, endTime;
+		FleetRepReactor();
+		typedef Fwk::Ptr<FleetRepReactor> Ptr;
+		void onAttributeIs();
+	private:
+		friend class FleetRep;
+		Fleet::Speed truckSpeed_, boatSpeed_, planeSpeed_, specialTruckSpeed_, specialBoatSpeed_, specialPlaneSpeed_;
+		Fleet::Cost truckCost_, boatCost_, planeCost_, specialTruckCost_, specialBoatCost_, specialPlaneCost_;
+		Fleet::Capacity truckCapacity_, boatCapacity_, planeCapacity_, specialTruckCapacity_, specialBoatCapacity_, specialPlaneCapacity_;
+		bool tSpeed, bSpeed, pSpeed, tCost, bCost, pCost, tCapacity, bCapacity, pCapacity, start, end;
+		Time startTime, endTime;
   };
 }
 
