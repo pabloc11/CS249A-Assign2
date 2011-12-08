@@ -73,8 +73,8 @@ namespace Shipping {
 	  	Segment::Ptr segment = iter.ptr();
 	  	if (segment->returnSegment() && !visited.count(segment->returnSegment()->source()->name())) {
 	  	  Connectivity::Connection newPath = curPath;
-	  	  curPath.segments_.push_back(segment);
-	  	  curPath.distance_ = Segment::Length(curPath.distance_.value() + segment->length().value());
+	  	  newPath.segments_.push_back(segment);
+	  	  newPath.distance_ = Segment::Length(curPath.distance_.value() + segment->length().value());
 	  	  p_queue.push(newPath);
 	  	}
 	  }
