@@ -65,6 +65,15 @@ class Activity::Manager : public Fwk::PtrInterface<Activity::Manager>
 
 		virtual Time now() const = 0;
 		virtual void nowIs(Time) = 0;
+
+		enum Type {
+		  virt_ = 0,
+		  real_ = 1
+		};
+		static inline Type virt() { return virt_; };
+		static inline Type real() { return real_ ;};
+		virtual Type type() const = 0;
+		virtual void typeIs(Type _type) = 0;
 };
 
 extern Fwk::Ptr<Activity::Manager> activityManagerInstance();

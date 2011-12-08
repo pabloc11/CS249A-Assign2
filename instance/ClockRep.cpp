@@ -5,7 +5,11 @@ namespace Shipping {
 string ClockRep::attribute(const string& name) {
 
 	if (name == "type"){
-		//return activityManager_->type()
+		Activity::Manager::Type type = activityManager_->type();
+		if(type == Activity::Manager::real())
+			return "real";
+		else if(type == Activity::Manager::virt())
+			return "virtual";
 	}
 	else if (name == "now") {
 		return Util::FloatToString(activityManager_->now().value());
@@ -20,7 +24,14 @@ string ClockRep::attribute(const string& name) {
 void ClockRep::attributeIs(const string& name, const string& v) {
 
 	if (name == "type"){
-		//activityManager_->typeIs(...)
+		if(v == "real")
+			activityManager_->typeIs(Activity::Manager::real());
+		else if (v == "virtual")
+			activityManager_->typeIs(Activity::Manager::virt());
+		else {
+			cerr << "Unsupported clock type argument: " << v << endl;
+			throw Fwk::UnknownArgException("Unsupported clock type argument");
+		}
 	}
 	else if (name == "now") {
 		vector<Location::Ptr> allLocations;

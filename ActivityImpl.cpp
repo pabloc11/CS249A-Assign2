@@ -72,7 +72,8 @@ void ManagerImpl::nowIs(Time t) {
 		Time diff = Time(nextToRun->nextTime().value() - now_.value());
 
 		//sleep 100ms (100,000 microseconds) for every unit of time
-		//usleep(( ((int)diff.value()) * 100000));
+		if(type_ == real_)
+			usleep(( ((int)diff.value()) * 100000));
 
 		now_ = nextToRun->nextTime();
 
