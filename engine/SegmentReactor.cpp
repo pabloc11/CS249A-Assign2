@@ -14,7 +14,11 @@ namespace Shipping {
     	//TODO: create the forwarding activity and kick it off
     }
 
-    SegmentReactor::SegmentReactor(Segment::Ptr _s, Stats::Ptr _stats) : Segment::Notifiee(), stats_(_stats) {
+    SegmentReactor::SegmentReactor(Segment::Ptr _s, Stats::Ptr _stats, Fleet::Ptr _fleet) :
+      Segment::Notifiee(),
+      stats_(_stats),
+      fleet_(_fleet)
+    {
       notifierIs(_s);
     }
 }

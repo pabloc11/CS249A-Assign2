@@ -44,6 +44,10 @@ int main(int argc, char* argv[]) {
 
 	activityManager->nowIs(24.0);
 
+	cout << "Shipments Received: " << loc[1]->attribute("shipments received") << endl;
+	cout << "Average Latency: " << loc[1]->attribute("average latency") << endl;
+	cout << "Total Cost: " << loc[1]->attribute("total cost") << endl;
+
 /*
 	// Create activities
   Activity::Ptr activity1 = manager->activityNew("activity 1");

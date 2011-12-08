@@ -1,9 +1,8 @@
 #include "Reactors.h"
 
 namespace Shipping {
-	CustomerReactor::CustomerReactor(CustomerLocation::Ptr _l, Activity::Manager::Ptr _a) :
+	CustomerReactor::CustomerReactor(CustomerLocation::Ptr _l) :
 	CustomerLocation::Notifiee(),
-	activityManager_(_a),
 	reactor_(NULL),
 	transferRateInit_(false),
 	shipmentSizeInit_(false),
@@ -34,6 +33,7 @@ namespace Shipping {
     void CustomerReactor::createOrUpdateActivity(){
     	if(!transferRateInit_ || !shipmentSizeInit_ ||  !destinationInit_)
     		return;
+    	/*
 			if (injectActivity_ == NULL)
    		{
 				injectActivity_ = activityManager_->activityNew("inject activity");
@@ -43,6 +43,6 @@ namespace Shipping {
 			}	
 			reactor_->transferRateIs(transferRate_);
 			reactor_->shipmentSizeIs(shipmentSize_);
-			reactor_->destinationIs(destination_);
+			reactor_->destinationIs(destination_);*/
     }
 }

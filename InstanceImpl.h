@@ -191,7 +191,7 @@ public:
 		manager->network()->entityIs(ptr);
 		location_ = ptr;
 		locationReactor_ = new LocationReactor(location_);
-		customerReactor_ = new CustomerReactor(ptr, manager_->clockRep()->activityManager());
+		customerReactor_ = new CustomerReactor(ptr);
 	}
 protected:
     CustomerReactor::Ptr customerReactor_;
@@ -243,7 +243,7 @@ public:
  		TruckSegment::Ptr ptr = TruckSegment::TruckSegmentNew(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
-		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats());
+		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats(), manager_->fleetRep()->fleet());
 	}
 };
 
@@ -253,7 +253,7 @@ public:
 		BoatSegment::Ptr ptr = BoatSegment::BoatSegmentNew(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
-		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats());
+		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats(), manager_->fleetRep()->fleet());
 	}
 };
 
@@ -263,7 +263,7 @@ public:
 		PlaneSegment::Ptr ptr = PlaneSegment::PlaneSegmentNew(name);
 		manager->network()->entityIs(ptr);
 		segment_ = ptr;
-		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats());
+		segmentReactor_ = new SegmentReactor(segment_, manager->statsRep()->stats(), manager_->fleetRep()->fleet());
 	}
 };
 

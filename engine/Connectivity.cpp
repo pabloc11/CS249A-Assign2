@@ -89,7 +89,7 @@ namespace Shipping {
 		error = !simpleUCS(start_, end_, path);
 	}
 	if(error) {
-		// TODO: throw an error here
+		throw new Fwk::InternalException("No route found.");
 		cerr << "No route found from " << start_->name() << " to " << end_->name() << endl;
 	}
 	return path;

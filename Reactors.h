@@ -36,9 +36,10 @@ namespace Shipping {
 	typedef Fwk::Ptr<SegmentReactor> Ptr;
     void onExpedited(Segment::Expedited _expedited);
     void onActiveShipmentNew(Shipment::Ptr _ptr);
-    SegmentReactor(Segment::Ptr _s, Stats::Ptr _stats);
+    SegmentReactor(Segment::Ptr _s, Stats::Ptr _stats, Fleet::Ptr _fleet);
   private:
-    Fwk::Ptr<Stats> stats_;
+    Stats::Ptr stats_;
+    Fleet::Ptr fleet_;
   };
 
   class NetworkReactor : public Network::Notifiee {
@@ -65,10 +66,9 @@ namespace Shipping {
     void onTransferRate(ShipmentsPerDay _transferRate);
     void onShipmentSize(PackagesPerShipment _shipmentSize);
     void onDestination(CustomerLocation::Ptr _destination);
-    CustomerReactor(CustomerLocation::Ptr _l, Activity::Manager::Ptr _a);
+    CustomerReactor(CustomerLocation::Ptr _l);
   private:
     void createOrUpdateActivity();
-		Activity::Manager::Ptr activityManager_;
 		Activity::Ptr injectActivity_;
 		InjectActivityReactor::Ptr reactor_;
     bool transferRateInit_;
