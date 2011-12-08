@@ -40,6 +40,10 @@ int main(int argc, char* argv[]) {
 	loc[0]->attributeIs("transfer rate", "4");
 	loc[0]->attributeIs("shipment size", "5");
 	loc[0]->attributeIs("destination", "customer2");
+	
+	loc[1]->attributeIs("transfer rate", "3");
+	loc[1]->attributeIs("shipment size", "10");
+	loc[1]->attributeIs("destination", "customer1");
 
 	activityManager->nowIs(24.0);
 

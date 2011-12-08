@@ -1,15 +1,15 @@
 #include "Reactors.h"
 
 namespace Shipping {
-	CustomerReactor::CustomerReactor(CustomerLocation::Ptr _l, Activity::Manager::Ptr _a) :
+	CustomerReactor::CustomerReactor(CustomerLocation::Ptr _l) :
 	CustomerLocation::Notifiee(),
-	activityManager_(_a),
 	reactor_(NULL),
 	transferRateInit_(false),
 	shipmentSizeInit_(false),
 	destinationInit_(false),
 	transferRate_(0),
 	shipmentSize_(0),
+	source_(_l),
 	destination_(NULL)
 	{
 		notifierIs(_l);
@@ -36,8 +36,8 @@ namespace Shipping {
     		return;
 			if (injectActivity_ == NULL)
    		{
-				injectActivity_ = activityManager_->activityNew("inject activity");
-				reactor_ = new InjectActivityReactor(injectActivity_);
+				injectActivity_ = activityManagerInstance()->activityNew(notifier()->name());
+				reactor_ = new InjectActivityReactor(injectActivity_, source_);
 				injectActivity_->lastNotifieeIs(reactor_.ptr());
 				injectActivity_->statusIs(Activity::queued);
 			}	

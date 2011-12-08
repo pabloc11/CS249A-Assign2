@@ -113,6 +113,7 @@ namespace Shipping {
   };
 
 /************************** STATS **************************/
+
   class NetworkReactor;
   class SegmentReactor;
 
@@ -269,6 +270,7 @@ namespace Shipping {
   class Location;
 
 /************************** SEGMENT **************************/
+
   class Shipment;
 
   class NumShipments : public Ordinal<NumShipments, int> {
@@ -328,7 +330,7 @@ namespace Shipping {
     // Attribute Accessors
     Fwk::Ptr<Location> source() const { return source_; }
     Segment::Ptr returnSegment() const { return returnSegment_; }
-	Length length() const { return length_; }
+		Length length() const { return length_; }
     Difficulty difficulty() const { return difficulty_; }
     Expedited expeditedState() const { return expeditedState_; }
     NumShipments shipmentsReceived() const { return shipmentsReceived_; }
@@ -339,7 +341,7 @@ namespace Shipping {
     // Attribute Mutators
     void sourceIs(Fwk::Ptr<Location> _source);
     void returnSegmentIs(Segment::Ptr _returnSegment);
-	void lengthIs(Length _length);
+		void lengthIs(Length _length);
     void difficultyIs(Difficulty _difficulty);
     void expeditedIs(Expedited _expedited);
     void capacityIs(NumShipments _capacity);
@@ -393,7 +395,7 @@ namespace Shipping {
     // Attributes
     Fwk::Ptr<Location> source_;
     Segment::Ptr returnSegment_;
-	Length length_;
+		Length length_;
     Difficulty difficulty_;
     Expedited expeditedState_;
     NumShipments shipmentsReceived_;
@@ -467,7 +469,7 @@ namespace Shipping {
     PlaneSegment(Fwk::String _name);
   };
 
-  /************************** LOCATION **************************/
+/************************** LOCATION **************************/
   
   class Location : public Entity {
     
@@ -523,7 +525,8 @@ namespace Shipping {
     Location::Notifiee::Ptr notifiee_;
   };
   
-  /************************** CUSTOMER LOCATION **************************/
+/************************** CUSTOMER LOCATION **************************/
+
   class ShipmentsPerDay : public Ordinal<ShipmentsPerDay, int> {
   public:
   	ShipmentsPerDay(int num) : Ordinal<ShipmentsPerDay, int>(num) {
@@ -601,7 +604,7 @@ namespace Shipping {
     CustomerLocation::Notifiee::Ptr notifiee_;
   };
   
-  /************************** PORT LOCATION **************************/
+/************************** PORT LOCATION **************************/
   
   class PortLocation : public Location {
     
@@ -619,7 +622,7 @@ namespace Shipping {
     PortLocation(Fwk::String _name);
   };
   
-  /************************** TERMINAL LOCATION **************************/
+/************************** TERMINAL LOCATION **************************/
   
   class TerminalLocation : public Location {
     
@@ -632,7 +635,7 @@ namespace Shipping {
     TerminalLocation( const TerminalLocation& );
   };
   
-  /************************** TRUCK TERMINAL **************************/
+/************************** TRUCK TERMINAL **************************/
   
   class TruckTerminal : public TerminalLocation {
     
@@ -650,7 +653,7 @@ namespace Shipping {
     TruckTerminal(Fwk::String _name);
   };
   
-  /************************** BOAT TERMINAL **************************/
+/************************** BOAT TERMINAL **************************/
   
   class BoatTerminal : public TerminalLocation {
     
@@ -668,7 +671,7 @@ namespace Shipping {
     BoatTerminal(Fwk::String _name);  
   };
   
-  /************************** PLANE TERMINAL **************************/
+/************************** PLANE TERMINAL **************************/
   
   class PlaneTerminal : public TerminalLocation {
     
@@ -686,7 +689,7 @@ namespace Shipping {
     PlaneTerminal(Fwk::String _name);
   };
 
-  /************************** SHIPMENT **************************/
+/************************** SHIPMENT **************************/
 
   class Shipment : public Fwk::NamedInterface
   {
@@ -737,7 +740,7 @@ namespace Shipping {
     Time startTime_;
   };
 
-  /************************** CONNECTIVITY **************************/
+/************************** CONNECTIVITY **************************/
 
   class Connectivity : public Fwk::PtrInterface<Fleet>
   {
