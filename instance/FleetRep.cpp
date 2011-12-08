@@ -67,7 +67,6 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 		fleet_->planeCapacityIs(Fleet::Capacity(atoi(v.c_str())));
 		fleetReactor_->planeCapacity_ = fleet_->planeCapacity();
 	}
-
 	else if (name == "Truck, speed, special") {
 		fleetReactor_->specialTruckSpeed_ = Fleet::Speed(atof(v.c_str()));
 		fleetReactor_->tSpeed = true;
