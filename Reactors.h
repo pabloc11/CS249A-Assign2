@@ -34,7 +34,6 @@ private:
 	Fleet::Ptr fleet_;
 	Stats::Ptr stats_;
 	Segment::Ptr segment_;
-	NumShipments capacity_;
 	Shipment::Ptr shipment_;
 };
 

@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 	loc.push_back( manager->instanceNew("customer2", "Customer") );
 
 	// Segments
-    seg.push_back( manager->instanceNew("ts1", "Truck segment") );
+  seg.push_back( manager->instanceNew("ts1", "Truck segment") );
 	seg.push_back( manager->instanceNew("ts2", "Truck segment") );
 
 	// Connections...
@@ -26,9 +26,9 @@ int main(int argc, char* argv[]) {
 	seg[1]->attributeIs("source", "customer2");
 	seg[0]->attributeIs("return segment", "ts2");
 
-    Ptr<Instance> fleet = manager->instanceNew("Fleet", "Fleet");
-    fleet->attributeIs("Truck, speed", "1");
-    fleet->attributeIs("Truck, capacity", "1");
+  Ptr<Instance> fleet = manager->instanceNew("Fleet", "Fleet");
+  fleet->attributeIs("Truck, speed", "1");
+  fleet->attributeIs("Truck, capacity", "1");
 
 	// Set some segment (shipment) capacities
 	seg[0]->attributeIs("capacity", "1");

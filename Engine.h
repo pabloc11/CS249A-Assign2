@@ -714,6 +714,8 @@ namespace Shipping {
     CustomerLocation::Ptr source() const { return source_; }
     CustomerLocation::Ptr destination() const { return destination_; }
     Time startTime() const { return startTime_; }
+		Fleet::Cost costTaken() const { return costTaken_; }
+		void costTakenIs(Fleet::Cost _cost) { costTaken_ = _cost; }
 
     static Shipment::Ptr ShipmentNew(NumPackages _numPackages, CustomerLocation::Ptr _source, CustomerLocation::Ptr _destination, Time _startTime) {
       std::stringstream s;
