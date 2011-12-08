@@ -45,6 +45,7 @@ namespace Shipping {
     void onActiveShipmentNew(Shipment::Ptr _ptr);
     SegmentReactor(Segment::Ptr _s, Fleet::Ptr _fleet, Stats::Ptr _stats);
   private:
+		Segment::Ptr segment_;
 		Fleet::Ptr fleet_;
     Fwk::Ptr<Stats> stats_;
 		Activity::Ptr forwardActivity_;
