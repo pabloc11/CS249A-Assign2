@@ -27,27 +27,21 @@ void InjectActivityReactor::onNextTime() {
 }
 
 void InjectActivityReactor::onStatus() {
-	
-	switch (activity_->status()) {
-		
-		case Activity::queued:
-			cout << "  Queueing " << activity_->name() << endl;
-			activityManagerInstance()->lastActivityIs(activity_);
-			break;
-	
-	  case Activity::executing:
-			cout << "  Executing " << activity_->name() << endl;
-			Shipment::ShipmentNew(Shipment::NumPackages(shipmentSize_.value()), source_, destination_, activity_->nextTime());
-			break;	
-			
-	  case Activity::done:
-			cout << "  Done executing " << activity_->name() << endl;
-			activity_->statusIs(Activity::done);
-			activity_->nextTimeIs(activity_->nextTime().value() + 24.0/transferRate_.value());
-			break;
-			
-	  default:
-			break;
+
+	if (activity_->status() == Activity::queued) {
+		cout << "  Queueing " << activity_->name() << endl;
+		activityManagerInstance()->lastActivityIs(activity_);
 	}
-	
+
+  else if (activity_->status() == Activity::executing) {
+		cout << "  Executing " << activity_->name() << endl;
+		Shipment::Ptr shipment = Shipment::ShipmentNew(Shipment::NumPackages(shipmentSize_.value()), source_, destination_, activity_->nextTime());
+		source_->shipmentIs(shipment);
+		activity_->statusIs(Activity::done);
+	}	
+		
+  else if (activity_->status() == Activity::done) {
+		cout << "  Done executing " << activity_->name() << endl;
+		activity_->nextTimeIs(activity_->nextTime().value() + 24.0/transferRate_.value());
+	}	
 }
