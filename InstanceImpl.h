@@ -95,7 +95,7 @@ class FleetRep : public Instance {
 public:	
 	FleetRep(const string& name, ManagerImpl* manager) : Instance(name), manager_(manager) {
 		fleet_ = Fleet::FleetNew();
-		fleetRepReactor_ = new FleetRepReactor(name, fleet_);
+		fleetRepReactor_ = new FleetRepReactor(fleet_);
 	}
 	Fleet::Ptr fleet() const { return fleet_; }
 	string attribute(const string& name);

@@ -127,14 +127,16 @@ namespace Shipping {
 
   class FleetRepReactor : public Fwk::PtrInterface<FleetRepReactor>{
   public:
-		FleetRepReactor(const string& name, Fleet::Ptr _fleet);
-		typedef Fwk::Ptr<FleetRepReactor> Ptr;
+	    typedef Fwk::Ptr<FleetRepReactor> Ptr;
+		FleetRepReactor(Fleet::Ptr _fleet);
 		void onAttributeIs();
+		static double currentTimeRoundedDownTo24();
 	private:
 		friend class FleetRep;
-		string name_;
 		Fleet::Ptr fleet_;
 		ScheduledFleetAttrs scheduledAttrs_;
+		ScheduleChangesReactor::Ptr scheduleReactor_;
+		UnscheduleChangesReactor::Ptr unscheduleReactor_;
   };
 }
 

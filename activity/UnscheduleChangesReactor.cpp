@@ -46,7 +46,8 @@ void UnscheduleChangesReactor::onStatus() {
 			fleet_->planeCapacityIs(scheduledAttrs_.planeCapacity);
 		}	
 
-		activity_->nextTimeIs(activity_->nextTime().value() + 24.0);
+		//activity_->nextTimeIs(activity_->nextTime().value() + 24.0);
+		activity_->nextTimeIs(scheduledAttrs_.endTime.value() + FleetRepReactor::currentTimeRoundedDownTo24() + 24.0);
 		activity_->statusIs(Activity::queued);
 	}
 }
