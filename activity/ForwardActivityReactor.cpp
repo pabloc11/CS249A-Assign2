@@ -46,7 +46,7 @@ void ForwardActivityReactor::onStatus() {
 		Shipment::Ptr shipment = segment_->activeShipmentDel(shipment_->name());
 		activityManagerInstance()->activityDel(activity_->name());
 		segment_->returnSegment()->source()->shipmentIs(shipment_);
-		cout << "  Done executing " << activity_->name() << endl;
+		//cout << "  Done executing " << activity_->name() << endl;
 	}
 }
 
