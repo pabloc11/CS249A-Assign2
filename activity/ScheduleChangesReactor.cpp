@@ -10,13 +10,13 @@ ScheduleChangesReactor::ScheduleChangesReactor(Activity* _a, Fleet::Ptr _f, Sche
 void ScheduleChangesReactor::onStatus() {
 
 	if (activity_->status() == Activity::queued) {
-		cout << "  Queueing " << activity_->name() << endl;
+		//cout << "  Queueing " << activity_->name() << endl;
 		activityManagerInstance()->lastActivityIs(activity_);
 	}
 		
   else if (activity_->status() == Activity::executing) {
 	
-		cout << "  Executing scheduling activity" << endl;
+		//cout << "  Executing scheduling activity" << endl;
 	
 		if (scheduledAttrs_.tSpeed) {
 			fleet_->truckSpeedIs(scheduledAttrs_.sTruckSpeed);

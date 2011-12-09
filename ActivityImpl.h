@@ -73,7 +73,7 @@ class ManagerImpl : public Activity::Manager
 	  virtual void lastActivityIs(Activity::Ptr activity);
   
 	protected:
-    ManagerImpl() : now_(0) {}
+    ManagerImpl() : now_(0), type_(Activity::Manager::virt()) {}
 
     //Data members
     priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComp> scheduledActivities_;

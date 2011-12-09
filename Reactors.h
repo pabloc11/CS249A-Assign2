@@ -40,7 +40,7 @@ private:
 class ForwardActivityReactor : public Activity::Notifiee {
 public:
 	typedef Fwk::Ptr<ForwardActivityReactor> Ptr;
-	ForwardActivityReactor(Activity* _a, Fleet::Ptr _fleet, Stats::Ptr _stats, Segment::Ptr _seg, Shipment::Ptr _ship);
+	ForwardActivityReactor(Activity::Ptr _a, Fleet::Ptr _fleet, Stats::Ptr _stats, Segment::Ptr _seg, Shipment::Ptr _ship);
 	void onStatus();	
 private:
 	Activity::Ptr activity_;
@@ -82,9 +82,9 @@ namespace Shipping {
   private:
 		Segment::Ptr segment_;
 		Fleet::Ptr fleet_;
-    Fwk::Ptr<Stats> stats_;
-		Activity::Ptr forwardActivity_;
-		ForwardActivityReactor::Ptr reactor_;
+        Fwk::Ptr<Stats> stats_;
+		//Activity::Ptr forwardActivity_;
+		//ForwardActivityReactor::Ptr reactor_;
   };
 
   class NetworkReactor : public Network::Notifiee {

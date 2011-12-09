@@ -10,13 +10,13 @@ UnscheduleChangesReactor::UnscheduleChangesReactor(Activity* _a, Fleet::Ptr _f, 
 void UnscheduleChangesReactor::onStatus() {
 		
 	if (activity_->status() == Activity::queued) {
-		cout << "  Queueing " << activity_->name() << endl;
+		//cout << "  Queueing " << activity_->name() << endl;
 		activityManagerInstance()->lastActivityIs(activity_);
 	}
 		
   else if (activity_->status() == Activity::executing) {
 	
-		cout << "  Executing unscheduling activity" << endl;
+		//cout << "  Executing unscheduling activity" << endl;
 	
 		if (scheduledAttrs_.tSpeed) {
 			fleet_->truckSpeedIs(scheduledAttrs_.truckSpeed);

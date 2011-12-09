@@ -2,8 +2,8 @@
 #include "Activity.h"
 #include "Reactors.h"
 
-ForwardActivityReactor::ForwardActivityReactor(Activity* _a, Fleet::Ptr _fleet, Stats::Ptr _stats, Segment::Ptr _seg, Shipment::Ptr _ship) : 
-	Activity::Notifiee(_a),
+ForwardActivityReactor::ForwardActivityReactor(Activity::Ptr _a, Fleet::Ptr _fleet, Stats::Ptr _stats, Segment::Ptr _seg, Shipment::Ptr _ship) :
+	Activity::Notifiee(_a.ptr()),
 	activity_(_a),
 	fleet_(_fleet),
 	stats_(_stats),
@@ -13,13 +13,13 @@ ForwardActivityReactor::ForwardActivityReactor(Activity* _a, Fleet::Ptr _fleet, 
 void ForwardActivityReactor::onStatus() {
 		
 	if (activity_->status() == Activity::queued) {
-		cout << "  Queueing " << activity_->name() << endl;
+		//cout << "  Queueing " << activity_->name() << endl;
 		activityManagerInstance()->lastActivityIs(activity_);
 	}
 		
   else if (activity_->status() == Activity::executing) {
 	
-		cout << "  Executing forwarding activity: " << activity_->name() << endl;
+		//cout << "  Executing forwarding activity: " << activity_->name() << endl;
 	
 		float cost;
 		

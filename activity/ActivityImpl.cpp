@@ -46,6 +46,18 @@ Activity::Ptr ManagerImpl::activity(const string& name) const {
   
 void ManagerImpl::activityDel(const string& name) {
 	activities_.erase(name);
+	vector<Activity::Ptr> allActivities;
+	while(!scheduledActivities_.empty()) {
+		Activity::Ptr cur = scheduledActivities_.top();
+		scheduledActivities_.pop();
+		if(cur->name() == name)
+			break;
+		allActivities.push_back(cur);
+	}
+	while(!allActivities.empty()) {
+		scheduledActivities_.push(allActivities.back());
+		allActivities.pop_back();
+	}
 }
   
 void ManagerImpl::lastActivityIs(Activity::Ptr activity) {
@@ -66,7 +78,7 @@ void ManagerImpl::nowIs(Time t) {
 			break;
 	  }
 	
-		cout << "Running activity: " << nextToRun->name() + " at time: " << nextToRun->nextTime().value() << endl;
+		//cout << "Running activity: " << nextToRun->name() + " at time: " << nextToRun->nextTime().value() << endl;
    
  		//calculate amount of time to sleep
 		Time diff = Time(nextToRun->nextTime().value() - now_.value());
