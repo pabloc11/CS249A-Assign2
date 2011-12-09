@@ -22,21 +22,30 @@ void ForwardActivityReactor::onStatus() {
 		//cout << "  Executing forwarding activity: " << activity_->name() << endl;
 	
 		float cost;
+		int capacity;
 		
 		// Truck segment
 		TruckSegment* truckPtr = dynamic_cast<TruckSegment *>(segment_.ptr());
-		if (truckPtr) cost = fleet_->truckCost().value();
+		if (truckPtr) {
+			cost = fleet_->truckCost().value();
+			capacity = fleet_->truckCapacity().value();
+		}
 		
 		// Boat segment
 		BoatSegment* boatPtr = dynamic_cast<BoatSegment *>(segment_.ptr());
-		if (boatPtr) cost = fleet_->boatCost().value();
+		if (boatPtr) {
+			cost = fleet_->boatCost().value();
+			capacity = fleet_->boatCapacity().value();
+		}
 		
 		// Plane segment
 		PlaneSegment* planePtr = dynamic_cast<PlaneSegment *>(segment_.ptr());
-		if (planePtr) cost = fleet_->planeCost().value();
+		if (planePtr) {
+			cost = fleet_->planeCost().value();
+			capacity = fleet_->boatCapacity().value();
+		}
 	
 		int numPackages = shipment_->numPackages().value();
-		int capacity = segment_->capacity().value();
 		float difficulty = segment_->difficulty().value();
 		float length = segment_->length().value();
 	
