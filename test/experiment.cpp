@@ -56,20 +56,23 @@ int main(int argc, char* argv[]) {
 		segments[i]->attributeIs("capacity", "1");
 
 	Ptr<Instance> fleet = manager->instanceNew("Fleet", "Fleet");
-	fleet->attributeIs("Truck, speed", "1");
-	fleet->attributeIs("Truck, capacity", "1");
+	fleet->attributeIs("Truck, speed", "60");
+	fleet->attributeIs("Truck, capacity", "100");
 
 	Ptr<Instance> conn = manager->instanceNew("myConn", "Conn");
 
 	conn->attributeIs("routing algorithm", "ucs");
 
+	/* initialize random seed: */
+  srand ( time(NULL) );
+  
 	for(int i = 0; i < 100; i++) {
 		customers[i]->attributeIs("transfer rate", "1");
-		customers[i]->attributeIs("shipment size", "1");
+		customers[i]->attributeIs("shipment size", itoa(rand() % 1000 + 1));
 		customers[i]->attributeIs("destination", "customer100");
 	}
 
-	clock->attributeIs("now", "24");
+	clock->attributeIs("now", "1000");
 
 	cout << "Shipments Received at Destination: " << customers[100]->attribute("shipments received") << endl;
 	cout << "Average Latency of Received Shipments at Destination: " << customers[100]->attribute("average latency") << endl;

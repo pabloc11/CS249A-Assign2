@@ -68,14 +68,14 @@ int main(int argc, char* argv[]) {
 
 	Ptr<Instance> conn = manager->instanceNew("myConn", "Conn");
 
-	conn->attributeIs("routing algorithm", "ucs");
+	conn->attributeIs("routing algorithm", "dfs");
 
 	loc[0]->attributeIs("transfer rate", "2");
-	loc[0]->attributeIs("shipment size", "1");
+	loc[0]->attributeIs("shipment size", "5");
 	loc[0]->attributeIs("destination", "customer2");
 
-	loc[1]->attributeIs("transfer rate", "0");
-	loc[1]->attributeIs("shipment size", "1");
+	loc[1]->attributeIs("transfer rate", "6");
+	loc[1]->attributeIs("shipment size", "10");
 	loc[1]->attributeIs("destination", "customer1");
 
 	clock->attributeIs("now", "24");

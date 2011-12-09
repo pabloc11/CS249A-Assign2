@@ -217,13 +217,66 @@ The first routing algorithm implemented is depth first search which ignores all 
 
 *** 5.2 Uniform Cost Search ***
 
+The second routing algorithm implemented is uniform cost search.  Instead of recursively computing paths between customer locations, it maintains a priority queue of partial paths from a source to a given location in the network sorted by path length.  This guarantees that the shortest path between any two customer locations will be found.  Like the depth first search, we disregard any paths that travel through intermediate customer locations.
 
-
-*************************** 6. Sample Results ***************************
+*************************** 6. Simulation Results ***************************
 
 *** 6.1 Sample Simulation 1 ***
 
+           Customer 1
+         /            \
+Truck terminal 1  Truck terminal 2
+         \            /
+           Customer 2
+
+The following statistics result from running test/verification using segment capacities of 2:
+
+Shipments Received at Customer 2: 2
+Average Latency at Customer 2: 6.00
+Total Cost at Customer 2: 20.00
+Shipments Received at Customer 1: 4
+Average Latency at Customer 1: 10.00
+Total Cost at Customer 1: 80.00
+
+The following statistics result from running test/verification using segment capacities of 1:
+
+Shipments Received at Customer 2: 2
+Average Latency at Customer 2: 10.00
+Total Cost at Customer 2: 20.00
+Shipments Received at Customer 1: 1
+Average Latency at Customer 1: 20.00
+Total Cost at Customer 1: 20.00
+
+As seen from the above results, reducing the segment capacities increases the average latency experienced by the shipments since the segments can't be shared between multiple shipments.  Similarly, for the shipments traveling between Customer 2 and Customer 1, the total number of shipments that arrive at the destination go down.  As expected, the total cost per shipment remains the same in both cases.  When we set the routing algorithm to 'dfs', the results differ yet again with segment capacities of 1 due to the varying segment lengths, as shown below:
+
+Shipments Received at Customer 2: 1
+Average Latency at Customer 2: 20.00
+Total Cost at Customer 2: 20.00
+Shipments Received at Customer 1: 0
+Average Latency at Customer 1: nan
+Total Cost at Customer 1: 0.00
+
+Here, no shipments arrive at customer 1 due to the increased path length from Customer 2 to Customer 1
+
 *** 6.2 Sample Simulation 2 ***
+
+The following statistics result from running test/experiment using a shipment size of 100:
+
+Shipments Received at Destination: 598
+Average Latency of Received Shipments at Destination: 17.08
+Total Cost of Received Shipments at Destination: 1794.00
+Average number of received shipments for all segments: 40.491
+Average number of refused shipments for all segments: 35.8514
+
+The following statistics result from running test/experiment using randomly generated shipment sizes (between 1 and 1000) for each source location:
+
+Shipments Received at Destination: 94
+Average Latency of Received Shipments at Destination: 35.36
+Total Cost of Received Shipments at Destination: 1896.00
+Average number of received shipments for all segments: 23.8468
+Average number of refused shipments for all segments: 23.2658
+
+As seen above, far fewer shipments arrive at their destinations in the latter case.  This is due to the fact that the average shipment size is significantly higher in the randomly generated case.  Furthermore, we note that nearly all shipments are refused due to the heavy congestion experienced by the network.  Latency also increases significantly due to the higher congestion.
 
 *************************** 7. Architecture and Design ***************************
 
@@ -236,7 +289,7 @@ This application is divided into 3 distinct layers:
 
 The client layer interacts with the middle layer only which allows the engine layer implementation to be changed without affecting the client code.  Furthermore the middle layer interface is designed using a strict attribute-only approach.  This greatly simplifies the client-facing API.
 
-The notifier/notifee approach is used by the activity manager to handle shipment injection and forwarding as well as for updating the statistics in the engine layer
+The notifier/notifee approach is used by the activity manager to handle shipment injection and forwarding as well as for updating the statistics in the engine layer.  The activity handling is all performed within the middle layer, alleviating the need for the client to create and manage an activity manager.
 
 
 
