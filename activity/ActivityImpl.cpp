@@ -25,7 +25,7 @@ Activity::Ptr ManagerImpl::activityNew(const string& name) {
 
 	Activity::Ptr activity = activities_[name];
 	if (activity != NULL) {
-	  cerr << "Activity already exists!" << endl;
+	  cerr << "Activity: " << name << " already exists." << endl;
 	  return NULL;
 	}	
 	activity = new ActivityImpl(name, this);
@@ -66,7 +66,7 @@ void ManagerImpl::nowIs(Time t) {
 			break;
 	  }
 	
-		cout << "Running activity at time: " << nextToRun->nextTime().value() << endl;
+		cout << "Running activity: " << nextToRun->name() + " at time: " << nextToRun->nextTime().value() << endl;
    
  		//calculate amount of time to sleep
 		Time diff = Time(nextToRun->nextTime().value() - now_.value());
@@ -76,6 +76,7 @@ void ManagerImpl::nowIs(Time t) {
 			usleep(( ((int)diff.value()) * 100000));
 
 		now_ = nextToRun->nextTime();
+		
 		//run the minimum time activity and remove it from the queue
 		nextToRun->statusIs(Activity::executing);
 	}

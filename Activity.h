@@ -28,12 +28,11 @@ class Activity : public Fwk::PtrInterface<Activity>
 			public:
 				typedef Fwk::Ptr<Notifiee> Ptr;
 				Notifiee(Activity* act) : Fwk::BaseNotifiee<Activity>(act) {}
-				virtual void onNextTime() {}
 				virtual void onStatus() {}
 		};
 
 	  class Manager;
-	  enum Status {queued, executing, done};
+	  enum Status {queued, executing};
 
 	  virtual Status status() const = 0;
 	  virtual void statusIs(Status s)  = 0;

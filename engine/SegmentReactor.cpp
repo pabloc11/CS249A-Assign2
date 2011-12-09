@@ -22,6 +22,7 @@ namespace Shipping {
 	}
 
   void SegmentReactor::onActiveShipmentNew(Shipment::Ptr _ptr) {
+	
   	forwardActivity_ = activityManagerInstance()->activityNew(_ptr->name());
 		reactor_ = new ForwardActivityReactor(forwardActivity_.ptr(), fleet_, stats_, notifier(), _ptr);
 		

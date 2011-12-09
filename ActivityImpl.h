@@ -37,9 +37,6 @@ class ActivityImpl : public Activity
 		virtual Time nextTime() const { return nextTime_; }
 		virtual void nextTimeIs(Time t) {
     	nextTime_ = t;
-    	if (notifiee_ != NULL) {
-    		notifiee_->onNextTime();
-    	}
 		}
 
 		virtual Notifiee::Ptr notifiee() const { return notifiee_; }

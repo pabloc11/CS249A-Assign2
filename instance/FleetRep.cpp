@@ -33,85 +33,85 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 
 	if (name == "Truck, speed") {
 		fleet_->truckSpeedIs(Fleet::Speed(atof(v.c_str())));
-		fleetRepReactor_->truckSpeed_ = fleet_->truckSpeed();
+		fleetRepReactor_->scheduledAttrs_.truckSpeed = Fleet::Speed(atof(v.c_str()));
 	}
 	else if (name == "Boat, speed") {
 		fleet_->boatSpeedIs(Fleet::Speed(atof(v.c_str())));
-		fleetRepReactor_->boatSpeed_ = fleet_->boatSpeed();
+		fleetRepReactor_->scheduledAttrs_.boatSpeed = Fleet::Speed(atof(v.c_str()));
 	}
 	else if (name == "Plane, speed") {
 		fleet_->planeSpeedIs(Fleet::Speed(atof(v.c_str())));
-		fleetRepReactor_->planeSpeed_ = fleet_->planeSpeed();
+		fleetRepReactor_->scheduledAttrs_.planeSpeed = Fleet::Speed(atof(v.c_str()));
 	}
 	else if (name == "Truck, cost") {
 		fleet_->truckCostIs(Fleet::Cost(atof(v.c_str())));
-		fleetRepReactor_->truckCost_ = fleet_->truckCost();
+		fleetRepReactor_->scheduledAttrs_.truckCost = Fleet::Cost(atof(v.c_str()));
 	}
 	else if (name == "Boat, cost") {
 		fleet_->boatCostIs(Fleet::Cost(atof(v.c_str())));
-		fleetRepReactor_->boatCost_ = fleet_->boatCost();
+		fleetRepReactor_->scheduledAttrs_.boatCost = Fleet::Cost(atof(v.c_str()));
 	}
 	else if (name == "Plane, cost") {
 		fleet_->planeCostIs(Fleet::Cost(atof(v.c_str())));
-		fleetRepReactor_->planeCost_ = fleet_->planeCost();
+		fleetRepReactor_->scheduledAttrs_.planeCost = Fleet::Cost(atof(v.c_str()));
 	}
 	else if (name == "Truck, capacity") {
 		fleet_->truckCapacityIs(Fleet::Capacity(atoi(v.c_str())));
-		fleetRepReactor_->truckCapacity_ = fleet_->truckCapacity();
+		fleetRepReactor_->scheduledAttrs_.truckCapacity = Fleet::Capacity(atoi(v.c_str()));
 	}
 	else if (name == "Boat, capacity") {
 		fleet_->boatCapacityIs(Fleet::Capacity(atoi(v.c_str())));
-		fleetRepReactor_->boatCapacity_ = fleet_->boatCapacity();
+		fleetRepReactor_->scheduledAttrs_.boatCapacity = Fleet::Capacity(atoi(v.c_str()));
 	}
 	else if (name == "Plane, capacity") {
 		fleet_->planeCapacityIs(Fleet::Capacity(atoi(v.c_str())));
-		fleetRepReactor_->planeCapacity_ = fleet_->planeCapacity();
+		fleetRepReactor_->scheduledAttrs_.planeCapacity = Fleet::Capacity(atoi(v.c_str()));
 	}
-	else if (name == "Truck, speed, special") {
-		fleetRepReactor_->specialTruckSpeed_ = Fleet::Speed(atof(v.c_str()));
-		fleetRepReactor_->tSpeed = true;
+	else if (name == "Truck, speed, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.sTruckSpeed = Fleet::Speed(atof(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.tSpeed = true;
 	}
-	else if (name == "Boat, speed, special") {
-		fleetRepReactor_->specialBoatSpeed_ = Fleet::Speed(atof(v.c_str()));
-		fleetRepReactor_->bSpeed = true;
+	else if (name == "Boat, speed, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.sBoatSpeed = Fleet::Speed(atof(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.bSpeed = true;
 	}
-	else if (name == "Plane, speed, special") {
-		fleetRepReactor_->specialPlaneSpeed_ = Fleet::Speed(atof(v.c_str()));
-		fleetRepReactor_->pSpeed = true;
+	else if (name == "Plane, speed, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.sPlaneSpeed = Fleet::Speed(atof(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.pSpeed = true;
 	}
-	else if (name == "Truck, cost, special") {
-		fleetRepReactor_->specialTruckCost_ = Fleet::Cost(atof(v.c_str()));
-		fleetRepReactor_->tCost = true;
+	else if (name == "Truck, cost, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.sTruckCost = Fleet::Cost(atof(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.tCost = true;
 	}
-	else if (name == "Boat, cost, special") {
-		fleetRepReactor_->specialBoatCost_ = Fleet::Cost(atof(v.c_str()));
-		fleetRepReactor_->bCost = true;
+	else if (name == "Boat, cost, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.sBoatCost = Fleet::Cost(atof(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.bCost = true;
 	}
-	else if (name == "Plane, cost, special") {
-		fleetRepReactor_->specialPlaneCost_ = Fleet::Cost(atof(v.c_str()));
-		fleetRepReactor_->pCost = true;
+	else if (name == "Plane, cost, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.sPlaneCost = Fleet::Cost(atof(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.pCost = true;
 	}
-	else if (name == "Truck, capacity, special") {
-		fleetRepReactor_->specialTruckCapacity_ = Fleet::Capacity(atoi(v.c_str()));
-		fleetRepReactor_->tCapacity = true;
+	else if (name == "Truck, capacity, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.sTruckCapacity = Fleet::Capacity(atoi(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.tCapacity = true;
 	}
-	else if (name == "Boat, capacity, special") {
-		fleetRepReactor_->specialBoatCapacity_ = Fleet::Capacity(atoi(v.c_str()));
-		fleetRepReactor_->bCapacity = true;
+	else if (name == "Boat, capacity, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.sBoatCapacity = Fleet::Capacity(atoi(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.bCapacity = true;
 	}
-	else if (name == "Plane, capacity, special") {
-		fleetRepReactor_->specialPlaneCapacity_ = Fleet::Capacity(atoi(v.c_str()));
-		fleetRepReactor_->pCapacity = true;
+	else if (name == "Plane, capacity, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.sPlaneCapacity = Fleet::Capacity(atoi(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.pCapacity = true;
 	}
-	else if (name == "Start time, special") {
-		fleetRepReactor_->startTime = Time(atof(v.c_str()));
-		fleetRepReactor_->start = true;
-		if (fleetRepReactor_->end = true) fleetRepReactor_->onAttributeIs();
+	else if (name == "Start time, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.startTime = Time(atof(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.start = true;
+		if (fleetRepReactor_->scheduledAttrs_.end) fleetRepReactor_->onAttributeIs();
 	}
-	else if (name == "End time, special") {
-		fleetRepReactor_->endTime = Time(atof(v.c_str()));
-		fleetRepReactor_->end = true;
-		if (fleetRepReactor_->start = true) fleetRepReactor_->onAttributeIs();
+	else if (name == "End time, scheduled") {
+		fleetRepReactor_->scheduledAttrs_.endTime = Time(atof(v.c_str()));
+		fleetRepReactor_->scheduledAttrs_.end = true;
+		if (fleetRepReactor_->scheduledAttrs_.start) fleetRepReactor_->onAttributeIs();
 	}	
 	else {
 		cerr << "Incompatible type-attribute pair: " << this->name() << ", " << name << endl;

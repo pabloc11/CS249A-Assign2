@@ -22,10 +22,6 @@ void InjectActivityReactor::destinationIs(CustomerLocation::Ptr l) {
 	destination_ = l;
 }
 
-void InjectActivityReactor::onNextTime() {
-	activity_->statusIs(Activity::queued);
-}
-
 void InjectActivityReactor::onStatus() {
 
 	if (activity_->status() == Activity::queued) {
@@ -34,14 +30,13 @@ void InjectActivityReactor::onStatus() {
 	}
 
   else if (activity_->status() == Activity::executing) {
-		cout << "  Executing " << activity_->name() << endl;
+	
+		cout << "  Executing inject activity: " << activity_->name() << endl;
+		
 		Shipment::Ptr shipment = Shipment::ShipmentNew(Shipment::NumPackages(shipmentSize_.value()), source_, destination_, activity_->nextTime());
 		source_->shipmentIs(shipment);
-		activity_->statusIs(Activity::done);
-	}	
-		
-  else if (activity_->status() == Activity::done) {
-		cout << "  Done executing " << activity_->name() << endl;
 		activity_->nextTimeIs(activity_->nextTime().value() + 24.0/transferRate_.value());
+		activity_->statusIs(Activity::queued);
 	}	
+
 }
