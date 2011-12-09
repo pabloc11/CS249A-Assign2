@@ -2,6 +2,7 @@
 #include <vector>
 #include <sstream>
 #include "Instance.h"
+#include <stdlib.h>
 
 string itoa(int i){
 	std::string s;
@@ -70,9 +71,19 @@ int main(int argc, char* argv[]) {
 
 	clock->attributeIs("now", "24");
 
-	cout << "Shipments Received at Customer 100: " << customers[100]->attribute("shipments received") << endl;
-	cout << "Average Latency at Customer 100: " << customers[100]->attribute("average latency") << endl;
-	cout << "Total Cost at Customer 100: " << customers[100]->attribute("total cost") << endl;
+	cout << "Shipments Received at Destination: " << customers[100]->attribute("shipments received") << endl;
+	cout << "Average Latency of Received Shipments at Destination: " << customers[100]->attribute("average latency") << endl;
+	cout << "Total Cost of Received Shipments at Destination: " << customers[100]->attribute("total cost") << endl;
+
+	int received = 0;
+	int refused = 0;
+	for(int i = 0; i < 222; i++) {
+		received += atoi(segments[i]->attribute("shipments received").c_str());
+		refused += atoi(segments[i]->attribute("shipments refused").c_str());
+	}
+	cout << "Average number of received shipments for all segments: " << received / 222.0 << endl;
+	cout << "Average number of refused shipments for all segments: " << refused / 222.0 << endl;
+
   return 0;
 }
 
