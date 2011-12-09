@@ -129,13 +129,6 @@ public:
 		float cost;
 		float time;
 		bool expedited;
-		// Connect params
-		string destination;
-	};
-	struct SearchProgress {
-		float dist;
-		float cost;
-		float time;
 	};
 	
 	ConnRep(const string& name, ManagerImpl* manager);
@@ -144,18 +137,10 @@ public:
 	void attributeIs(const string& name, const string& v);
 
 private:
-	bool paramsExceeded(SearchProgress& progress);
-	void appendToPath(Segment::PtrConst seg, Location::PtrConst loc, string& path);
-	SearchProgress updateProgress(Segment::PtrConst seg, SearchProgress& progress, bool expedited);
-	void exploreDFS(Segment::PtrConst seg, Location::PtrConst loc, set<string> visited,
-			 		SearchProgress progress, string& output, string path);
-	void connectDFS(Segment::PtrConst seg, Location::PtrConst loc, set<string> visited,
-					SearchProgress progress, bool expedited, string& output, string path);
- 	string explore(Ptr<LocationRep> loc);
-	string connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1);
+	string tokenizeExplore(vector<Connectivity::Connection> & results);
+	string tokenizeConnect(vector<Connectivity::Connection> & results);
 	
   Ptr<ManagerImpl> manager_;
-	SearchParams params_;
 	Connectivity::Ptr connectivity_;
 };
 

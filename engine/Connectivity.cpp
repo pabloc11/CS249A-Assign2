@@ -30,10 +30,13 @@ namespace Shipping {
 	for (Location::SegmentListIterator iter = currentLocation->segmentIter(); iter.ptr(); ++iter) {
 	  Segment::Ptr segment = iter.ptr();
 	  if (segment->returnSegment()) {
-		path.segments_.push_back(segment);
-		if(simpleDFS(segment->returnSegment()->source(), goal, visited, path))
+		CustomerLocation * c = dynamic_cast<CustomerLocation*>(segment->returnSegment()->source().ptr());
+		if(!c || c->name() == goal->name()) { //don't transfer through customer locations unless it's the destination
+		  path.segments_.push_back(segment);
+		  if(simpleDFS(segment->returnSegment()->source(), goal, visited, path))
 			return true;
-		path.segments_.pop_back();
+		  path.segments_.pop_back();
+		}
 	  }
 	}
 	return false;
@@ -44,8 +47,7 @@ namespace Shipping {
   public:
     bool operator() (const Connectivity::Connection& lhs, const Connectivity::Connection&rhs) const
     {
-      //TODO: check if this is in the correct direction
-      return lhs.distance_.value() < rhs.distance_.value();
+      return lhs.distance_.value() > rhs.distance_.value();
     }
   };
 
@@ -72,10 +74,13 @@ namespace Shipping {
 	  for (Location::SegmentListIterator iter = curLocation->segmentIter(); iter.ptr(); ++iter) {
 	  	Segment::Ptr segment = iter.ptr();
 	  	if (segment->returnSegment() && !visited.count(segment->returnSegment()->source()->name())) {
-	  	  Connectivity::Connection newPath = curPath;
-	  	  curPath.segments_.push_back(segment);
-	  	  curPath.distance_ = Segment::Length(curPath.distance_.value() + segment->length().value());
-	  	  p_queue.push(newPath);
+		  CustomerLocation * c = dynamic_cast<CustomerLocation*>(segment->returnSegment()->source().ptr());
+		  if(!c || c->name() == goal->name()) { //don't transfer through customer locations unless it's the destination
+		    Connectivity::Connection newPath = curPath;
+	  	    newPath.segments_.push_back(segment);
+	  	    newPath.distance_ = Segment::Length(curPath.distance_.value() + segment->length().value());
+	  	    p_queue.push(newPath);
+		  }
 	  	}
 	  }
 	}
@@ -126,8 +131,8 @@ namespace Shipping {
 	  }
 	  float additionalCost = prevSegment->difficulty().value() * prevSegment->length().value() * segmentCost;
 	  if(expedited == Segment::expedited()) {
-		additionalCost *= additionalCost;
-		segmentSpeed *= segmentSpeed;
+		additionalCost *= 1.5;
+		segmentSpeed *= 1.3;
 	  }
 	  path.cost_ = Fleet::Cost(path.cost_.value() + additionalCost);
 	  path.time_ = Time(path.time_.value() + (prevSegment->length().value() / segmentSpeed));
@@ -183,8 +188,8 @@ namespace Shipping {
 	  }
 	  float additionalCost = prevSegment->difficulty().value() * prevSegment->length().value() * segmentCost;
 	  if(expedited == Segment::expedited()) {
-		additionalCost *= additionalCost;
-		segmentSpeed *= segmentSpeed;
+		additionalCost *= 1.5;
+		segmentSpeed *= 1.3;
 	  }
 	  path.cost_ = Fleet::Cost(path.cost_.value() + additionalCost);
 	  path.time_ = Time(path.time_.value() + (prevSegment->length().value() / segmentSpeed));
@@ -193,8 +198,8 @@ namespace Shipping {
 
 	if((maxCost.value() > 0 && path.cost_ > maxCost) || (maxTime.value() > 0 && path.time_ > maxTime) || (maxDist.value() > 0 && path.distance_ > maxDist))
 	  return;
-
-	results.push_back(path);
+	if(prevSegment)
+		results.push_back(path);
 
 	visited.insert(currentLocation->name());
 

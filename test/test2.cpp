@@ -80,10 +80,10 @@ int main(int argc, char *argv[]) {
     Ptr<Instance> boatSeg4 = manager->instanceNew("boatSeg4", "Boat segment");
     Ptr<Instance> boatSeg5 = manager->instanceNew("boatSeg5", "Boat segment");
     Ptr<Instance> boatSeg6 = manager->instanceNew("boatSeg6", "Boat segment");
-    Ptr<Instance> boatSeg7 = manager->instanceNew("boatSeg6", "Boat segment");
+    /*Ptr<Instance> boatSeg7 = manager->instanceNew("boatSeg6", "Boat segment");
     if (boatSeg7 != NULL) {
         cout << "Creating instance with same name -- error \n";
-    }
+    }*/
     // truck
     Ptr<Instance> truckSeg1 = manager->instanceNew("truckSeg1", "Truck segment");
     Ptr<Instance> truckSeg2 = manager->instanceNew("truckSeg2", "Truck segment");

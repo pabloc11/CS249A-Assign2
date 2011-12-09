@@ -1,13 +1,11 @@
 #include <iostream>
 #include <vector>
 #include "Instance.h"
-#include "Activity.h"
 
 int main(int argc, char* argv[]) {
 	
 	Ptr<Instance::Manager> manager = shippingInstanceManager();
 	Ptr<Instance> clock = manager->instanceNew("clock", "Clock");
-	//Ptr<Activity::Manager> activityManager = manager->activityManager();
 	
 	/* Set up the network */
 	vector< Ptr<Instance> > loc;
@@ -20,6 +18,8 @@ int main(int argc, char* argv[]) {
 	// Segments
   seg.push_back( manager->instanceNew("ts1", "Truck segment") );
 	seg.push_back( manager->instanceNew("ts2", "Truck segment") );
+	seg[0]->attributeIs("length", "1");
+	seg[1]->attributeIs("length", "1");
 
 	// Connections...
 	seg[0]->attributeIs("source", "customer1");
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 
 	Ptr<Instance> conn = manager->instanceNew("myConn", "Conn");
 
-	conn->attributeIs("routing algorithm", "dfs");
+	conn->attributeIs("routing algorithm", "ucs");
 	
 	loc[0]->attributeIs("transfer rate", "4");
 	loc[0]->attributeIs("shipment size", "5");
