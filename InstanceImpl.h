@@ -151,6 +151,8 @@ private:
 			 		SearchProgress progress, string& output, string path);
 	void connectDFS(Segment::PtrConst seg, Location::PtrConst loc, set<string> visited,
 					SearchProgress progress, bool expedited, string& output, string path);
+	string tokenizeExplore(vector<Connectivity::Connection> & results);
+	string tokenizeConnect(vector<Connectivity::Connection> & results);
  	string explore(Ptr<LocationRep> loc);
 	string connect(Ptr<LocationRep> loc0, Ptr<LocationRep> loc1);
 	

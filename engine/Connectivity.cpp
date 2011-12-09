@@ -131,8 +131,8 @@ namespace Shipping {
 	  }
 	  float additionalCost = prevSegment->difficulty().value() * prevSegment->length().value() * segmentCost;
 	  if(expedited == Segment::expedited()) {
-		additionalCost *= additionalCost;
-		segmentSpeed *= segmentSpeed;
+		additionalCost *= 1.5;
+		segmentSpeed *= 1.3;
 	  }
 	  path.cost_ = Fleet::Cost(path.cost_.value() + additionalCost);
 	  path.time_ = Time(path.time_.value() + (prevSegment->length().value() / segmentSpeed));
@@ -188,8 +188,8 @@ namespace Shipping {
 	  }
 	  float additionalCost = prevSegment->difficulty().value() * prevSegment->length().value() * segmentCost;
 	  if(expedited == Segment::expedited()) {
-		additionalCost *= additionalCost;
-		segmentSpeed *= segmentSpeed;
+		additionalCost *= 1.5;
+		segmentSpeed *= 1.3;
 	  }
 	  path.cost_ = Fleet::Cost(path.cost_.value() + additionalCost);
 	  path.time_ = Time(path.time_.value() + (prevSegment->length().value() / segmentSpeed));
@@ -198,8 +198,8 @@ namespace Shipping {
 
 	if((maxCost.value() > 0 && path.cost_ > maxCost) || (maxTime.value() > 0 && path.time_ > maxTime) || (maxDist.value() > 0 && path.distance_ > maxDist))
 	  return;
-
-	results.push_back(path);
+	if(prevSegment)
+		results.push_back(path);
 
 	visited.insert(currentLocation->name());
 
