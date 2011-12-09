@@ -292,7 +292,7 @@ The client layer interacts with the middle layer only which allows the engine la
 
 The notifier/notifee approach is used by the activity manager to handle shipment injection and forwarding as well as for updating the statistics in the engine layer.  The activity handling is all performed within the middle layer, alleviating the need for the client to create and manage an activity manager.
 
-*** 7.1 Typical Simulation Program Flow ***
+*** 7.2 Typical Simulation Program Flow ***
 
 - A Shipment arrives at a Location either by an InjectActivityReactor an a ForwardingActivityReactor, shipmentIs() is called.
 - The LocationReactor is notified through onShipmentIs(). If the shipment is destined for this destination then statistics are updated and no further action is taken. Otherwise the next segment is looked up in the route table and the shipment is queued on that segment using queuedShipmentIs().
