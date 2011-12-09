@@ -1,38 +1,242 @@
 user: pabloc11
 user: nch25
 
-*************** MIDDLE LAYER *************** 
+Name: Pablo Ceballos
+Name: Nicholas Hippenmeyer
 
-The middle layer is divided into several classes, all of which inherit from the Instance class:
+Compiling: Run 'make' in the top level directory.  This will compile all code, including all client simulation code in the 'test' directory.
+Running Simulations: Client simulation code is located in the 'test' directory.  As an example, run 'test/activity' to run the activity test file.
 
---StatsRep class - this class represents the stats entity to the client.  It overrides the attribute() and attributeIs() methods of the Instance class and performs error checking relevant to the Stats entity.  The attributeIs() method is empty since writing to the stats entity is not supported.
+*************************** Index ***************************
 
---FleetRep class - this class represents the fleet entity to the client.  It overrides the attribute() and attributeIs() methods of the Instance class and performs error checking relevant to the Fleet entity.
+1. Introduction
+2. Client Interface APIs
+		2.1 Code Organization
+    2.2 Supported Entities
+    2.3 Supported Attributes
+    2.4 Creating/Querying a Network
+3. Exceptions
+    3.1 All Supported Exceptions
+    3.2 Handling Exceptions in the client code
+4. Running Simulations
+    4.1 Virtual Time vs Real Time
+    4.2 Scheduled Changes to Fleet Attributes
+5. Routing Algorithms
+    5.1 Depth First Search
+    5.2 Uniform Cost Search
+6. Simulation Results
+    6.1 Sample Simulation 1
+    6.2 Sample Simulation 2
+7. Architecture and Design
+    7.1 Architecture/Design Decisions
 
---ConnRep class - this class represents a connectivity entity which doesn't exist in the engine layer.  It overrides the attribute() and attributeIs() methods of the Instance class and performs error checking relevant to this entity as outlined in the assignment description.  The class also includes several private methods to aid in the graph traversals required by the attribute() method.  The attributeIs() method is empty since writing to this class is not supported.
+*************************** 1. Introduction ***************************
 
---LocationRep class - this class represents the location entity to the client.  It overrides the attribute() and attributeIs() methods of the Instance class and performs error checking relevant to the location entity.  The attributeIs() method is empty since writing to the location entity is not supported.
+The purpose of this assignment was to design a library and client interface that could be used to simulate the congestion effects of a shipping business.  Shipments are defined by the client which are then shipped through a network consisting of locations and segments.  Constraints such as transportation speed, difficulty, cost and capacity are imposed to model real-world transportation limitations.  Finally, a simulation is run and statistics are output to the client.
 
---SegmentRep class - this class represents the segment entity to the client.  It overrides the attribute() and attributeIs() methods of the Instance class and performs error checking relevant to the segment entity.
+*************************** 2. Client API ***************************
 
-The following classes inherit from LocationRep: CustomerLocationRep, PortLocationRep, TruckTerminalRep, BoatTerminalRep and PlaneTerminalRep, all of which represent respective entities in the engine layer.  Similarly, the following classes inherit from SegmentRep: TruckSegmentRep, BoatSegmentRep and PlaneSegmentRep.
+*** 2.1 Code Organization ***
 
-Finally the ManagerImpl class inherits from Instance::Manager, and provides functionality for creating new instance objects (instanceNew) and deleting instance objects (instanceDel).
+The project top-level directory contains all the header files used to interact with the various layers of the application.  Furthermore, the following subdirectories exist as well:
 
-*************** ENGINE LAYER *************** 
+- fwk (Framework source code)
+- engine (Engine layer source code)
+- instance (Middle layer source code)
+- activity (Activity source code)
+- test (Simulation code)
 
-The engine layer is divided into several classes enumerated below:
+*** 2.2 Supported Entities ***
 
---Network class - this class is a collection of shipping entities maintained in a hash map. Entities are added/removed from the Network by calling entityIs()/entityDel(). The Network also provides a notifier interface for a single notifiee, in this case intended for the Stats object to track the number of each kind of entity in the network.
+The following entities exist in the engine layer:
 
---Stats class - this class keeps a number of counters about information pertaining to the entities in a network. It registers with a Network object to be notified when entities are added/removed from the network. In addition when a Segment is added to the Network the Stats object will also register to be notified of changes to the expedited state of the segment so that it can accurately maintain the percentage of expedited segments in the network.
+- Segment
+	- Truck Segment
+	- Boat Segment
+	- Plane Segment
+- Location
+	- Customer Location
+	- Port Location
+	- Terminal Location
+		- Truck Terminal
+		- Boat Terminal
+		- Plane Terminal
+		
+In addition, the following classes which subclass directly from the NamedInterface class also exist in the engine layer:
 
---Fleet class - this class provides simple accessors/mutators for a number of attributes pertaining to speed/cost/capacity of the different modes of transportation in a network.
+- Network
+- Stats
+- Fleet
+- Connectivity
+- Shipment
 
---Entity class - this class is the root of the entity hierarchy and defines a single attribute entityType which is an enumeration of all the possible entities. This is easily expandable if more entities are created.
+All of the above classes, with the exception of Shipments can be interacted with from the middle (representation) layer.
 
---Segment class - this class has a number of attributes pertaining to segments, source, returnSegment, length, difficulty, and expeditedState. It also provides a notifier interface for a single notifiee, in this case intended to notify the Stats object when the expeditedState changes. 
+*** 2.3 Supported Attributes ***
 
---Location class - this class maintains a linked list of segments that originate from the Location. A linked list is used so that arbitrary elements can be easily removed. This list can be read by index, but cannot be written directly. Instead the Segment class is made a friend class of the Location class so that setting the source attribute on a Segment can also modify the segment list in a Location object. This ensures that it is impossible to create inconsistency between the two.
+The following attributes exist for each class accessible through the client API:
 
---the remaining classes fill out the rest of the entity hierarchy but do not have any relevant attributes.
+Segments:
+- "source" (the name of a location where the segment begins)
+- "length" (a number representing the length in miles of a segment)
+- "return segment" (the name of a segment that represents the reverse direction)
+- "difficulty" (a number from 1 to 5 representing the difficulty of a segment)
+- "expedite support" ('yes' or 'no' indicating whether the segment supports expedited shipping)
+- "capacity" (an integer number representing the number of packages a segment can support)
+- "shipments received" (read-only: the number of shipments received by a segment)
+- "shipments refused" (read-only: the number of shipments refused by a segment)
+
+Locations:
+- "segmentX" (read-only: the Xth segment originating from a location)
+
+Customer Locations:
+- "transfer rate" (an integer number of shipments per day supported by a location)
+- "shipment size" (an integer number of packages per shipment)
+- "destination" (the name of a customer location representing the destination of a shipment)
+- "shipments received" (the number of shipments received by a location)
+- "average latency" (the average time taken for a shipment to arrive at a location)
+- "total cost" (the total cost taken for a shipment to arrive at a location)
+			
+Stats:
+- "Customer" (read-only: the number of customer locations in a network)
+- "Port" (read-only: the number of port locations in a network)
+- "Truck terminal" (read-only: the number of truck terminals in a network)
+- "Boat terminal" (read-only: the number of boat terminals in a network)
+- "Plane terminal" (read-only: the number of plane terminals in a network)
+- "Expedite percentage" (read-only: the percentage of segments in a network that support expedited shipping)
+
+Fleet:
+- "Truck/Boat/Plane, speed" (a number representing the speed of a given mode of transportation)
+- "Truck/Boat/Plane, cost" (a number representing the cost of a given mode of transportation)
+- "Truck/Boat/Plane, capacity" (an integer number representing the number of packages transportable by a given mode of transportation)
+- "Truck/Boat/Plane, speed, scheduled" (the scheduled speed during a further specified time window)
+- "Truck/Boat/Plane, cost, scheduled" (the scheduled cost during a further specified time window)
+- "Truck/Boat/Plane, capacity, scheduled" (the scheduled capacity during a further specified time window)
+- "Start time, scheduled" (the scheduled start time for a fleet's change in attributes: given as a number between 0 and 24)
+- "End time, scheduled" (the scheduled end time for a fleet's change in attributes: given as a number between 0 and 24)
+
+Connectivity:
+- "routing algorithm" ('dfs' or 'ucs' indicating the algorithm used for routing shipments in a network)
+- "explore loc0 : att0 v0 att1 v1 ..." (read_only: as outlined in assignment 2 description)
+- "connect loc0 : loc1" (read_only: as outlined in assignment 2 description)
+
+Furthermore, the following class exists only in the middle layer and is used for setting up and running simulations.
+
+Clock:
+- "type" ('real' or 'virtual' indicating the type of activity manager used to run a simulation)
+- "now" (a number indicating the current time of a simulation)
+
+*** 2.4 Creating/Querying a Network ***
+
+A network is created by running the command:
+Ptr<Instance::Manager> manager = shippingInstanceManager();
+
+This creates a manager in the middle layer for creating network entities and running a simulation.  The command "instanceNew(name, entity)" is then called on the manager for creating instance objects in the middle layer and corresponding entities in the engine layer.  These instances can then be referenced by their given name.  The method attributeIs(attr, value) can be called on any instance object as outlined above to set its respective attribute value.
+
+Once a network has been created, any attribute can be queried by calling the attribute(attr) method on an entity.
+
+*************************** 3. Exceptions ***************************
+
+*** 3.1 All Supported Exceptions ***
+
+All errors are handled by printing a detailed error message to stderr and throwing an exception which must be caught at the client layer.  The following exceptions can be throw:
+
+- Fwk::UnknownArgException (thrown when an invalid type-attribute pair is given to an instance object)
+- Fwk::EntityNotFoundException (thrown when a entity can't be found by its instance name)
+- Fwk::IllegalNameException (thrown when an invalid name is given for an instance object)
+- Fwk::NameInUseException (thrown when an instance object is named something that's already in use)
+- Fwk::UnknownTypeException (thrown when the type of an instance object is incompatible with an operation)
+- Fwk::RangeException (thrown when a value is out of bounds for a given operation)
+- Fwk::InternalException (thrown when an internal error has occured)
+
+*** 3.2 Handling Exceptions in the client code ***
+
+The client should handle exceptions by enclosing all code that could generate an exception within a try, catch block.  An example is illustrated below:
+
+try{
+  // Any calls to middle layer
+}
+catch (Fwk::UnknownArgException) {
+	// handle unknown argument exception
+}
+catch (Fwk::EntityNotFoundException) {
+	// handle entity not found exception
+}
+catch (Fwk::IllegalNameException) {
+	// handle illegal name exception
+}
+catch (Fwk::NameInUseException) {
+	// handle name in use exception
+}
+catch (Fwk::UnknownTypeException) {
+	// handle unknown type exception
+}
+catch (Fwk::RangeException) {
+	// handle out of range exception
+}
+catch (Fwk::InternalException) {
+	// handle internal exception
+}
+
+*************************** 4. Running Simulations ***************************
+
+*** 4.1 Virtual Time vs Real Time ***
+
+Running simulations in virtual time can be accomplished by creating a clock instance (the activity manager type defaults to virtual).  A virtual time activity manager will automatically be created in the middle layer when the a call to instanceNew is made for the first time on the instance manager.  Finally, the simulation can be started by setting the current time on the clock.  To run the simulation for 24 hours, a value of 24 would be used:
+
+Ptr<Instance> clock = manager->instanceNew("clock", "Clock");
+clock->attributeIs("now", "24");
+
+To run a simulation in real time, the type 'real' type must be specified on the clock instance:
+
+clock->attributeIs("type", "real");
+
+The scaling factor used is 1s real time : 1hr virtual time.
+
+*** 4.2 Scheduled Changes to Fleet Attributes ***
+
+To specify a time period during which scheduled changes to the fleet's attributes occur, an example of the commands that must be made is shown below:
+
+fleet->attributeIs("Truck, speed", "1");
+fleet->attributeIs("Truck, capacity", "1");
+fleet->attributeIs("Truck, speed, scheduled", "2");
+fleet->attributeIs("Truck, capacity, scheduled", "2");
+// any other desired fleet changes
+fleet->attributeIs("Start time, scheduled", "10");
+fleet->attributeIs("End time, scheduled", "20");
+
+The start and end time represent the beginning and end times in a 24 hour day, respectively.  For the example above, the start time would be 10am and the end time would be 8pm.  After these two times are specified, the activity manager will create an activity to cycle between the normal fleet attributes and the scheduled changes at the given times.
+
+*************************** 5. Routing Algorithms ***************************
+
+The routes between any two customer locations in a network are computed when the 'now' attribute is set on a clock instance.  A routing table is stored for every location in the network as a hash map.  Destination locations are used as the keys with the next segment in the route used as the value.  Whenever a forwarding activity occurs, the outgoing segment from a given location is found by searching for the value (next segment) associated with a given destination.
+
+*** 5.1 Depth First Search ***
+
+The first routing algorithm implemented is depth first search which ignores all paths from a source to a destination that go through a customer location.  This addresses the issue of shipments arriving at customer locations they are not destined for.  
+
+*** 5.2 Uniform Cost Search ***
+
+
+
+*************************** 6. Sample Results ***************************
+
+*** 6.1 Sample Simulation 1 ***
+
+*** 6.2 Sample Simulation 2 ***
+
+*************************** 7. Architecture and Design ***************************
+
+*** 7.1 Architecture/Design Decisions ***
+
+This application is divided into 3 distinct layers:
+- Client layer
+- Middle layer
+- Engine layer
+
+The client layer interacts with the middle layer only which allows the engine layer implementation to be changed without affecting the client code.  Furthermore the middle layer interface is designed using a strict attribute-only approach.  This greatly simplifies the client-facing API.
+
+The notifier/notifee approach is used by the activity manager to handle shipment injection and forwarding as well as for updating the statistics in the engine layer
+
+
+

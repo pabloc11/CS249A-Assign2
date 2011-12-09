@@ -71,13 +71,13 @@ void ManagerImpl::nowIs(Time t) {
  		//calculate amount of time to sleep
 		Time diff = Time(nextToRun->nextTime().value() - now_.value());
 
-		//sleep 100ms (100,000 microseconds) for every unit of time
+		//sleep 1s for every unit of time
 		if(type_ == real_)
-			usleep(( ((int)diff.value()) * 100000));
+			usleep(( ((int)diff.value()) * 1000000));
 
 		now_ = nextToRun->nextTime();
 		
-		//run the minimum time activity and remove it from the queue
+		//run the minimum time activity
 		nextToRun->statusIs(Activity::executing);
 	}
 
