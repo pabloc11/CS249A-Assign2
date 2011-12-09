@@ -6,6 +6,21 @@
 
 using namespace Shipping;
 
+struct ScheduledFleetAttrs {
+	Fleet::Speed truckSpeed, boatSpeed, planeSpeed, sTruckSpeed, sBoatSpeed, sPlaneSpeed;
+	Fleet::Cost truckCost, boatCost, planeCost, sTruckCost, sBoatCost, sPlaneCost;
+	Fleet::Capacity truckCapacity, boatCapacity, planeCapacity, sTruckCapacity, sBoatCapacity, sPlaneCapacity;
+	Time startTime, endTime;
+	bool tSpeed, bSpeed, pSpeed, tCost, bCost, pCost, tCapacity, bCapacity, pCapacity, start, end;
+	ScheduledFleetAttrs() :
+		truckSpeed(1), boatSpeed(1), planeSpeed(1), sTruckSpeed(1), sBoatSpeed(1), sPlaneSpeed(1),
+		truckCost(1), boatCost(1), planeCost(1), sTruckCost(1), sBoatCost(1), sPlaneCost(1),
+		truckCapacity(1), boatCapacity(1), planeCapacity(1), sTruckCapacity(1), sBoatCapacity(1), sPlaneCapacity(1),
+		startTime(0), endTime(0) {
+			tSpeed = bSpeed = pSpeed = tCost = bCost = pCost = tCapacity = bCapacity = pCapacity = start = end = false;		
+		}
+};
+
 class InjectActivityReactor : public Activity::Notifiee {
 public:
 	typedef Fwk::Ptr<InjectActivityReactor> Ptr;
@@ -13,7 +28,6 @@ public:
 	void transferRateIs(ShipmentsPerDay n);
 	void shipmentSizeIs(PackagesPerShipment n);
 	void destinationIs(CustomerLocation::Ptr l);
-	void onNextTime();
 	void onStatus();	
 private:
 	Activity::Ptr activity_;
@@ -27,7 +41,6 @@ class ForwardActivityReactor : public Activity::Notifiee {
 public:
 	typedef Fwk::Ptr<ForwardActivityReactor> Ptr;
 	ForwardActivityReactor(Activity* _a, Fleet::Ptr _fleet, Stats::Ptr _stats, Segment::Ptr _seg, Shipment::Ptr _ship);
-	void onNextTime();
 	void onStatus();	
 private:
 	Activity::Ptr activity_;
@@ -35,6 +48,28 @@ private:
 	Stats::Ptr stats_;
 	Segment::Ptr segment_;
 	Shipment::Ptr shipment_;
+};
+
+class ScheduleChangesReactor : public Activity::Notifiee {
+public:
+	typedef Fwk::Ptr<ScheduleChangesReactor> Ptr;
+	ScheduleChangesReactor(Activity* _a, Fleet::Ptr _f, ScheduledFleetAttrs& _s);
+	void onStatus();
+private:
+	Activity::Ptr activity_;
+	Fleet::Ptr fleet_;
+	ScheduledFleetAttrs scheduledAttrs_;
+};
+
+class UnscheduleChangesReactor : public Activity::Notifiee {
+public:
+	typedef Fwk::Ptr<UnscheduleChangesReactor> Ptr;
+	UnscheduleChangesReactor(Activity* _a, Fleet::Ptr _f, ScheduledFleetAttrs& _s);
+	void onStatus();
+private:
+	Activity::Ptr activity_;
+	Fleet::Ptr fleet_;
+	ScheduledFleetAttrs scheduledAttrs_;
 };
 
 namespace Shipping {
@@ -92,13 +127,14 @@ namespace Shipping {
 
   class FleetRepReactor : public Fwk::PtrInterface<FleetRepReactor>{
   public:
-	FleetRepReactor();
-	typedef Fwk::Ptr<FleetRepReactor> Ptr;
-	Fleet::Speed truckSpeed_, boatSpeed_, planeSpeed_, specialTruckSpeed_, specialBoatSpeed_, specialPlaneSpeed_;
-	Fleet::Cost truckCost_, boatCost_, planeCost_, specialTruckCost_, specialBoatCost_, specialPlaneCost_;
-	Fleet::Capacity truckCapacity_, boatCapacity_, planeCapacity_, specialTruckCapacity_, specialBoatCapacity_, specialPlaneCapacity_;
-	bool tSpeed, bSpeed, pSpeed, tCost, bCost, pCost, tCapacity, bCapacity, pCapacity, start, end;
-	Time startTime, endTime;
+		FleetRepReactor(const string& name, Fleet::Ptr _fleet);
+		typedef Fwk::Ptr<FleetRepReactor> Ptr;
+		void onAttributeIs();
+	private:
+		friend class FleetRep;
+		string name_;
+		Fleet::Ptr fleet_;
+		ScheduledFleetAttrs scheduledAttrs_;
   };
 }
 

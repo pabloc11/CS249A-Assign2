@@ -29,10 +29,18 @@ int main(int argc, char* argv[]) {
   Ptr<Instance> fleet = manager->instanceNew("Fleet", "Fleet");
   fleet->attributeIs("Truck, speed", "1");
   fleet->attributeIs("Truck, capacity", "1");
+	
+	// Scheduled changes
+  fleet->attributeIs("Truck, speed, scheduled", "2");
+  fleet->attributeIs("Truck, capacity, scheduled", "2");
+  fleet->attributeIs("Start time, scheduled", "10");
+  fleet->attributeIs("End time, scheduled", "20");
 
 	// Set some segment (shipment) capacities
 	seg[0]->attributeIs("capacity", "1");
 	seg[1]->attributeIs("capacity", "1");
+	seg[0]->attributeIs("length", "1");
+	seg[1]->attributeIs("length", "1");
 
 	Ptr<Instance> conn = manager->instanceNew("myConn", "Conn");
 
@@ -42,9 +50,11 @@ int main(int argc, char* argv[]) {
 	loc[0]->attributeIs("shipment size", "5");
 	loc[0]->attributeIs("destination", "customer2");
 	
-	loc[1]->attributeIs("transfer rate", "3");
-	loc[1]->attributeIs("shipment size", "10");
-	loc[1]->attributeIs("destination", "customer1");
+	// loc[1]->attributeIs("transfer rate", "3");
+	// loc[1]->attributeIs("shipment size", "10");
+	// loc[1]->attributeIs("destination", "customer1");
+	
+	clock->attributeIs("type", "real");
 
 	//activityManager->nowIs(24.0);
 	clock->attributeIs("now", "24");
