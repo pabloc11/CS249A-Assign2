@@ -57,7 +57,15 @@ int main(int argc, char* argv[]) {
 	clock->attributeIs("type", "real");
 
 	//activityManager->nowIs(24.0);
+	clock->attributeIs("now", "24");
+
+	loc[0]->attributeIs("transfer rate", "0");
+
 	clock->attributeIs("now", "48");
+
+	loc[0]->attributeIs("transfer rate", "1");
+
+	clock->attributeIs("now", "72");
 
 	cout << "Shipments Received: " << loc[1]->attribute("shipments received") << endl;
 	cout << "Average Latency: " << loc[1]->attribute("average latency") << endl;

@@ -7,9 +7,9 @@ namespace Shipping {
 		Segment::Notifiee(),
 		segment_(_s),
 		fleet_(_fleet),
-		stats_(_stats),
-		forwardActivity_(NULL),
-		reactor_(NULL)		
+		stats_(_stats)//,
+		//forwardActivity_(NULL),
+		//reactor_(NULL)
  	{
     notifierIs(_s);
   }
@@ -23,29 +23,29 @@ namespace Shipping {
 
   void SegmentReactor::onActiveShipmentNew(Shipment::Ptr _ptr) {
 	
-  	forwardActivity_ = activityManagerInstance()->activityNew(_ptr->name());
-		reactor_ = new ForwardActivityReactor(forwardActivity_.ptr(), fleet_, stats_, notifier(), _ptr);
-		
-		float speed = 1;
-		float length = segment_->length().value();
-		
-		// Truck segment
-		TruckSegment* truckPtr = dynamic_cast<TruckSegment *>(segment_.ptr());
-		if (truckPtr) speed = fleet_->truckSpeed().value();
-		
-		// Boat segment
-		BoatSegment* boatPtr = dynamic_cast<BoatSegment *>(segment_.ptr());
-		if (boatPtr) speed = fleet_->boatSpeed().value();
-		
-		// Plane segment
-		PlaneSegment* planePtr = dynamic_cast<PlaneSegment *>(segment_.ptr());
-		if (planePtr) speed = fleet_->planeSpeed().value();
-		
-		int numPackages = _ptr->numPackages().value();
-		int capacity = segment_->capacity().value();
-		int numTrips = ceil((float)numPackages/(float)capacity);
-		forwardActivity_->nextTimeIs(activityManagerInstance()->now().value() + (float)numTrips*length/speed);
-		forwardActivity_->lastNotifieeIs(reactor_.ptr());
-		forwardActivity_->statusIs(Activity::queued);
+  	Activity::Ptr forwardActivity_ = activityManagerInstance()->activityNew(_ptr->name());
+	ForwardActivityReactor * reactor = new ForwardActivityReactor(forwardActivity_, fleet_, stats_, notifier(), _ptr);
+
+	float speed = 1;
+	float length = segment_->length().value();
+
+	// Truck segment
+	TruckSegment* truckPtr = dynamic_cast<TruckSegment *>(segment_.ptr());
+	if (truckPtr) speed = fleet_->truckSpeed().value();
+
+	// Boat segment
+	BoatSegment* boatPtr = dynamic_cast<BoatSegment *>(segment_.ptr());
+	if (boatPtr) speed = fleet_->boatSpeed().value();
+
+	// Plane segment
+	PlaneSegment* planePtr = dynamic_cast<PlaneSegment *>(segment_.ptr());
+	if (planePtr) speed = fleet_->planeSpeed().value();
+
+	int numPackages = _ptr->numPackages().value();
+	int capacity = segment_->capacity().value();
+	int numTrips = ceil((float)numPackages/(float)capacity);
+	forwardActivity_->nextTimeIs(activityManagerInstance()->now().value() + (float)numTrips*length/speed);
+	forwardActivity_->lastNotifieeIs(reactor);
+	forwardActivity_->statusIs(Activity::queued);
   }
 }

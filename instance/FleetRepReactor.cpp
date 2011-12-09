@@ -19,22 +19,22 @@ double FleetRepReactor::currentTimeRoundedDownTo24() {
 void FleetRepReactor::onAttributeIs() {
 	
 	// Create scheduleChanges activity
-	if(!scheduleReactor_) {
-		Activity::Ptr scheduleChanges = activityManagerInstance()->activityNew("schedule");
-		scheduleReactor_ = new ScheduleChangesReactor(scheduleChanges.ptr(), fleet_, scheduledAttrs_);
-		scheduleChanges->nextTimeIs(currentTimeRoundedDownTo24() + scheduledAttrs_.startTime.value());
-		scheduleChanges->lastNotifieeIs(scheduleReactor_.ptr());
-		scheduleChanges->statusIs(Activity::queued);
-	}
+	if(scheduleReactor_)
+		activityManagerInstance()->activityDel("schedule");
+	Activity::Ptr scheduleChanges = activityManagerInstance()->activityNew("schedule");
+	scheduleReactor_ = new ScheduleChangesReactor(scheduleChanges.ptr(), fleet_, scheduledAttrs_);
+	scheduleChanges->nextTimeIs(currentTimeRoundedDownTo24() + scheduledAttrs_.startTime.value());
+	scheduleChanges->lastNotifieeIs(scheduleReactor_.ptr());
+	scheduleChanges->statusIs(Activity::queued);
 	
 	// Create unscheduleChanges activity
-	if(!unscheduleReactor_) {
-		Activity::Ptr unscheduleChanges = activityManagerInstance()->activityNew("unschedule");
-		unscheduleReactor_ = new UnscheduleChangesReactor(unscheduleChanges.ptr(), fleet_, scheduledAttrs_);
-		unscheduleChanges->nextTimeIs(currentTimeRoundedDownTo24() + scheduledAttrs_.endTime.value());
-		unscheduleChanges->lastNotifieeIs(unscheduleReactor_.ptr());
-		unscheduleChanges->statusIs(Activity::queued);
-	}
-}
+	if(unscheduleReactor_)
+		activityManagerInstance()->activityDel("unschedule");
+	Activity::Ptr unscheduleChanges = activityManagerInstance()->activityNew("unschedule");
+	unscheduleReactor_ = new UnscheduleChangesReactor(unscheduleChanges.ptr(), fleet_, scheduledAttrs_);
+	unscheduleChanges->nextTimeIs(currentTimeRoundedDownTo24() + scheduledAttrs_.endTime.value());
+	unscheduleChanges->lastNotifieeIs(unscheduleReactor_.ptr());
+	unscheduleChanges->statusIs(Activity::queued);
 
+}
 }

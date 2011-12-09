@@ -36,14 +36,19 @@ namespace Shipping {
     		return;
 
 			if (injectActivity_ == NULL)
-   		{
+			{
 				injectActivity_ = activityManagerInstance()->activityNew(notifier()->name());
 				reactor_ = new InjectActivityReactor(injectActivity_, source_);
 				injectActivity_->lastNotifieeIs(reactor_.ptr());
+				injectActivity_->nextTimeIs(activityManagerInstance()->now());
 				injectActivity_->statusIs(Activity::queued);
 			}	
 			reactor_->transferRateIs(transferRate_);
 			reactor_->shipmentSizeIs(shipmentSize_);
 			reactor_->destinationIs(destination_);
+			if(injectActivity_ && transferRate_.value() == 0) {
+				activityManagerInstance()->activityDel(notifier_->name());
+				injectActivity_ = NULL;
+			}
     }
 }
